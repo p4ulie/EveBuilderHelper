@@ -41,7 +41,45 @@ class EveDB(object):
         self.DB = DB
 
 
-class EveItem(EveDB):
+class EveLists(EveDB):
+    '''
+    Class obtaining lists of entries from EveDB tables (Categories, Groups, ...)
+    '''
+
+    def getCategoriesList(self):
+        '''
+        Get list of categories
+        '''
+        query = """
+                    SELECT c.categoryID, c.categoryName, c.description
+                    FROM invCategories AS c
+                    WHERE c.published = 1
+                """
+        data = self.fetchData(query)
+        return data
+
+    def getGroupsList(self, category=''):
+        '''
+        Get list of groups
+        '''
+        if category is '':
+            query = """
+                        SELECT g.groupID, g.categoryID, g.groupName, g.description
+                        FROM invGroups AS g
+                        WHERE g.published = 1
+                    """
+        else:
+            query = """
+                        SELECT g.groupID, g.categoryID, g.groupName, g.description
+                        FROM invGroups AS g
+                        WHERE g.published = 1
+                        and g.categoryID = %s
+                    """ % category
+        data = self.fetchData(query)
+        return data
+
+
+class EveInvType(EveDB):
     '''
     Class for Item and Blueprint data reading and handling
     '''
