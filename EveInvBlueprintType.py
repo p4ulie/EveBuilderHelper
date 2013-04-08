@@ -9,7 +9,7 @@ import EveDB
 
 class EveInvBlueprintType(EveDB):
     '''
-    Class for Blueprint data reading and handling
+    Class for invBlueprintType data reading and handling
     '''
 
     blueprintTypeID = ''
@@ -26,15 +26,11 @@ class EveInvBlueprintType(EveDB):
     wasteFactor = ''
     maxProductionLimit = ''
 
-    def __getInvBlueprintType(self):
+    def __getInvBlueprintType(self, query):
         '''
-        Get blueprint data from DB
+        Get invBlueprintType data from DB
         '''
-        query = """
-                    SELECT *
-                    FROM invBlueprintTypes AS b
-                    WHERE b.productTypeID = %s
-                """ % self.typeID
+
         data = self.fetchData(query)
         if data:
             self.blueprintTypeID = data[0][0]
@@ -57,6 +53,12 @@ class EveInvBlueprintType(EveDB):
         '''
 
         self.DB = DB
+
+        query = """
+                    SELECT *
+                    FROM invBlueprintTypes AS b
+                    WHERE b.productTypeID = %s
+                """ % blueprintTypeID
 
         if blueprintTypeID != '':
             self.__getInvBlueprintType(blueprintTypeID)
