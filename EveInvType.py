@@ -50,9 +50,9 @@ class EveInvType(EveDB):
             self.marketGroupID = data[0][13]
             self.chanceOfDuplicating = data[0][14]
 
-    def getItemByID(self, typeID=''):
+    def getInvTypeByID(self, typeID=''):
         '''
-        Get item data by ID
+        Get InvType data by ID
         '''
 
         if typeID != '':
@@ -63,9 +63,9 @@ class EveInvType(EveDB):
                     """ % typeID
             self.__getInvType(query)
 
-    def getItemByName(self, typeName=''):
+    def getInvTypeByName(self, typeName=''):
         '''
-        Get item data by Name
+        Get InvType data by Name
         '''
 
         if typeName != '':
@@ -78,7 +78,7 @@ class EveInvType(EveDB):
 
     def getBaseMaterialList(self):
         '''
-        Get base list of materials for item,
+        Get base list of materials for InvType,
         equals amount of materials when recycling item
         (list of lists - [ID, quantity])
         '''
@@ -94,7 +94,7 @@ class EveInvType(EveDB):
 
     def getExtraMaterialList(self):
         '''
-        Get list of materials for item, inclusive R.A.M.
+        Get list of materials for InvType, inclusive R.A.M.
         (list of lists - [ID, quantity])
         '''
 
@@ -131,7 +131,8 @@ class EveInvType(EveDB):
 
     def getProduceMaterialIDList(self):
         '''
-        Generate a list of materials for production, list of IDs only
+        Generate a list of materials for production,
+        returns list of IDs only
         '''
         materialList = []
         materialRecycleList = self.getBaseMaterialList()
@@ -188,9 +189,7 @@ class EveInvType(EveDB):
         self.DB = DB
 
         if typeID != '':
-            self.getItemByID(typeID)
+            self.getInvTypeByID(typeID)
         else:
             if typeName != '':
-                self.getItemByName(typeName)
-
-#        self.__getBlueprintData()
+                self.getInvTypeByName(typeName)
