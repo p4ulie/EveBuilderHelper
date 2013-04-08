@@ -33,7 +33,7 @@ class EveInvGroup(EveDB):
         Get invGroup by ID
         '''
         query = """
-                    SELECT g.groupID, g.groupName, g.description
+                    SELECT g.groupID, g.categoryID, g.groupName, g.description
                     FROM invGroups AS g
                     WHERE g.groupID = %s
                 """ % groupID
@@ -44,13 +44,13 @@ class EveInvGroup(EveDB):
         Get invGroup by name
         '''
         query = """
-                    SELECT g.groupID, g.groupName, g.description
+                    SELECT g.groupID, g.categoryID, g.groupName, g.description
                     FROM invGroups AS g
                     WHERE g.groupName = '%s'
                 """ % groupName
         self.__getInvGroup(query)
 
-    def getGroupsList(self, categoryID=''):
+    def getInvGroupsList(self, categoryID=''):
         '''
         Get list of groups
         '''
