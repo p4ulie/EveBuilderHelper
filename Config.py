@@ -1,7 +1,7 @@
 '''
 Created on 6.7.2012
 
-@author: PA
+@author: Pavol Antalik
 '''
 
 #DB = '../Data/inferno10-sqlite-2.db'
