@@ -4,7 +4,7 @@ Created on 7.4.2013
 @author: Pavol Antalik
 '''
 
-import EveDB
+from EveDB import EveDB
 
 
 class EveInvBlueprintType(EveDB):
@@ -61,4 +61,4 @@ class EveInvBlueprintType(EveDB):
                 """ % blueprintTypeID
 
         if blueprintTypeID != '':
-            self.__getInvBlueprintType(blueprintTypeID)
+            self.__getInvBlueprintType(query)
