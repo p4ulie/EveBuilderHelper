@@ -8,6 +8,9 @@ import EveDB
 
 
 class EveInvGroup(EveDB):
+    '''
+    Class for invGroup data reading and handling
+    '''
 
     groupID = ''
     categoryID = ''

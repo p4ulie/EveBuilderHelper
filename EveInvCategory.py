@@ -8,6 +8,9 @@ import EveDB
 
 
 class EveInvCategory(EveDB):
+    '''
+    Class for invCategory data reading and handling
+    '''
 
     categoryID = ''
     categoryName = ''
