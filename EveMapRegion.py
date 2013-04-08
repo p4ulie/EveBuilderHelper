@@ -4,7 +4,7 @@ Created on 7.4.2013
 @author: Pavol Antalik
 '''
 
-import EveDB
+from EveDB import EveDB
 
 
 class EveMapRegion(EveDB):
@@ -55,7 +55,6 @@ class EveMapRegion(EveDB):
         '''
         Constructor, initial data load
         '''
-
         self.DB = DB
 
         if regionID != '':

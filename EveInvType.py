@@ -4,7 +4,7 @@ Created on 7.4.2013
 @author: Pavol Antalik
 '''
 
-import EveDB
+from EveDB import EveDB
 
 
 class EveInvType(EveDB):
@@ -185,7 +185,6 @@ class EveInvType(EveDB):
         '''
         Constructor, initial data load
         '''
-
         self.DB = DB
 
         if typeID != '':

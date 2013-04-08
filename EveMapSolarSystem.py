@@ -4,7 +4,7 @@ Created on 7.4.2013
 @author: Pavol Antalik
 '''
 
-import EveDB
+from EveDB import EveDB
 
 
 class EveMapSolarSystem(EveDB):
@@ -59,7 +59,6 @@ class EveMapSolarSystem(EveDB):
         '''
         Constructor, initial data load
         '''
-
         self.DB = DB
 
         if solarSystemID != '':
