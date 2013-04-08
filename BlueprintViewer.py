@@ -6,8 +6,9 @@ Created on 5.4.2013
 
 import Tkinter as tk
 from Config import *
-import EveDB
-from EveDB import EveLists
+from EveInvType import *
+from EveInvGroup import *
+from EveInvCategory import *
 
 
 class Application(tk.Frame):
@@ -25,45 +26,65 @@ class Application(tk.Frame):
     def createWidgets(self):
         self.categoriesLabel = tk.Label(self, text="Categories:").grid(row=0)
         self.categoriesList = tk.Listbox(self)
-#        self.countryList.bind('<<ListboxSelect>>', self.countryListClick)
-#        for env in envList:
-#            self.countryList.insert(tk.END, env)
+        self.categoriesList.bind('<<ListboxSelect>>', self.categoriesListClick)
         self.categoriesList.grid(row=1, column=0, rowspan=3)
 
         self.groupsLabel = tk.Label(self, text="Groups:").grid(row=4, column=0)
         self.groupsList = tk.Listbox(self)
+        self.groupsList.bind('<<ListboxSelect>>', self.groupsListClick)
         self.groupsList.grid(row=5, column=0, rowspan=3)
 
         self.invTypesLabel = tk.Label(self, text="Types:").grid(row=0, column=1)
         self.invTypesList = tk.Listbox(self)
-        self.invTypesList.grid(row=1, column=1, rowspan=7, sticky='NSE')
+        self.invTypesList.grid(row=1, column=1, rowspan=7, columnspan=30, sticky='NSE')
 
-    def populateWidgets(self):
-        categories = EveDB.EveLists(DB)
-        for cat in categories.getCategoriesList():
+    def categoriesListClick(self, evt):
+        # Note here that Tkinter passes an event object to onselect()
+        w = evt.widget
+        index = int(w.curselection()[0])
+        value = w.get(index)
+        self.populateGroupsList(value)
+        self.populateInvTypesList(self.groupsList.get(0))
+
+    def groupsListClick(self, evt):
+        # Note here that Tkinter passes an event object to onselect()
+        w = evt.widget
+        index = int(w.curselection()[0])
+        value = w.get(index)
+        self.populateInvTypesList(value)
+
+    def populateCategoriesList(self):
+        category = EveInvCategory(DB)
+        for cat in category.getInvCategoriesList():
             self.categoriesList.insert(tk.END, cat[1])
 
-        groups = EveDB.EveLists(DB)
-        for grp in groups.getGroupsList():
+    def populateGroupsList(self, categoryName=''):
+        group = EveInvGroup(DB)
+        category = EveInvCategory(DB)
+        if categoryName is '':
+            groupsList = group.getInvGroupsList()
+        else:
+            category.getInvCategoryByName(categoryName)
+            groupsList = group.getInvGroupsList(category.categoryID)
+        self.groupsList.delete(0, tk.END)
+        for grp in groupsList:
             self.groupsList.insert(tk.END, grp[2])
 
+    def populateInvTypesList(self, groupName=''):
+        invType = EveInvType(DB)
+        group = EveInvGroup(DB, groupName=groupName)
+        if groupName is '':
+            invTypesList = invType.getInvTypesList()
+        else:
+            invTypesList = invType.getInvTypesList(group.groupID)
+        self.invTypesList.delete(0, tk.END)
+        for iT in invTypesList:
+            self.invTypesList.insert(tk.END, iT[2])
 
-#===============================================================================
-#         self.hostNameLabel = tk.Label(self, text="Hostname:").grid(row=1, column=1)
-#         self.hostNameEntry = tk.Entry(self)
-#         self.hostNameEntry.grid(row=1, column=2, sticky='WE')
-#
-#         self.userNameLabel = tk.Label(self, text="Username:").grid(row=2, column=1)
-#         self.userNameEntry = tk.Entry(self)
-#         self.userNameEntry.grid(row=2, column=2, sticky='WE')
-#
-#         self.deployDirLabel = tk.Label(self, text="deployDir:").grid(row=3, column=1)
-#         self.deployDirEntry = tk.Entry(self)
-#         self.deployDirEntry.grid(row=3, column=2, sticky='WE')
-#
-#         self.startButton = tk.Button(self, text='Start', command=self.startPreDeployer)
-#         self.startButton.grid(row=4, column=2)
-#===============================================================================
+    def populateWidgets(self):
+        self.populateCategoriesList()
+        self.populateGroupsList(self.categoriesList.get(0))
+        self.populateInvTypesList(self.groupsList.get(0))
 
 
 def main():
