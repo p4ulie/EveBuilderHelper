@@ -1,0 +1,116 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html><head><title>Python: module EveInvType</title>
+</head><body bgcolor="#f0f0f8">
+
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="heading">
+<tr bgcolor="#7799ee">
+<td valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial">&nbsp;<br><big><big><strong>EveInvType</strong></big></big></font></td
+><td align=right valign=bottom
+><font color="#ffffff" face="helvetica, arial"><a href=".">index</a><br><a href="file:///D:/program%20files/eclipse.workspace.2/evebuilderhelper/eveinvtype.py">d:\program files\eclipse.workspace.2\evebuilderhelper\eveinvtype.py</a></font></td></tr></table>
+    <p><tt>Created&nbsp;on&nbsp;7.4.2013<br>
+&nbsp;<br>
+@author:&nbsp;Pavol&nbsp;Antalik</tt></p>
+<p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#ee77aa">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#ffffff" face="helvetica, arial"><big><strong>Classes</strong></big></font></td></tr>
+    
+<tr><td bgcolor="#ee77aa"><tt>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</tt></td><td>&nbsp;</td>
+<td width="100%"><dl>
+<dt><font face="helvetica, arial"><a href="EveDB.html#EveDB">EveDB.EveDB</a>(<a href="__builtin__.html#object">__builtin__.object</a>)
+</font></dt><dd>
+<dl>
+<dt><font face="helvetica, arial"><a href="EveInvType.html#EveInvType">EveInvType</a>
+</font></dt></dl>
+</dd>
+</dl>
+ <p>
+<table width="100%" cellspacing=0 cellpadding=2 border=0 summary="section">
+<tr bgcolor="#ffc8d8">
+<td colspan=3 valign=bottom>&nbsp;<br>
+<font color="#000000" face="helvetica, arial"><a name="EveInvType">class <strong>EveInvType</strong></a>(<a href="EveDB.html#EveDB">EveDB.EveDB</a>)</font></td></tr>
+    
+<tr bgcolor="#ffc8d8"><td rowspan=2><tt>&nbsp;&nbsp;&nbsp;</tt></td>
+<td colspan=2><tt>Class&nbsp;for&nbsp;Item&nbsp;data&nbsp;reading&nbsp;and&nbsp;handling<br>&nbsp;</tt></td></tr>
+<tr><td>&nbsp;</td>
+<td width="100%"><dl><dt>Method resolution order:</dt>
+<dd><a href="EveInvType.html#EveInvType">EveInvType</a></dd>
+<dd><a href="EveDB.html#EveDB">EveDB.EveDB</a></dd>
+<dd><a href="__builtin__.html#object">__builtin__.object</a></dd>
+</dl>
+<hr>
+Methods defined here:<br>
+<dl><dt><a name="EveInvType-__init__"><strong>__init__</strong></a>(self, DB, typeID<font color="#909090">=''</font>, typeName<font color="#909090">=''</font>)</dt><dd><tt>Constructor,&nbsp;initial&nbsp;data&nbsp;load</tt></dd></dl>
+
+<dl><dt><a name="EveInvType-getBaseMaterialList"><strong>getBaseMaterialList</strong></a>(self)</dt><dd><tt>Get&nbsp;base&nbsp;list&nbsp;of&nbsp;materials&nbsp;for&nbsp;InvType,<br>
+equals&nbsp;amount&nbsp;of&nbsp;materials&nbsp;when&nbsp;recycling&nbsp;item<br>
+(list&nbsp;of&nbsp;lists&nbsp;-&nbsp;[ID,&nbsp;quantity])</tt></dd></dl>
+
+<dl><dt><a name="EveInvType-getExtraMaterialList"><strong>getExtraMaterialList</strong></a>(self)</dt><dd><tt>Get&nbsp;list&nbsp;of&nbsp;materials&nbsp;for&nbsp;InvType,&nbsp;inclusive&nbsp;R.A.M.<br>
+(list&nbsp;of&nbsp;lists&nbsp;-&nbsp;[ID,&nbsp;quantity])</tt></dd></dl>
+
+<dl><dt><a name="EveInvType-getInvTypeByID"><strong>getInvTypeByID</strong></a>(self, typeID<font color="#909090">=''</font>)</dt><dd><tt>Get&nbsp;InvType&nbsp;data&nbsp;by&nbsp;ID</tt></dd></dl>
+
+<dl><dt><a name="EveInvType-getInvTypeByName"><strong>getInvTypeByName</strong></a>(self, typeName<font color="#909090">=''</font>)</dt><dd><tt>Get&nbsp;InvType&nbsp;data&nbsp;by&nbsp;Name</tt></dd></dl>
+
+<dl><dt><a name="EveInvType-getInvTypesList"><strong>getInvTypesList</strong></a>(self, groupID<font color="#909090">=''</font>)</dt><dd><tt>Get&nbsp;list&nbsp;of&nbsp;invTypes,&nbsp;possibly&nbsp;limit&nbsp;it&nbsp;for&nbsp;specific&nbsp;invGroup</tt></dd></dl>
+
+<dl><dt><a name="EveInvType-getManufacturingMaterialAmountList"><strong>getManufacturingMaterialAmountList</strong></a>(self, ME<font color="#909090">=0</font>, PE<font color="#909090">=0</font>)</dt><dd><tt>Generate&nbsp;a&nbsp;list&nbsp;of&nbsp;materials&nbsp;for&nbsp;production,&nbsp;IDs&nbsp;and&nbsp;quantities,<br>
+waste&nbsp;is&nbsp;added&nbsp;from&nbsp;researched&nbsp;blueprint&nbsp;ME&nbsp;amount&nbsp;and&nbsp;PE&nbsp;skill&nbsp;level</tt></dd></dl>
+
+<dl><dt><a name="EveInvType-getProduceMaterialIDList"><strong>getProduceMaterialIDList</strong></a>(self)</dt><dd><tt>Generate&nbsp;a&nbsp;list&nbsp;of&nbsp;materials&nbsp;for&nbsp;production,<br>
+returns&nbsp;list&nbsp;of&nbsp;IDs&nbsp;only</tt></dd></dl>
+
+<hr>
+Data and other attributes defined here:<br>
+<dl><dt><strong>basePrice</strong> = ''</dl>
+
+<dl><dt><strong>capacity</strong> = ''</dl>
+
+<dl><dt><strong>chanceOfDuplicating</strong> = ''</dl>
+
+<dl><dt><strong>description</strong> = ''</dl>
+
+<dl><dt><strong>graphicID</strong> = ''</dl>
+
+<dl><dt><strong>groupID</strong> = ''</dl>
+
+<dl><dt><strong>marketGroupID</strong> = ''</dl>
+
+<dl><dt><strong>mass</strong> = ''</dl>
+
+<dl><dt><strong>portionSize</strong> = ''</dl>
+
+<dl><dt><strong>published</strong> = ''</dl>
+
+<dl><dt><strong>raceID</strong> = ''</dl>
+
+<dl><dt><strong>radius</strong> = ''</dl>
+
+<dl><dt><strong>typeID</strong> = ''</dl>
+
+<dl><dt><strong>typeName</strong> = ''</dl>
+
+<dl><dt><strong>volume</strong> = ''</dl>
+
+<hr>
+Methods inherited from <a href="EveDB.html#EveDB">EveDB.EveDB</a>:<br>
+<dl><dt><a name="EveInvType-fetchData"><strong>fetchData</strong></a>(self, query)</dt><dd><tt>Main&nbsp;method&nbsp;for&nbsp;accessing&nbsp;the&nbsp;DB</tt></dd></dl>
+
+<hr>
+Data descriptors inherited from <a href="EveDB.html#EveDB">EveDB.EveDB</a>:<br>
+<dl><dt><strong>__dict__</strong></dt>
+<dd><tt>dictionary&nbsp;for&nbsp;instance&nbsp;variables&nbsp;(if&nbsp;defined)</tt></dd>
+</dl>
+<dl><dt><strong>__weakref__</strong></dt>
+<dd><tt>list&nbsp;of&nbsp;weak&nbsp;references&nbsp;to&nbsp;the&nbsp;object&nbsp;(if&nbsp;defined)</tt></dd>
+</dl>
+<hr>
+Data and other attributes inherited from <a href="EveDB.html#EveDB">EveDB.EveDB</a>:<br>
+<dl><dt><strong>DB</strong> = ''</dl>
+
+</td></tr></table></td></tr></table>
+</body></html>
