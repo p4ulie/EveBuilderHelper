@@ -7,7 +7,7 @@ Created on 7.4.2013
 from EveDB import EveDB
 
 
-class EveInvGroup(EveDB):
+class EveGroup(EveDB):
     '''
     Class for invGroup data reading and handling
     '''
@@ -17,7 +17,7 @@ class EveInvGroup(EveDB):
     groupName = ''
     description = ''
 
-    def __getInvGroup(self, query):
+    def __getGroup(self, query):
         '''
         Get invGroup data from DB
         '''
@@ -28,7 +28,7 @@ class EveInvGroup(EveDB):
             self.groupName = data[0][2]
             self.description = data[0][3]
 
-    def getInvGroupByID(self, groupID):
+    def getGroupByID(self, groupID):
         '''
         Get invGroup by ID
         '''
@@ -37,9 +37,9 @@ class EveInvGroup(EveDB):
                     FROM invGroups AS g
                     WHERE g.groupID = %s
                 """ % groupID
-        self.__getInvGroup(query)
+        self.__getGroup(query)
 
-    def getInvGroupByName(self, groupName):
+    def getGroupByName(self, groupName):
         '''
         Get invGroup by name
         '''
@@ -48,9 +48,9 @@ class EveInvGroup(EveDB):
                     FROM invGroups AS g
                     WHERE g.groupName = '%s'
                 """ % groupName
-        self.__getInvGroup(query)
+        self.__getGroup(query)
 
-    def getInvGroupsList(self, categoryID=''):
+    def getGroupsInCategory(self, categoryID=''):
         '''
         Get list of groups
         '''
@@ -70,6 +70,26 @@ class EveInvGroup(EveDB):
         data = self.fetchData(query)
         return data
 
+    def getItemsInGroup(self, ):
+        '''
+        Get list of invTypes, possibly limit it for specific invGroup
+        '''
+        if self.groupID is '':
+            query = """
+                        SELECT t.typeID, t.groupID, t.typeName, t.description
+                        FROM invTypes AS t
+                        WHERE t.published = '1'
+                    """
+        else:
+            query = """
+                        SELECT t.typeID, t.groupID, t.typeName, t.description
+                        FROM invTypes AS t
+                        WHERE t.published = '1'
+                        and t.groupID = '%s'
+                    """ % self.groupID
+        data = self.fetchData(query)
+        return data
+
     def __init__(self, DB, groupID='', groupName=''):
         '''
         Constructor, initial data load
@@ -77,7 +97,8 @@ class EveInvGroup(EveDB):
         self.DB = DB
 
         if groupID != '':
-            self.getInvGroupByID(groupID)
+            self.getGroupByID(groupID)
         else:
             if groupName != '':
-                self.getInvGroupByName(groupName)
+                self.getGroupByName(groupName)
+

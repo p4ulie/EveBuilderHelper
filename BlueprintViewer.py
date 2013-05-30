@@ -7,7 +7,7 @@ Created on 5.4.2013
 import Tkinter as tk
 from Config import *
 from EveItem import *
-from EveInvGroup import *
+from EveGroup import *
 from EveInvCategory import *
 
 
@@ -55,28 +55,28 @@ class Application(tk.Frame):
 
     def populateCategoriesList(self):
         category = EveInvCategory(DB)
-        for cat in category.getInvCategoriesList():
+        for cat in category.getCategories():
             self.categoriesList.insert(tk.END, cat[1])
 
     def populateGroupsList(self, categoryName=''):
-        group = EveInvGroup(DB)
+        group = EveGroup(DB)
         category = EveInvCategory(DB)
         if categoryName is '':
-            groupsList = group.getInvGroupsList()
+            groupsList = group.getGroups()
         else:
-            category.getInvCategoryByName(categoryName)
-            groupsList = group.getInvGroupsList(category.categoryID)
+            category.getCategoryByName(categoryName)
+            groupsList = group.getGroups(category.categoryID)
         self.groupsList.delete(0, tk.END)
         for grp in groupsList:
             self.groupsList.insert(tk.END, grp[2])
 
     def populateInvTypesList(self, groupName=''):
         invType = EveItem(DB)
-        group = EveInvGroup(DB, groupName=groupName)
+        group = EveGroup(DB, groupName=groupName)
         if groupName is '':
-            invTypesList = invType.getInvTypesList()
+            invTypesList = invType.getItemsInGroup()
         else:
-            invTypesList = invType.getInvTypesList(group.groupID)
+            invTypesList = invType.getItemsInGroup(group.groupID)
         self.invTypesList.delete(0, tk.END)
         for iT in invTypesList:
             self.invTypesList.insert(tk.END, iT[2])

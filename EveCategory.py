@@ -16,7 +16,7 @@ class EveInvCategory(EveDB):
     categoryName = ''
     description = ''
 
-    def __getInvCategory(self, query):
+    def __getCategory(self, query):
         '''
         Get invCategory data from DB
         '''
@@ -26,7 +26,7 @@ class EveInvCategory(EveDB):
             self.categoryName = data[0][1]
             self.description = data[0][1]
 
-    def getInvCategoryByID(self, categoryID):
+    def getCategoryByID(self, categoryID):
         '''
         Get invCategory by ID
         '''
@@ -35,9 +35,9 @@ class EveInvCategory(EveDB):
                     FROM invCategories AS c
                     WHERE c.categoryID = %s
                 """ % categoryID
-        self.__getInvCategory(query)
+        self.__getCategory(query)
 
-    def getInvCategoryByName(self, categoryName):
+    def getCategoryByName(self, categoryName):
         '''
         Get invCategory by name
         '''
@@ -46,9 +46,9 @@ class EveInvCategory(EveDB):
                     FROM invCategories AS c
                     WHERE c.categoryName = '%s'
                 """ % categoryName
-        self.__getInvCategory(query)
+        self.__getCategory(query)
 
-    def getInvCategoriesList(self):
+    def getCategories(self):
         '''
         Get list of categories
         '''
@@ -67,7 +67,7 @@ class EveInvCategory(EveDB):
         self.DB = DB
 
         if categoryID != '':
-            self.getInvCategoryByID(categoryID)
+            self.getCategoryByID(categoryID)
         else:
             if categoryName != '':
-                self.getInvCategoryByName(categoryName)
+                self.getCategoryByName(categoryName)

@@ -28,7 +28,7 @@ class EveItem(EveDB):
     marketGroupID = ''
     chanceOfDuplicating = ''
 
-    def __getInvType(self, query):
+    def __getItem(self, query):
         '''
         Get invType data from DB
         '''
@@ -50,7 +50,7 @@ class EveItem(EveDB):
             self.marketGroupID = data[0][13]
             self.chanceOfDuplicating = data[0][14]
 
-    def getInvTypeByID(self, typeID=''):
+    def getItemByID(self, typeID=''):
         '''
         Get InvType data by ID
         '''
@@ -61,9 +61,9 @@ class EveItem(EveDB):
                         FROM invTypes AS t
                         WHERE t.typeID = '%s'
                     """ % typeID
-            self.__getInvType(query)
+            self.__getItem(query)
 
-    def getInvTypeByName(self, typeName=''):
+    def getItemByName(self, typeName=''):
         '''
         Get InvType data by Name
         '''
@@ -74,7 +74,7 @@ class EveItem(EveDB):
                         FROM invTypes AS t
                         WHERE t.typeName = '%s'
                     """ % typeName
-            self.__getInvType(query)
+            self.__getItem(query)
 
     def getBaseMaterialList(self):
         '''
@@ -92,95 +92,6 @@ class EveItem(EveDB):
         data = self.fetchData(query)
         return data
 
-    def getExtraMaterialList(self):
-        '''
-        Get list of materials for InvType, inclusive R.A.M.
-        (list of lists - [ID, quantity])
-        '''
-
-        query = """
-                    SELECT r.requiredTypeID, r.quantity, r.damagePerJob
-                    FROM ramTypeRequirements AS r
-                     INNER JOIN invTypes AS t
-                      ON r.requiredTypeID = t.typeID
-                     INNER JOIN invGroups AS g
-                      ON t.groupID = g.groupID
-                    WHERE r.typeID = %s
-                     AND r.activityID = 1
-                     AND g.categoryID != 16;
-                """ % self.blueprintTypeID
-        data = self.fetchData(query)
-        return data
-
-    def __computeWasteFromMEResearchLevel(self, materialAmount, BlueprintMEResearchLevel):
-        '''
-        Compute waste for specific ME Blueprint Research level
-        '''
-        if BlueprintMEResearchLevel >= 0:
-            waste = round(float(materialAmount) * (float(self.wasteFactor) / 100) * (1 / (float(BlueprintMEResearchLevel) + 1)))
-        else:
-            waste = round(float(materialAmount) * (float(self.wasteFactor) / 100) * (1 - float(BlueprintMEResearchLevel)))
-        return int(waste)
-
-    def __computeWasteFromPESkill(self, materialAmount, PESkillLevel):
-        '''
-        Compute waste for trained Production Efficiency skill level
-        '''
-        waste = round(((25 - (5 * float(PESkillLevel))) * float(materialAmount)) / 100)
-        return int(waste)
-
-    def getProduceMaterialIDList(self):
-        '''
-        Generate a list of materials for production,
-        returns list of IDs only
-        '''
-        materialList = []
-        materialRecycleList = self.getBaseMaterialList()
-        for material in materialRecycleList:
-            materialID = material[0]
-            materialList.append(materialID)
-        return materialList
-
-    def getManufacturingMaterialAmountList(self, ME=0, PE=0):
-        '''
-        Generate a list of materials for production, IDs and quantities,
-        waste is added from researched blueprint ME amount and PE skill level
-        '''
-        materialList = []
-        materialBaseList = self.getBaseMaterialList()
-        materialExtraList = self.getExtraMaterialList()
-        for material in materialBaseList:
-            materialID = material[0]
-            wasteME = self.__computeWasteFromMEResearchLevel(material[1], ME)
-            wastePE = self.__computeWasteFromPESkill(material[1], PE)
-            materialQuantity = material[1] + wasteME + wastePE
-            materialList.append([materialID, materialQuantity])
-        for material in materialExtraList:
-            materialID = material[0]
-            materialQuantity = material[1]
-            materialList.append([materialID, materialQuantity])
-        return materialList
-
-    def getInvTypesList(self, groupID=''):
-        '''
-        Get list of invTypes, possibly limit it for specific invGroup
-        '''
-        if groupID is '':
-            query = """
-                        SELECT t.typeID, t.groupID, t.typeName, t.description
-                        FROM invTypes AS t
-                        WHERE t.published = '1'
-                    """
-        else:
-            query = """
-                        SELECT t.typeID, t.groupID, t.typeName, t.description
-                        FROM invTypes AS t
-                        WHERE t.published = '1'
-                        and t.groupID = '%s'
-                    """ % groupID
-        data = self.fetchData(query)
-        return data
-
     def __init__(self, DB, typeID='', typeName=''):
         '''
         Constructor, initial data load
@@ -188,7 +99,7 @@ class EveItem(EveDB):
         self.DB = DB
 
         if typeID != '':
-            self.getInvTypeByID(typeID)
+            self.getItemByID(typeID)
         else:
             if typeName != '':
-                self.getInvTypeByName(typeName)
+                self.getItemByName(typeName)
