@@ -6,7 +6,7 @@ Created on 5.4.2013
 
 import Tkinter as tk
 from Config import *
-from EveInvType import *
+from EveItem import *
 from EveInvGroup import *
 from EveInvCategory import *
 
@@ -71,7 +71,7 @@ class Application(tk.Frame):
             self.groupsList.insert(tk.END, grp[2])
 
     def populateInvTypesList(self, groupName=''):
-        invType = EveInvType(DB)
+        invType = EveItem(DB)
         group = EveInvGroup(DB, groupName=groupName)
         if groupName is '':
             invTypesList = invType.getInvTypesList()

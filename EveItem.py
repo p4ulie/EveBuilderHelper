@@ -7,7 +7,7 @@ Created on 7.4.2013
 from EveDB import EveDB
 
 
-class EveInvType(EveDB):
+class EveItem(EveDB):
     '''
     Class for Item data reading and handling
     '''

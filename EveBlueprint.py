@@ -7,7 +7,7 @@ Created on 7.4.2013
 from EveDB import EveDB
 
 
-class EveInvBlueprintType(EveDB):
+class EveBlueprint(EveDB):
     '''
     Class for invBlueprintType data reading and handling
     '''

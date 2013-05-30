@@ -5,7 +5,7 @@ Created on 6.7.2012
 @author: PA
 '''
 
-import EveDB
+import EveItem
 import EveCentral
 import locale
 from Config import *
@@ -17,10 +17,10 @@ productionEfficiency = 5
 
 
 def main():
-#    invType1 = EveDB.EveItem(DB, 0, typeName='Abaddon')
-    invType1 = EveDB.EveItem(DB, 0, typeName='Anshar')
-#    invType1 = EveDB.EveItem(DB, 0, typeName='Orca')
-#    invType1 = EveDB.EveItem(DB, 24692, typeName='')
+#    invType1 = EveItem.EveItem(DB, 0, typeName='Abaddon')
+    invType1 = EveItem.EveItem(DB, 0, typeName='Anshar')
+#    invType1 = EveItem.EveItem(DB, 0, typeName='Orca')
+#    invType1 = EveItem.EveItem(DB, 24692, typeName='')
 
     ec = EveCentral.EveCentral()
     print 'Product Name: %s, ID: %s' % (invType1.typeName, invType1.typeID)
@@ -32,13 +32,13 @@ def main():
 #    ECresult = ec.getItemDataByTypeID(materialList)
 
     for materialType, materialAmount in materialAmountList:
-        material = EveDB.EveItem(DB, materialType)
+        material = EveItem.EveItem(DB, materialType)
         print "Amount of %s-%s: %s" % (material.typeID, material.typeName, locale.format("%d", materialAmount, True))
         #=======================================================================
         # if material.blueprintTypeID:
         #    subMaterialAmountList = material.getManufacturingMaterialAmountList(ME, productionEfficiency)
         #    for subMaterialType, subMaterialAmount in subMaterialAmountList:
-        #        subMaterial = EveDB.EveItem(DB, subMaterialType)
+        #        subMaterial = EveItem.EveItem(DB, subMaterialType)
         #        print ".... Amount of %s-%s: %s" % (subMaterial.typeID, subMaterial.typeName, locale.format("%d", subMaterialAmount, True))
         #=======================================================================
 
