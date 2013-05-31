@@ -117,7 +117,7 @@ class EveBlueprint(EveDB):
             waste = round(float(materialAmount) * (float(self.wasteFactor) / 100) * (1 - float(self.researchLevelME)))
         return int(waste)
 
-    def __computeWasteFromCharacterPESkill(self, materialAmount, PESkillLevel):
+    def __computeWasteFromCharacterSkillLevelPE(self, materialAmount, PESkillLevel):
         '''
         Compute waste for trained Production Efficiency skill level
         '''
@@ -131,14 +131,21 @@ class EveBlueprint(EveDB):
 
         self.DB = DB
 
-        query = """
-                    SELECT *
-                    FROM invBlueprintTypes AS b
-                    WHERE b.productTypeID = %s
-                """ % blueprintTypeID
+        if productTypeID != '':
+            query = """
+                        SELECT *
+                        FROM invBlueprintTypes AS b
+                        WHERE b.productTypeID = %s
+                    """ % productTypeID
 
         if blueprintTypeID != '':
-            self.__getBlueprint(query)
+            query = """
+                        SELECT *
+                        FROM invBlueprintTypes AS b
+                        WHERE b.blueprintTypeID = %s
+                    """ % blueprintTypeID
+
+        self.__getBlueprint(query)
 
         if ResearchLevelME != 0:
             self.researchLevelME = ResearchLevelME
