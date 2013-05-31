@@ -28,11 +28,11 @@ def main():
     ec = EveCentral.EveCentral()
     print 'Product Name: %s, ID: %s' % (item1.typeName, item1.typeID)
     print 'Parent  BlueprintTypeID: %s' % (blueprint1.blueprintTypeID)
-
     
+    sys.exit()
+
     materialList = blueprint1.getManufacturingMaterials()
 
-    sys.exit()
 
 #    ECresult = ec.getItemDataByTypeID(materialList)
 
