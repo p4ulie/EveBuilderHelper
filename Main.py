@@ -37,7 +37,13 @@ def main():
 
     for materialType, materialAmount in materialList:
         material = EveItem(DB, materialType)
-        print "Amount of %s-%s: %s" % (material.typeID, material.typeName, locale.format("%d", materialAmount, True))
+
+        if material.getBlueprintTypeID():
+            isBuildable = 'buildable'
+        else:
+            isBuildable = 'not buildable'
+            
+        print "Amount of %s-%s: %s, (%s)" % (material.typeID, material.typeName, locale.format("%d", materialAmount, True), isBuildable)
 
 if __name__ == '__main__':
     main()
