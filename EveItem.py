@@ -90,6 +90,18 @@ class EveItem(EveDB):
         data = self.fetchData(query)
         return data
 
+    def getBlueprintTypeID(self):
+        '''
+        Get blueprintID for this item, if it exists
+        '''
+        query = """
+                    SELECT blueprintTypeID
+                    FROM invBlueprintTypes AS b
+                    WHERE b.productTypeID = %s
+                """ % self.typeID
+        data = self.fetchData(query)
+        return data
+
     def __init__(self, DB, typeID='', typeName=''):
         '''
         Constructor, initial data load
