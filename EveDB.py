@@ -21,6 +21,8 @@ class EveDB(object):
         '''
         Main method for accessing the DB
         '''
+        dbcon = ''
+        
         try:
             dbcon = lite.connect(self.DB)
             cur = dbcon.cursor()
