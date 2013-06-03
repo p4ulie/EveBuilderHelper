@@ -20,7 +20,7 @@ elif (sys.platform == 'linux2'):
     locale.setlocale(locale.LC_ALL, "en_US.UTF-8")
 
 ME = 0
-productionEfficiency = 5
+skillLevelProdEff = 5
 
 
 def main():
@@ -31,7 +31,7 @@ def main():
     print 'Product Name: %s, ID: %s' % (item1.typeName, item1.typeID)
     print 'Parent  BlueprintTypeID: %s' % (blueprint1.blueprintTypeID)
 
-    materialList = blueprint1.getManufacturingMaterials()
+    materialList = blueprint1.getManufacturingMaterials(skillLevelProdEff)
 
 #    ECresult = ec.getItemDataByTypeID(materialList)
 
