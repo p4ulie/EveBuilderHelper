@@ -4,9 +4,7 @@ Created on 6.7.2012
 @author: Pavol Antalik
 '''
 
-#DB = '../Data/inferno10-sqlite-2.db'
-DB = 'src/Data/ret110-sqlite3-v1.db'
-#DB = 'd:/Program Files/eclipse.workspace.2/Data/Blueprints/bp.db'
+DB = 'data/ody100-sqlite3-v1.db'
 
 if __name__ == '__main__':
     pass
