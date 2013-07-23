@@ -7,7 +7,7 @@ Created on 7.4.2013
 from EveDB import EveDB
 
 
-class EveInvCategory(EveDB):
+class EveCategory(EveDB):
     '''
     Class for invCategory data reading and handling
     '''
