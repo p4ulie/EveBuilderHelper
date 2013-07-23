@@ -6,14 +6,14 @@
 
 import wx
 
-# begin wxGlade: dependencies
-import gettext
-# end wxGlade
-
 from Config import *
 from EveModules.EveCategory import *
 from EveModules.EveGroup import *
 from EveModules.EveItem import *
+
+# begin wxGlade: dependencies
+import gettext
+# end wxGlade
 
 # begin wxGlade: extracode
 # end wxGlade
