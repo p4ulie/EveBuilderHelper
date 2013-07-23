@@ -27,6 +27,12 @@ class MyFrame(wx.Frame):
         self.tree_ctrl_Items = wx.TreeCtrl(self, wx.ID_ANY, style=wx.TR_HAS_BUTTONS | wx.TR_DEFAULT_STYLE | wx.SUNKEN_BORDER)
         self.list_ctrl_Materials = wx.ListCtrl(self, wx.ID_ANY, style=wx.LC_REPORT | wx.SUNKEN_BORDER)
 
+        self.__set_properties()
+        self.__do_layout()
+
+        self.Bind(wx.EVT_TREE_ITEM_ACTIVATED, self.itemActivated, self.tree_ctrl_Items)
+        # end wxGlade
+
         rootTree = self.tree_ctrl_Items.AddRoot('Item list')
 
         category = EveCategory(DB)
@@ -42,12 +48,6 @@ class MyFrame(wx.Frame):
                     itmTree = self.tree_ctrl_Items.AppendItem(grpTree, itm[2])
 
         self.tree_ctrl_Items.Expand(rootTree)
-
-        self.__set_properties()
-        self.__do_layout()
-
-        self.Bind(wx.EVT_TREE_ITEM_ACTIVATED, self.itemActivated, self.tree_ctrl_Items)
-        # end wxGlade
 
     def __set_properties(self):
         # begin wxGlade: MyFrame.__set_properties
@@ -65,10 +65,12 @@ class MyFrame(wx.Frame):
         # end wxGlade
 
     def itemActivated(self, event):  # wxGlade: MyFrame.<event_handler>
-
+        print self.tree_ctrl_Items.ItemHasChildren(event.Item)
+        
         self.list_ctrl_Materials.ClearAll()
         self.list_ctrl_Materials.InsertColumn(0, 'Material')
-#        self.list_ctrl_Materials.SetColumnWidth(0, 200)
+        self.list_ctrl_Materials.InsertColumn(1, 'Quantity')
+#        self.list_ctrl_Materials.SetCgolumnWidth(0, 200)
 
 #         group = EveGroup(DB)
 # 
@@ -87,3 +89,4 @@ if __name__ == "__main__":
     app.SetTopWindow(MainFrame)
     MainFrame.Show()
     app.MainLoop()
+    
