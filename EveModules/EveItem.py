@@ -74,6 +74,26 @@ class EveItem(EveDB):
                     """ % typeName
             self.__getItem(query)
 
+    def getItems(self, groupID=''):
+        '''
+        Get list of items
+        '''
+        if groupID != '':
+            query = """
+                        SELECT *
+                        FROM invTypes AS t
+                        WHERE t.published = '1'
+                        AND t.groupID = '%s'
+                    """ % groupID
+        else:
+            query = """
+                        SELECT *
+                        FROM invTypes AS t
+                        WHERE t.published = '1'
+                    """
+        data = self.fetchData(query)
+        return data
+
     def getBaseMaterialList(self):
         '''
         Get base list of materials for InvType,
