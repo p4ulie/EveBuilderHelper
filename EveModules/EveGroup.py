@@ -69,6 +69,7 @@ class EveGroup(EveDB):
                     """ % categoryID
         data = self.fetchData(query)
         return data
+    
     def getItemsInGroup(self):
         '''
         Get list of invTypes, possibly limit it for specific invGroup
