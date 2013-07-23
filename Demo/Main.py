@@ -5,9 +5,9 @@ Created on 6.7.2012
 @author: PA
 '''
 
-from EveItem import *
-from EveBlueprint import *
-import EveCentral
+from EveModules.EveItem import *
+from EveModules.EveBlueprint import *
+import EveModules.EveCentral
 import locale
 from Config import *
 import sys
