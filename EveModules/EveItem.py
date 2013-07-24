@@ -5,6 +5,7 @@ Created on 7.4.2013
 '''
 
 from EveDB import EveDB
+from EveBlueprint import EveBlueprint
 
 
 class EveItem(EveDB):
@@ -12,9 +13,9 @@ class EveItem(EveDB):
     Class for Item data reading and handling
     '''
 
-    typeID = ''
+    itemID = ''
     groupID = ''
-    typeName = ''
+    name = ''
     description = ''
     graphicID = ''
     radius = ''
@@ -34,9 +35,9 @@ class EveItem(EveDB):
         '''
         data = self.fetchData(query)
         if data:
-            self.typeID = data[0][0]
+            self.itemID = data[0][0]
             self.groupID = data[0][1]
-            self.typeName = data[0][2]
+            self.name = data[0][2]
             self.description = data[0][3]
             self.mass = data[0][4]
             self.volume = data[0][5]
@@ -48,35 +49,33 @@ class EveItem(EveDB):
             self.marketGroupID = data[0][11]
             self.chanceOfDuplicating = data[0][12]
 
-    def getItemByID(self, typeID=''):
+    def getItemByID(self, itemID=''):
         '''
         Get InvType data by ID
         '''
-
-        if typeID != '':
+        if itemID != '':
             query = """
                         SELECT *
                         FROM invTypes AS t
                         WHERE t.typeID = '%s'
-                    """ % typeID
+                    """ % itemID
             self.__getItem(query)
 
-    def getItemByName(self, typeName=''):
+    def getItemByName(self, name=''):
         '''
         Get InvType data by Name
         '''
-
-        if typeName != '':
+        if name != '':
             query = """
                         SELECT *
                         FROM invTypes AS t
                         WHERE t.typeName = '%s'
-                    """ % typeName
+                    """ % name
             self.__getItem(query)
 
     def getItems(self, groupID=''):
         '''
-        Get list of items
+        Get list of items, possibly from specific group
         '''
         if groupID != '':
             query = """
@@ -94,23 +93,7 @@ class EveItem(EveDB):
         data = self.fetchData(query)
         return data
 
-    def getBaseMaterialList(self):
-        '''
-        Get base list of materials for InvType,
-        equals amount of materials when recycling item
-        (list of lists - [ID, quantity])
-        '''
-        query = """
-                    SELECT t.typeID, m.quantity
-                    FROM invTypeMaterials AS m
-                     INNER JOIN invTypes AS t
-                      ON m.materialTypeID = t.typeID
-                    WHERE m.typeID = %s
-                """ % self.typeID
-        data = self.fetchData(query)
-        return data
-
-    def getBlueprintTypeID(self):
+    def getBlueprintID(self):
         '''
         Get blueprintID for this item, if it exists
         '''
@@ -118,18 +101,26 @@ class EveItem(EveDB):
                     SELECT blueprintTypeID
                     FROM invBlueprintTypes AS b
                     WHERE b.productTypeID = %s
-                """ % self.typeID
-        data = self.fetchData(query)
+                """ % self.itemID
+        data = self.fetchData(query)[0]
         return data
 
-    def __init__(self, DB, typeID='', typeName=''):
+    def getBlueprintObject(self):
+        '''
+        Get blueprintID for this item, if it exists
+        create and return an instance of EveBlueprint class
+        '''
+        blueprint = EveBlueprint(self.DB, blueprintID = self.getBlueprintID())
+        return blueprint
+
+    def __init__(self, DB, itemID='', name=''):
         '''
         Constructor, initial data load
         '''
         self.DB = DB
 
-        if typeID != '':
-            self.getItemByID(typeID)
+        if itemID != '':
+            self.getItemByID(itemID)
         else:
-            if typeName != '':
-                self.getItemByName(typeName)
+            if name != '':
+                self.getItemByName(name)
