@@ -124,7 +124,7 @@ class EveBlueprint(EveDB):
         waste = round(((25 - (5 * float(PESkillLevel))) * float(materialAmount)) / 100)
         return int(waste)
 
-    def __init__(self, DB, blueprintTypeID = '', productTypeID = '', ResearchLevelME = '', ResearchLevelPE = ''):
+    def __init__(self, DB, blueprintID = '', productID = '', ResearchLevelME = '', ResearchLevelPE = ''):
         '''
         Constructor, initial data load
         '''
@@ -133,19 +133,19 @@ class EveBlueprint(EveDB):
 
         query = ""
 
-        if productTypeID != '':
+        if productID != '':
             query = """
                         SELECT *
                         FROM invBlueprintTypes AS b
                         WHERE b.productTypeID = %s
-                    """ % productTypeID
+                    """ % productID
 
-        if blueprintTypeID != '':
+        if blueprintID != '':
             query = """
                         SELECT *
                         FROM invBlueprintTypes AS b
                         WHERE b.blueprintTypeID = %s
-                    """ % blueprintTypeID
+                    """ % blueprintID
 
         self.__getBlueprint(query)
 
