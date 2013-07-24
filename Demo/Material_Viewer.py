@@ -10,6 +10,7 @@ from Config import *
 from EveModules.EveCategory import *
 from EveModules.EveGroup import *
 from EveModules.EveItem import *
+from EveModules.EveBlueprint import *
 
 # begin wxGlade: dependencies
 import gettext
@@ -24,13 +25,13 @@ class MyFrame(wx.Frame):
         # begin wxGlade: MyFrame.__init__
         kwds["style"] = wx.DEFAULT_FRAME_STYLE
         wx.Frame.__init__(self, *args, **kwds)
-        self.tree_ctrl_Items = wx.TreeCtrl(self, wx.ID_ANY, style=wx.TR_HAS_BUTTONS | wx.TR_DEFAULT_STYLE | wx.SUNKEN_BORDER)
+        self.tree_ctrl_Items = wx.TreeCtrl(self, wx.ID_ANY, style=wx.TR_HAS_BUTTONS | wx.TR_LINES_AT_ROOT | wx.TR_DEFAULT_STYLE | wx.SUNKEN_BORDER)
         self.list_ctrl_Materials = wx.ListCtrl(self, wx.ID_ANY, style=wx.LC_REPORT | wx.SUNKEN_BORDER)
 
         self.__set_properties()
         self.__do_layout()
 
-        self.Bind(wx.EVT_TREE_ITEM_ACTIVATED, self.itemActivated, self.tree_ctrl_Items)
+        self.Bind(wx.EVT_TREE_SEL_CHANGED, self.itemSelChanged, self.tree_ctrl_Items)
         # end wxGlade
 
         rootTree = self.tree_ctrl_Items.AddRoot('Item list')
@@ -49,6 +50,9 @@ class MyFrame(wx.Frame):
 
         self.tree_ctrl_Items.Expand(rootTree)
 
+        self.__set_properties()
+        self.__do_layout()
+
     def __set_properties(self):
         # begin wxGlade: MyFrame.__set_properties
         self.SetTitle(_("frame_1"))
@@ -64,22 +68,23 @@ class MyFrame(wx.Frame):
         self.Layout()
         # end wxGlade
 
-    def itemActivated(self, event):  # wxGlade: MyFrame.<event_handler>
-        print self.tree_ctrl_Items.ItemHasChildren(event.Item)
-        
+    def itemSelChanged(self, event):  # wxGlade: MyFrame.<event_handler>
         self.list_ctrl_Materials.ClearAll()
         self.list_ctrl_Materials.InsertColumn(0, 'Material')
         self.list_ctrl_Materials.InsertColumn(1, 'Quantity')
-#        self.list_ctrl_Materials.SetCgolumnWidth(0, 200)
 
-#         group = EveGroup(DB)
-# 
-#         for gr in category.getGroupsInCategory():
-#             group.getGroupByID(gr[0])
-#             self.lcGroup.Append([group.groupName])
+        if not self.tree_ctrl_Items.ItemHasChildren(event.Item):
+            item = EveItem(DB, name=self.tree_ctrl_Items.GetItemText(event.Item))
+            bp = item.getBlueprintObject()
+            materialList = bp.getManufacturingMaterials(characterSkillLevelME=5)
+            for material in materialList:
+                matItem = EveItem(DB, itemID=material[0])
+                matQuant = material[1]
+                self.list_ctrl_Materials.Append([matItem.name, matQuant])
+                
         event.Skip()
-
 # end of class MyFrame
+
 if __name__ == "__main__":
     gettext.install("app") # replace with the appropriate catalog name
 
