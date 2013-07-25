@@ -4,3 +4,5 @@
 .pydevproject
 *.bak
 *~
+.settings/*
+*.db
