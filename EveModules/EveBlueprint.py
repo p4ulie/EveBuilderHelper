@@ -12,9 +12,9 @@ class EveBlueprint(EveDB):
     Class for invBlueprintType data reading and handling
     '''
 
-    blueprintTypeID = ''
-    parentBlueprintTypeID = ''
-    productTypeID = ''
+    blueprintID = ''
+    parentBlueprintID = ''
+    productID = ''
     productionTime = ''
     techLevel = ''
     researchProductivityTime = ''
@@ -37,9 +37,9 @@ class EveBlueprint(EveDB):
 
         data = self.fetchData(query)
         if data:
-            self.blueprintTypeID = data[0][0]
-            self.parentBlueprintTypeID = data[0][1]
-            self.productTypeID = data[0][2]
+            self.blueprintID = data[0][0]
+            self.parentBlueprintID = data[0][1]
+            self.productID = data[0][2]
             self.productionTime = data[0][3]
             self.techLevel = data[0][4]
             self.researchProductivityTime = data[0][5]
@@ -63,7 +63,7 @@ class EveBlueprint(EveDB):
                      INNER JOIN invTypes AS t
                       ON m.materialTypeID = t.typeID
                     WHERE m.typeID = %s
-                """ % self.productTypeID
+                """ % self.productID
         data = self.fetchData(query)
         return data
 
@@ -83,7 +83,7 @@ class EveBlueprint(EveDB):
                     WHERE r.typeID = %s
                      AND r.activityID = 1
                      AND g.categoryID != 16;
-                """ % self.blueprintTypeID
+                """ % self.blueprintID
         data = self.fetchData(query)
         return data
 
@@ -153,7 +153,6 @@ class EveBlueprint(EveDB):
             self.researchLevelME = ResearchLevelME
         elif self.techLevel == 2:
             self.researchLevelME = -4
-
 
         if ResearchLevelPE:
             self.researchLevelPE = ResearchLevelPE
