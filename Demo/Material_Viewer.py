@@ -55,7 +55,7 @@ class MyFrame(wx.Frame):
 
     def __set_properties(self):
         # begin wxGlade: MyFrame.__set_properties
-        self.SetTitle(_("frame_1"))
+        self.SetTitle(_("Material Viewer"))
         # end wxGlade
 
     def __do_layout(self):
