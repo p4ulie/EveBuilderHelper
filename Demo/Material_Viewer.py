@@ -36,17 +36,20 @@ class MyFrame(wx.Frame):
 
         rootTree = self.tree_ctrl_Items.AddRoot('Item list')
 
-        category = EveCategory(DB)
-        for cat in category.getCategories():
-            catTree = self.tree_ctrl_Items.AppendItem(rootTree, cat[1])
+#         category = EveCategory(DB)
+#         for cat in category.getCategories():
+#             catTree = self.tree_ctrl_Items.AppendItem(rootTree, cat[1])
 
-            group = EveGroup(DB)
-            for grp in group.getGroups(cat[0]):
-                grpTree = self.tree_ctrl_Items.AppendItem(catTree, grp[2])
-            
-                item = EveItem(DB)
-                for itm in item.getItems(grp[0]):
-                    itmTree = self.tree_ctrl_Items.AppendItem(grpTree, itm[2])
+        category = EveCategory(DB, categoryName = 'Ship')
+
+        group = EveGroup(DB)
+        for grp in group.getGroups(category.categoryID):
+#            grpTree = self.tree_ctrl_Items.AppendItem(catTree, grp[2])
+            grpTree = self.tree_ctrl_Items.AppendItem(rootTree, grp[2])
+        
+            item = EveItem(DB)
+            for itm in item.getItems(grp[0]):
+                itmTree = self.tree_ctrl_Items.AppendItem(grpTree, itm[2])
 
         self.tree_ctrl_Items.Expand(rootTree)
 
@@ -77,10 +80,9 @@ class MyFrame(wx.Frame):
             item = EveItem(DB, name=self.tree_ctrl_Items.GetItemText(event.Item))
             bp = item.getBlueprintObject()
             materialList = bp.getManufacturingMaterials(characterSkillLevelME=5)
-            for material in materialList:
-                matItem = EveItem(DB, itemID=material[0])
-                matQuant = material[1]
-                self.list_ctrl_Materials.Append([matItem.name, matQuant])
+            for material,quantity in materialList.iteritems():
+                matItem = EveItem(DB, itemID=material)
+                self.list_ctrl_Materials.Append([matItem.name, quantity])
                 
         event.Skip()
 # end of class MyFrame
