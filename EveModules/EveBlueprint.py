@@ -6,6 +6,26 @@ Created on 7.4.2013
 
 from EveDB import EveDB
 
+def addMaterialToList(materialList, material):
+    '''
+    Add specified amount of material (itemID, quantity) to materialList dictionary
+    '''
+   
+    if material[0] in materialList:
+        materialList[material[0]] = materialList[material[0]] + material[1]
+    else: 
+        materialList[material[0]] = material[1]
+
+def substractMaterialFromList(materialList, material):
+    '''
+    Substract specified amount of material (itemID, quantity) from materialList dictionary
+    '''
+
+    if material[0] in materialList:
+        if materialList[material[0]] > material[1]:
+            materialList[material[0]] = materialList[material[0]] - material[1]
+        else:
+            del materialList[material[0]] 
 
 class EveBlueprint(EveDB):
     '''
@@ -51,27 +71,35 @@ class EveBlueprint(EveDB):
             self.wasteFactor = data[0][11]
             self.maxProductionLimit = data[0][12]
 
-    def getBaseMaterialList(self):
+    def getBaseMaterialList(self, itemID = ''):
         '''
         Get base list of materials for InvType,
         equals amount of materials when recycling item
         (list of lists - [ID, quantity])
         '''
+
+        if not itemID:
+            itemID = self.productID 
+
         query = """
                     SELECT t.typeID, m.quantity
                     FROM invTypeMaterials AS m
                      INNER JOIN invTypes AS t
                       ON m.materialTypeID = t.typeID
                     WHERE m.typeID = %s
-                """ % self.productID
+                """ % itemID
+
         data = self.fetchData(query)
         return data
 
-    def getExtraMaterialList(self):
+    def getExtraMaterialList(self, blueprintID = ''):
         '''
         Get list of materials for InvType, inclusive R.A.M.
         (list of lists - [ID, quantity])
         '''
+
+        if not blueprintID:
+            blueprintID = self.blueprintID 
 
         query = """
                     SELECT r.requiredTypeID, r.quantity, r.damagePerJob
@@ -83,8 +111,34 @@ class EveBlueprint(EveDB):
                     WHERE r.typeID = %s
                      AND r.activityID = 1
                      AND g.categoryID != 16;
-                """ % self.blueprintID
+                """ % blueprintID
+
         data = self.fetchData(query)
+        return data
+
+    def getT1ItemForT2Blueprint(self, blueprintID = ''):
+        '''
+        Get ID of T1 item used in manufacturing of T2
+        '''
+
+        data = ''
+        
+        if self.techLevel == 2:
+            if not blueprintID:
+                blueprintID = self.blueprintID 
+
+            query = """
+                        select r.requiredTypeID from ramTypeRequirements as r
+                        inner join invTypes as t on r.requiredTypeID = t.typeID
+                        inner join invGroups as g on t.groupID = g.groupID
+                        and r.activityID = 1
+                        and g.categoryID != 16
+                        and g.categoryID != 17
+                        and r.typeID = %s;
+                    """ % blueprintID
+
+            data = self.fetchData(query)[0]
+
         return data
 
     def getManufacturingMaterials(self, characterSkillLevelME=0):
@@ -92,19 +146,27 @@ class EveBlueprint(EveDB):
         Generate a list of materials for production, IDs and quantities,
         waste is added from researched blueprint ME amount and PE skill level
         '''
-        materialList = []
+        materialList = {}
         materialBaseList = self.getBaseMaterialList()
-        materialExtraList = self.getExtraMaterialList()
+
         for material in materialBaseList:
             materialID = material[0]
             wasteME = self.__computeWasteFromResearchLevelME(material[1])
             wastePE = self.__computeWasteFromCharacterSkillLevelPE(material[1], characterSkillLevelME)
             materialQuantity = material[1] + wasteME + wastePE
-            materialList.append([materialID, materialQuantity])
+            addMaterialToList(materialList, [materialID, materialQuantity])
+
+        materialExtraList = self.getExtraMaterialList()
         for material in materialExtraList:
-            materialID = material[0]
-            materialQuantity = material[1]
-            materialList.append([materialID, materialQuantity])
+            addMaterialToList(materialList, material)
+
+        if self.techLevel == 2:
+            itemT1 = self.getT1ItemForT2Blueprint()
+            materialT1List = self.getBaseMaterialList(itemT1)
+            for material in materialT1List:
+#                substractMaterialFromList(materialList, material)
+                pass
+
         return materialList
 
     def __computeWasteFromResearchLevelME(self, materialAmount):
