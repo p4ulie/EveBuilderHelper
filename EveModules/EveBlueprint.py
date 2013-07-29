@@ -16,7 +16,7 @@ def addMaterialToList(materialList, material):
     else: 
         materialList[material[0]] = material[1]
 
-def substractMaterialFromList(materialList, material):
+def subtractMaterialFromList(materialList, material):
     '''
     Substract specified amount of material (itemID, quantity) from materialList dictionary
     '''
@@ -149,23 +149,26 @@ class EveBlueprint(EveDB):
         materialList = {}
         materialBaseList = self.getBaseMaterialList()
 
+        # Add base materials to material list
         for material in materialBaseList:
-            materialID = material[0]
-            wasteME = self.__computeWasteFromResearchLevelME(material[1])
-            wastePE = self.__computeWasteFromCharacterSkillLevelPE(material[1], characterSkillLevelME)
-            materialQuantity = material[1] + wasteME + wastePE
-            addMaterialToList(materialList, [materialID, materialQuantity])
-
-        materialExtraList = self.getExtraMaterialList()
-        for material in materialExtraList:
             addMaterialToList(materialList, material)
 
+        # In case of T2 item, subtract materials of T1 item needed for manufacturing (Wolf - Rifter) 
         if self.techLevel == 2:
             itemT1 = self.getT1ItemForT2Blueprint()
             materialT1List = self.getBaseMaterialList(itemT1)
             for material in materialT1List:
-#                substractMaterialFromList(materialList, material)
-                pass
+                subtractMaterialFromList(materialList, material)
+
+        # Compute and add waste to material list
+        for materialID, quantity in materialList.iteritems():
+            wasteME = self.__computeWasteFromResearchLevelME(quantity)
+            wastePE = self.__computeWasteFromCharacterSkillLevelPE(quantity, characterSkillLevelME)
+            addMaterialToList(materialList, [materialID, wasteME + wastePE])
+
+        materialExtraList = self.getExtraMaterialList()
+        for material in materialExtraList:
+            addMaterialToList(materialList, material)
 
         return materialList
 
