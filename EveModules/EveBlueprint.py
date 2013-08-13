@@ -6,27 +6,6 @@ Created on 7.4.2013
 
 from EveDB import EveDB
 
-def addMaterialToList(materialList, material):
-    '''
-    Add specified amount of material (itemID, quantity) to materialList dictionary
-    '''
-   
-    if material[0] in materialList:
-        materialList[material[0]] = materialList[material[0]] + material[1]
-    else: 
-        materialList[material[0]] = material[1]
-
-def subtractMaterialFromList(materialList, material):
-    '''
-    Substract specified amount of material (itemID, quantity) from materialList dictionary
-    '''
-
-    if material[0] in materialList:
-        if materialList[material[0]] > material[1]:
-            materialList[material[0]] = materialList[material[0]] - material[1]
-        else:
-            del materialList[material[0]] 
-
 class EveBlueprint(EveDB):
     '''
     Class for invBlueprintType data reading and handling
@@ -116,7 +95,7 @@ class EveBlueprint(EveDB):
         data = self.fetchData(query)
         return data
 
-    def getT1ItemForT2Blueprint(self, blueprintID = ''):
+    def __getT1ItemForT2Blueprint(self, blueprintID = ''):
         '''
         Get ID of T1 item used in manufacturing of T2
         '''
@@ -141,11 +120,33 @@ class EveBlueprint(EveDB):
 
         return data
 
-    def getManufacturingMaterials(self, characterSkillLevelME=0):
+    def getManufacturingMaterials(self, characterPESkillLvl=5):
         '''
         Generate a list of materials for production, IDs and quantities,
         waste is added from researched blueprint ME amount and PE skill level
         '''
+
+        def addMaterialToList(materialList, material):
+            '''
+            Add specified amount of material (itemID, quantity) to materialList dictionary
+            '''
+           
+            if material[0] in materialList:
+                materialList[material[0]] = materialList[material[0]] + material[1]
+            else: 
+                materialList[material[0]] = material[1]
+        
+        def subtractMaterialFromList(materialList, material):
+            '''
+            Substract specified amount of material (itemID, quantity) from materialList dictionary
+            '''
+        
+            if material[0] in materialList:
+                if materialList[material[0]] > material[1]:
+                    materialList[material[0]] = materialList[material[0]] - material[1]
+                else:
+                    del materialList[material[0]] 
+        
         materialList = {}
         materialBaseList = self.getBaseMaterialList()
 
@@ -155,7 +156,7 @@ class EveBlueprint(EveDB):
 
         # In case of T2 item, subtract materials of T1 item needed for manufacturing (Wolf - Rifter) 
         if self.techLevel == 2:
-            itemT1 = self.getT1ItemForT2Blueprint()
+            itemT1 = self.__getT1ItemForT2Blueprint()
             materialT1List = self.getBaseMaterialList(itemT1)
             for material in materialT1List:
                 subtractMaterialFromList(materialList, material)
@@ -163,7 +164,7 @@ class EveBlueprint(EveDB):
         # Compute and add waste to material list
         for materialID, quantity in materialList.iteritems():
             wasteME = self.__computeWasteFromResearchLevelME(quantity)
-            wastePE = self.__computeWasteFromCharacterSkillLevelPE(quantity, characterSkillLevelME)
+            wastePE = self.__computeWasteFromCharacterSkillLevelPE(quantity, characterPESkillLvl)
             addMaterialToList(materialList, [materialID, wasteME + wastePE])
 
         materialExtraList = self.getExtraMaterialList()

@@ -48,38 +48,6 @@ class EveCategory(EveDB):
                 """ % categoryName
         self.__getCategory(query)
 
-    def getCategories(self):
-        '''
-        Get list of categories
-        '''
-        query = """
-                    SELECT c.categoryID, c.categoryName, c.description
-                    FROM invCategories AS c
-                    WHERE c.published = 1
-                """
-        data = self.fetchData(query)
-        return data
-
-    def getGroupsInCategory(self):
-        '''
-        Get list of groups
-        '''
-        if self.categoryID is '':
-            query = """
-                        SELECT g.groupID, g.categoryID, g.groupName, g.description
-                        FROM invGroups AS g
-                        WHERE g.published = '1'
-                    """
-        else:
-            query = """
-                        SELECT g.groupID, g.categoryID, g.groupName, g.description
-                        FROM invGroups AS g
-                        WHERE g.published = '1'
-                        and g.categoryID = '%s'
-                    """ % self.categoryID
-        data = self.fetchData(query)
-        return data
-
     def __init__(self, DB, categoryID='', categoryName=''):
         '''
         Constructor, initial data load

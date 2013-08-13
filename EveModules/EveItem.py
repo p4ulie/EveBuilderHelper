@@ -73,26 +73,6 @@ class EveItem(EveDB):
                     """ % name
             self.__getItem(query)
 
-    def getItems(self, groupID=''):
-        '''
-        Get list of items, possibly from specific group
-        '''
-        if groupID != '':
-            query = """
-                        SELECT *
-                        FROM invTypes AS t
-                        WHERE t.published = '1'
-                        AND t.groupID = '%s'
-                    """ % groupID
-        else:
-            query = """
-                        SELECT *
-                        FROM invTypes AS t
-                        WHERE t.published = '1'
-                    """
-        data = self.fetchData(query)
-        return data
-
     def getBlueprintID(self):
         '''
         Get blueprintID for this item, if it exists

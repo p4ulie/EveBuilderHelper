@@ -50,46 +50,6 @@ class EveGroup(EveDB):
                 """ % groupName
         self.__getGroup(query)
 
-    def getGroups(self, categoryID=''):
-        '''
-        Get list of groups
-        '''
-        if categoryID is '':
-            query = """
-                        SELECT g.groupID, g.categoryID, g.groupName, g.description
-                        FROM invGroups AS g
-                        WHERE g.published = '1'
-                    """
-        else:
-            query = """
-                        SELECT g.groupID, g.categoryID, g.groupName, g.description
-                        FROM invGroups AS g
-                        WHERE g.published = '1'
-                        and g.categoryID = '%s'
-                    """ % categoryID
-        data = self.fetchData(query)
-        return data
-    
-    def getItemsInGroup(self):
-        '''
-        Get list of invTypes, possibly limit it for specific invGroup
-        '''
-        if self.groupID is '':
-            query = """
-                        SELECT t.typeID, t.groupID, t.typeName, t.description
-                        FROM invTypes AS t
-                        WHERE t.published = '1'
-                    """
-        else:
-            query = """
-                        SELECT t.typeID, t.groupID, t.typeName, t.description
-                        FROM invTypes AS t
-                        WHERE t.published = '1'
-                        and t.groupID = '%s'
-                    """ % self.groupID
-        data = self.fetchData(query)
-        return data
-
     def __init__(self, DB, groupID='', groupName=''):
         '''
         Constructor, initial data load
