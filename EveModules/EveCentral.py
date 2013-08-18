@@ -60,7 +60,7 @@ class EveCentral(object):
                     result = data.firstChild.data
         return float(result)
 
-    def marketstatGet(self, typeIDList, setHours='', regionLimit='', useSystem='', setMinQ=''):
+    def marketstatGet(self, typeIDList, setHours='', regionLimit='', useSystem='', minQ=''):
         '''
         Endpoint: http://api.eve-central.com/api/marketstat
         Purpose: Retrieve aggregate statistics for the items specified.
@@ -80,16 +80,16 @@ class EveCentral(object):
             args.append(('typeid', typeIDList))
 
             if setHours:
-                args.append(('setHours', setHours))
+                args.append(('sethours', setHours))
 
             if regionLimit:
                 args.append(('regionlimit', regionLimit))
 
             if useSystem:
-                args.append(('useSystem', useSystem))
+                args.append(('usesystem', useSystem))
 
-            if setMinQ:
-                args.append(('setMinQ', setMinQ))
+            if minQ:
+                args.append(('minQ', minQ))
 
             encargs = urlencode(args, True)
             xmlresult = self.__fetchData(url, encargs)
@@ -104,7 +104,7 @@ class EveCentral(object):
         result = []
         xmldoc = minidom.parseString(tradeData)
         for method in xmldoc.getElementsByTagName('quicklook'):
-            print method.getElementsByTagName('itemname')[0].firstChild.data
+#            print method.getElementsByTagName('itemname')[0].firstChild.data
             for node in method.getElementsByTagName(orderType):
                 for order in node.getElementsByTagName('order'):
                     row = []
@@ -123,7 +123,7 @@ class EveCentral(object):
                     result.append(row)
         return result
 
-    def quicklookGet(self, typeIDList, setHours, regionLimit, useSystem, setMinQ):
+    def quicklookGet(self, typeIDList, setHours, regionLimit, useSystem, minQ):
         '''
         Endpoint: http://api.eve-central.com/api/quicklook
         Purpose: Retrieve all of the available market orders, including prices, stations, order IDs, volumes, etc.
@@ -143,16 +143,16 @@ class EveCentral(object):
             args.append(('typeid', typeIDList))
 
             if setHours:
-                args.append(('setHours', setHours))
+                args.append(('sethours', setHours))
 
             if regionLimit:
                 args.append(('regionlimit', regionLimit))
 
             if useSystem:
-                args.append(('useSystem', useSystem))
+                args.append(('usesystem', useSystem))
 
-            if setMinQ:
-                args.append(('setMinQ', setMinQ))
+            if minQ:
+                args.append(('minQ', minQ))
 
             encargs = urlencode(args, True)
             xmlresult = self.__fetchData(url, encargs)
