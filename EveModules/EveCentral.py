@@ -18,7 +18,7 @@ Eve Central API documentation: http://dev.eve-central.com/evec-api/start
 
 class EveCentral(object):
     '''
-    Basic class for interacting with EveDB
+    Basic class for interacting with Eve Central
     '''
 
     EVE_CENTRAL_BASE_URI = 'http://api.eve-central.com/api/'
@@ -60,7 +60,7 @@ class EveCentral(object):
                     result = data.firstChild.data
         return float(result)
 
-    def marketstatGet(self, typeID, setHours, regionLimit, useSystem, setMinQ):
+    def marketstatGet(self, typeIDList, setHours='', regionLimit='', useSystem='', setMinQ=''):
         '''
         Endpoint: http://api.eve-central.com/api/marketstat
         Purpose: Retrieve aggregate statistics for the items specified.
@@ -76,15 +76,14 @@ class EveCentral(object):
 
         xmlresult = ''
 
-        if typeID:
-            args.append(('typeid', typeID))
+        if typeIDList:
+            args.append(('typeid', typeIDList))
 
             if setHours:
                 args.append(('setHours', setHours))
 
             if regionLimit:
-                for region in regionLimit:
-                    args.append(('regionlimit', region))
+                args.append(('regionlimit', regionLimit))
 
             if useSystem:
                 args.append(('useSystem', useSystem))
@@ -92,9 +91,9 @@ class EveCentral(object):
             if setMinQ:
                 args.append(('setMinQ', setMinQ))
 
-            encargs = urlencode(args)
-#            print encargs
+            encargs = urlencode(args, True)
             xmlresult = self.__fetchData(url, encargs)
+
         return xmlresult
 
     def quicklookParse(self, tradeData, orderType):
@@ -104,23 +103,27 @@ class EveCentral(object):
         '''
         result = []
         xmldoc = minidom.parseString(tradeData)
-        for node in xmldoc.getElementsByTagName(orderType):
-            for order in node.getElementsByTagName('order'):
-                row = []
-                row.append(order.getElementsByTagName('region')[0].firstChild.data)
-                row.append(order.getElementsByTagName('station')[0].firstChild.data)
-                row.append(order.getElementsByTagName('station_name')[0].firstChild.data)
-                row.append(order.getElementsByTagName('security')[0].firstChild.data)
-                row.append(order.getElementsByTagName('range')[0].firstChild.data)
-                row.append(order.getElementsByTagName('price')[0].firstChild.data)
-                row.append(order.getElementsByTagName('vol_remain')[0].firstChild.data)
-                row.append(order.getElementsByTagName('min_volume')[0].firstChild.data)
-                row.append(order.getElementsByTagName('expires')[0].firstChild.data)
-                row.append(order.getElementsByTagName('reported_time')[0].firstChild.data)
-                result.append(row)
+        for method in xmldoc.getElementsByTagName('quicklook'):
+            print method.getElementsByTagName('itemname')[0].firstChild.data
+            for node in method.getElementsByTagName(orderType):
+                for order in node.getElementsByTagName('order'):
+                    row = []
+                    row.append(method.getElementsByTagName('item')[0].firstChild.data)
+                    row.append(method.getElementsByTagName('itemname')[0].firstChild.data)
+                    row.append(order.getElementsByTagName('region')[0].firstChild.data)
+                    row.append(order.getElementsByTagName('station')[0].firstChild.data)
+                    row.append(order.getElementsByTagName('station_name')[0].firstChild.data)
+                    row.append(order.getElementsByTagName('security')[0].firstChild.data)
+                    row.append(order.getElementsByTagName('range')[0].firstChild.data)
+                    row.append(order.getElementsByTagName('price')[0].firstChild.data)
+                    row.append(order.getElementsByTagName('vol_remain')[0].firstChild.data)
+                    row.append(order.getElementsByTagName('min_volume')[0].firstChild.data)
+                    row.append(order.getElementsByTagName('expires')[0].firstChild.data)
+                    row.append(order.getElementsByTagName('reported_time')[0].firstChild.data)
+                    result.append(row)
         return result
 
-    def quicklookGet(self, typeID, setHours, regionLimit, useSystem, setMinQ):
+    def quicklookGet(self, typeIDList, setHours, regionLimit, useSystem, setMinQ):
         '''
         Endpoint: http://api.eve-central.com/api/quicklook
         Purpose: Retrieve all of the available market orders, including prices, stations, order IDs, volumes, etc.
@@ -136,15 +139,14 @@ class EveCentral(object):
 
         xmlresult = ''
 
-        if typeID:
-            args.append(('typeid', typeID))
+        if typeIDList:
+            args.append(('typeid', typeIDList))
 
             if setHours:
                 args.append(('setHours', setHours))
 
             if regionLimit:
-                for region in regionLimit:
-                    args.append(('regionlimit', region))
+                args.append(('regionlimit', regionLimit))
 
             if useSystem:
                 args.append(('useSystem', useSystem))
@@ -152,13 +154,16 @@ class EveCentral(object):
             if setMinQ:
                 args.append(('setMinQ', setMinQ))
 
-            encargs = urlencode(args)
+            encargs = urlencode(args, True)
             xmlresult = self.__fetchData(url, encargs)
+
         return xmlresult
 
-    def quicklookGetList(self, typeID, setHours, regionLimit, useSystem, setMinQ, orderType):
-        xmlresult = self.quicklookGet(typeID, setHours, regionLimit, useSystem, setMinQ)
+    def quicklookGetList(self, typeIDList, setHours = '', regionLimit = '', useSystem = '', setMinQ = '', orderType = ''):
+        xmlresult = self.quicklookGet(typeIDList, setHours, regionLimit, useSystem, setMinQ)
         result = self.quicklookParse(xmlresult, orderType)
+        
+        return result
 
     def __init__(self):
         '''
