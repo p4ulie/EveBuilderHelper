@@ -33,20 +33,6 @@ class EveCentral(object):
 
         return result
 
-    #===========================================================================
-    # def getItemDataByTypeID(self, items):
-    #    '''
-    #    Get item data from Eve-Central by TypeID,
-    #    multiple typeID can be specified in a list
-    #    '''
-    #    args = []
-    #    for item in items:
-    #        args.append(('typeid', item))
-    #    encargs = urlencode(args)
-    #    xmlresult = self.__fetchData("marketstat", encargs)
-    #    return xmlresult
-    #===========================================================================
-
     def marketstatParse(self, tradeData, typeID, orderType, attributeName):
         '''
         Parse XML data returned by marketstatGet() call,
