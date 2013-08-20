@@ -41,7 +41,8 @@ cur.executescript("""
         minVolume integer,
         expires text,
         reportedTime text,
-        orderType text
+        orderType text,
+        jitaBuyMax real
     );
     """)
 
@@ -65,9 +66,11 @@ def main():
 
     materialList = bp.getManufacturingMaterials(characterPESkillLvl=characterPESkillLvl)
 
-#     item = EveItem(DB, name='Robotics')
-#     materialList = {}
-#     materialList[item.itemID] = 0
+    #===========================================================================
+    # item = EveItem(DB, name='Robotics')
+    # materialList = {}
+    # materialList[item.itemID] = 0
+    #===========================================================================
 
     print("Name of item: %s\n") % (item.name)
 
@@ -108,10 +111,11 @@ def main():
                                 minVolume,
                                 expires,
                                 reportedTime,
-                                orderType)
-                                values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'sell')
+                                orderType,
+                                jitaBuyMax)
+                                values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'sell', ?)
                 """, (matItem.itemID, matItem.name, line[2], line[3], line[4], line[5], line[6], line[7],
-                      line[8], line[9], line[10], line[11])
+                      line[8], line[9], line[10], line[11], priceJitaBuyMax)
                 )
 
     print "\nList of items:\n"
@@ -119,29 +123,29 @@ def main():
     for material in materialList.keys():
         matItem = EveItem(DB, itemID=material)
         print "\nItem: %s (Jita buy max: %s)\n" % (matItem.name, priceListJita[matItem.itemID])
-        for order in cur.execute('''SELECT itemName, price, volRemain, stationName, regionID, security
-                                    FROM prices WHERE price < ? AND itemID = ?
+        for order in cur.execute('''SELECT itemName, price, volRemain, stationName, (jitaBuyMax - price) * volRemain as savings
+                                    FROM prices WHERE price < jitaBuyMax AND itemID = ?
                                     AND security > 0.4 AND volRemain > 1
                                     AND orderType = "sell"
                                     ORDER BY price''',
-                                    (priceListJita[material], material)):
-            print 'Sell %s: %s units for %s (%s)' % (order[0], order[2], order[1], order[3])
+                                    (material,)):
+            print 'Sell %s: %s units for %s (%s) - saving %s' % (order[0], order[2], order[1], order[3], locale.currency( order[4], symbol=False, grouping=True))
 
-    print "\n\nList of items for trade hubs:"
+    print "\nList of items for trade hubs:\n"
 
     for tradeHub in tradeHubList.values():
         if tradeHub != 'Jita IV - Moon 4 - Caldari Navy Assembly Plant':
-            print "%s:" % tradeHub
-            for order in cur.execute('''SELECT itemName, price, volRemain, stationName, regionID, security, itemID
-                                        FROM prices WHERE stationName = ?
+            print "\n%s:\n" % tradeHub
+            for order in cur.execute('''SELECT itemName, price, volRemain, stationName, (jitaBuyMax - price) * volRemain as savings
+                                        FROM prices WHERE price < jitaBuyMax 
+                                        AND stationName = ?
                                         AND security > 0.4 AND volRemain > 1
                                         AND orderType = "sell"
                                         ORDER BY itemName, price''',
                                         (tradeHub,)):
-                if order[1] < priceListJita[order[6]]:
-                    matItem = EveItem(DB, itemID=order[6])
-                    print "Sell %s: %s units for %s (saving %s)" % (order[0], order[2], order[1], locale.currency(float(order[1]*order[2]), symbol=False, grouping=True))
-        print "\n"
+                print "Sell %s: %s units for %s - saving %s" % (order[0], order[2], order[1], locale.currency( order[4], symbol=False, grouping=True))
+
+    print "\n"
                 
 if __name__ == '__main__':
     main()
