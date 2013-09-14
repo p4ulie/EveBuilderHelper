@@ -8,8 +8,10 @@ Created on 12.9.2013
 '''
 
 import sqlite3
+import time
 from EveModules.EveCentral import *
 
+defaultDBFile = 'marketdata.db'
 marketDataSources = ('EveCentral')
 
 class EveMarketData(object):
@@ -36,6 +38,8 @@ class EveMarketData(object):
 
         for line in result:
             print format(line)
+            ts = time.time()
+            print ts
 #             self.cur.execute("""INSERT INTO prices
 #                             (itemID,
 #                             itemName,
@@ -56,11 +60,12 @@ class EveMarketData(object):
 #                   line[8], line[9], line[10], line[11], priceJitaBuyMax)
 #             )
 
-    def __init__(self):
+    def __init__(self, dbFile=defaultDBFile):
         '''
         Create a DB connection
         '''
-        self.con = sqlite3.connect(":memory:")
+#        self.con = sqlite3.connect(":memory:")
+        self.con = sqlite3.connect(dbFile)
         self.con.text_factory = str
         self.cur = self.con.cursor()
         self.cur.executescript("""
