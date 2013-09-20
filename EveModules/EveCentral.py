@@ -9,7 +9,6 @@ Created on 2.8.2012
 from urllib2 import urlopen
 from urllib import urlencode
 from xml.dom import minidom
-#import EveDB
 
 '''
 Eve Central API documentation: http://dev.eve-central.com/evec-api/start
@@ -82,16 +81,20 @@ class EveCentral(object):
 
         return xmlresult
 
-    def quicklookParse(self, tradeData, orderType):
+    def quicklookParse(self, tradeData, **kwargs):
         '''
         Parse XML data returned by quicklookGet() call,
         return the attribute specified by orderType and attributeName
         '''
+
+        if not 'orderType' in kwargs:
+            kwargs['orderType'] = 'sell_orders'
+
         result = []
         xmldoc = minidom.parseString(tradeData)
         for method in xmldoc.getElementsByTagName('quicklook'):
 #            print method.getElementsByTagName('itemname')[0].firstChild.data
-            for node in method.getElementsByTagName(orderType):
+            for node in method.getElementsByTagName(kwargs['orderType']):
                 for order in node.getElementsByTagName('order'):
                     row = []
                     row.append(method.getElementsByTagName('item')[0].firstChild.data)
@@ -109,7 +112,7 @@ class EveCentral(object):
                     result.append(row)
         return result
 
-    def quicklookGet(self, typeIDList, setHours, regionLimit, useSystem, minQ):
+    def quicklookGet(self, **kwargs):
         '''
         Endpoint: http://api.eve-central.com/api/quicklook
         Purpose: Retrieve all of the available market orders, including prices, stations, order IDs, volumes, etc.
@@ -125,29 +128,29 @@ class EveCentral(object):
 
         xmlresult = ''
 
-        if typeIDList:
-            args.append(('typeid', typeIDList))
+        if 'itemID' in kwargs:
+            args.append(('typeid', kwargs['itemID']))
 
-            if setHours:
-                args.append(('sethours', setHours))
+            if 'setHours' in kwargs:
+                args.append(('sethours', kwargs['setHours']))
 
-            if regionLimit:
-                args.append(('regionlimit', regionLimit))
+            if 'regionLimit' in kwargs:
+                args.append(('regionlimit', kwargs['regionLimit']))
 
-            if useSystem:
-                args.append(('usesystem', useSystem))
+            if 'useSystem' in kwargs:
+                args.append(('usesystem', kwargs['useSystem']))
 
-            if minQ:
-                args.append(('minQ', minQ))
+            if 'minQ' in kwargs:
+                args.append(('minQ', kwargs['minQ']))
 
             encargs = urlencode(args, True)
             xmlresult = self.__fetchData(url, encargs)
 
         return xmlresult
 
-    def quicklookGetList(self, typeIDList, setHours = '', regionLimit = '', useSystem = '', setMinQ = '', orderType = ''):
-        xmlresult = self.quicklookGet(typeIDList, setHours, regionLimit, useSystem, setMinQ)
-        result = self.quicklookParse(xmlresult, orderType)
+    def quicklookGetList(self, **kwargs):
+        xmlresult = self.quicklookGet(**kwargs)
+        result = self.quicklookParse(xmlresult, **kwargs)
         
         return result
 
@@ -158,3 +161,4 @@ class EveCentral(object):
 
 if __name__ == '__main__':
     pass
+

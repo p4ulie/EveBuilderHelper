@@ -21,13 +21,13 @@ class EveMarketData(object):
     Class for Eve Market data fetching and storing 
     '''
     
-    def fetchOrdersFromEveCentral(self, itemID, regionLimit='', orderType='sell_orders'):
+    def fetchOrdersFromEveCentral(self, **kwargs):
         '''
         Fetch data from Eve-Central  
         '''
 
         ec = EveCentral()
-        result = ec.quicklookGetList(itemID, regionLimit=regionLimit, orderType=orderType)
+        result = ec.quicklookGetList(**kwargs)
 
         ts = time.time()
         for line in result:
@@ -48,7 +48,7 @@ class EveMarketData(object):
                             timeStampFetch)
                             values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             """, (line[0], line[1], line[2], line[3], line[4], line[5], line[6], line[7],
-                  line[8], line[9], line[10], line[11], orderType, ts)
+                  line[8], line[9], line[10], line[11], kwargs['orderType'], ts)
             )
         self.con.commit()
         
@@ -64,11 +64,11 @@ class EveMarketData(object):
         self.cur.execute("""DELETE FROM prices WHERE timeStampFetch < ?""", (olderThanMinutes,))
         self.con.commit()
 
-    def areThereOrderOlderThanMinutes(self, itemID = '', ifOlderThanMinutes=OLDER_THAN_MINUTES_DEFAULT):
-        if itemID:
+    def areThereOrderOlderThanMinutes(self, **kwargs):
+        if 'itemID' in kwargs:
             ts = time.time()
-            olderThanMinutes = ts - (ifOlderThanMinutes * 60)
-            self.cur.execute("""SELECT count(*) FROM prices WHERE itemID = ? AND timeStampFetch < ?""", (itemID, olderThanMinutes))
+            olderThanMinutes = ts - (kwargs['ifOlderThanMinutes'] * 60)
+            self.cur.execute("""SELECT count(*) FROM prices WHERE itemID = ? AND timeStampFetch < ?""", (kwargs['itemID'], olderThanMinutes))
             result = self.cur.fetchone()[0]
             if result > 0:
                 return True
@@ -76,17 +76,21 @@ class EveMarketData(object):
                 return False
         return False
     
-    def fetchOrders(self, itemID='', ifOlderThanMinutes = OLDER_THAN_MINUTES_DEFAULT, regionLimit='', orderType='sell_orders', marketDataSource='EveCentral'):
+    def fetchOrders(self, **kwargs):
         '''
         Fetch data from various Market pages (Eve-Central, Eve market Data, ...)  
         '''
         
         # only update data if DB entries got older than ifOlderThanMinutes
-        if not self.areThereOrderOlderThanMinutes(itemID=itemID, ifOlderThanMinutes=ifOlderThanMinutes):
-            if marketDataSource == 'EveCentral':
-                if self.fetchOrdersFromEveCentral(itemID, regionLimit=regionLimit, orderType=orderType):
+        if not self.areThereOrderOlderThanMinutes(**kwargs):
+            # if not defined, set Eve-Central as default data source
+            if not 'marketDataSource' in kwargs:
+                kwargs['marketDataSource'] = 'EveCentral'
+            if kwargs['marketDataSource'] == 'EveCentral':
+                if self.fetchOrdersFromEveCentral(**kwargs):
                     # if we have some new data, delete all older
-                    self.deleteOlderThan(ifOlderThanMinutes)
+                    self.deleteOlderThan(kwargs['ifOlderThanMinutes'])
+
 
     def __init__(self, dbFile=defaultDBFile):
         '''
@@ -121,5 +125,6 @@ if __name__ == '__main__':
 
     emd = EveMarketData()
     emd.deleteOlderThan(OLDER_THAN_MINUTES_DEFAULT)
-    emd.fetchOrders(itemID = Tritanium_ID, ifOlderThanMinutes = OLDER_THAN_MINUTES_DEFAULT)
+    emd.fetchOrders(itemID = Strong_Blue_Pill_Booster_ID, orderType = 'sell_orders', ifOlderThanMinutes = OLDER_THAN_MINUTES_DEFAULT)
+
     
