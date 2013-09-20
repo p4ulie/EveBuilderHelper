@@ -11,7 +11,7 @@ import sqlite3
 import time
 from EveModules.EveCentral import *
 
-OLDERTHANMINUTES = 1
+OLDER_THAN_MINUTES_DEFAULT = 60
 
 defaultDBFile = 'marketdata.db'
 marketDataSources = ('EveCentral')
@@ -58,30 +58,25 @@ class EveMarketData(object):
         self.cur.execute("""DELETE FROM prices""")
         self.con.commit()
         
-    def deleteOldOrders(self, minutes=OLDERTHANMINUTES):
+    def deleteOlderThan(self, minutes=OLDER_THAN_MINUTES_DEFAULT):
         ts = time.time()
         olderThanMinutes = ts - (minutes * 60)
-        self.cur.execute("""DELETE FROM prices WHERE timeStampFetch < (olderThanMinutes)
-                            values (?)""")
+        self.cur.execute("""DELETE FROM prices WHERE timeStampFetch < ?""", (olderThanMinutes,))
         self.con.commit()
 
-    def areThereOrderOlderThanMinutes(self, itemID = '', minutes=OLDERTHANMINUTES):
+    def areThereOrderOlderThanMinutes(self, itemID = '', ifOlderThanMinutes=OLDER_THAN_MINUTES_DEFAULT):
         if itemID:
             ts = time.time()
-            olderThanMinutes = ts - (minutes * 60)
-            self.cur.execute("""SELECT count(*) FROM prices WHERE itemID = (?) AND timeStampFetch < (olderThanMinutes)
-                                values (?)""")
-            result = self.cur.fetchone()
-            if result:
-                if result > 0:
-                    return True
-                else:
-                    return False
+            olderThanMinutes = ts - (ifOlderThanMinutes * 60)
+            self.cur.execute("""SELECT count(*) FROM prices WHERE itemID = ? AND timeStampFetch < ?""", (itemID, olderThanMinutes))
+            result = self.cur.fetchone()[0]
+            if result > 0:
+                return True
             else:
                 return False
         return False
     
-    def fetchOrders(self, itemID='', ifOlderThanMinutes = OLDERTHANMINUTES, regionLimit='', orderType='sell_orders', marketDataSource='EveCentral'):
+    def fetchOrders(self, itemID='', ifOlderThanMinutes = OLDER_THAN_MINUTES_DEFAULT, regionLimit='', orderType='sell_orders', marketDataSource='EveCentral'):
         '''
         Fetch data from various Market pages (Eve-Central, Eve market Data, ...)  
         '''
@@ -91,7 +86,7 @@ class EveMarketData(object):
             if marketDataSource == 'EveCentral':
                 if self.fetchOrdersFromEveCentral(itemID, regionLimit=regionLimit, orderType=orderType):
                     # if we have some new data, delete all older
-                    self.deleteOldOrders(ifOlderThanMinutes)
+                    self.deleteOlderThan(ifOlderThanMinutes)
 
     def __init__(self, dbFile=defaultDBFile):
         '''
@@ -121,9 +116,10 @@ class EveMarketData(object):
         self.con.commit()
     
 if __name__ == '__main__':
-    emd = EveMarketData()
-    
     Tritanium_ID = 34
     Strong_Blue_Pill_Booster_ID = 10156
-    emd.fetchOrders(itemID = Strong_Blue_Pill_Booster_ID, ifOlderThanMinutes = OLDERTHANMINUTES)
+
+    emd = EveMarketData()
+    emd.deleteOlderThan(OLDER_THAN_MINUTES_DEFAULT)
+    emd.fetchOrders(itemID = Tritanium_ID, ifOlderThanMinutes = OLDER_THAN_MINUTES_DEFAULT)
     
