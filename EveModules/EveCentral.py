@@ -9,6 +9,7 @@ Created on 2.8.2012
 from urllib2 import urlopen
 from urllib import urlencode
 from xml.dom import minidom
+from xml.etree import ElementTree
 
 '''
 Eve Central API documentation: http://dev.eve-central.com/evec-api/start
@@ -91,25 +92,33 @@ class EveCentral(object):
             kwargs['orderType'] = 'sell_orders'
 
         result = []
-        xmldoc = minidom.parseString(tradeData)
-        for method in xmldoc.getElementsByTagName('quicklook'):
-#            print method.getElementsByTagName('itemname')[0].firstChild.data
-            for node in method.getElementsByTagName(kwargs['orderType']):
-                for order in node.getElementsByTagName('order'):
-                    row = []
-                    row.append(method.getElementsByTagName('item')[0].firstChild.data)
-                    row.append(method.getElementsByTagName('itemname')[0].firstChild.data)
-                    row.append(order.getElementsByTagName('region')[0].firstChild.data)
-                    row.append(order.getElementsByTagName('station')[0].firstChild.data)
-                    row.append(order.getElementsByTagName('station_name')[0].firstChild.data)
-                    row.append(order.getElementsByTagName('security')[0].firstChild.data)
-                    row.append(order.getElementsByTagName('range')[0].firstChild.data)
-                    row.append(order.getElementsByTagName('price')[0].firstChild.data)
-                    row.append(order.getElementsByTagName('vol_remain')[0].firstChild.data)
-                    row.append(order.getElementsByTagName('min_volume')[0].firstChild.data)
-                    row.append(order.getElementsByTagName('expires')[0].firstChild.data)
-                    row.append(order.getElementsByTagName('reported_time')[0].firstChild.data)
-                    result.append(row)
+
+        tree = ElementTree.parse(tradeData)
+
+        for node in tree.getiterator():
+            print node.tag, node.attrib
+
+        #=======================================================================
+        # xmldoc = minidom.parseString(tradeData)
+        # for method in xmldoc.getElementsByTagName('quicklook'):
+        #     for node in method.getElementsByTagName(kwargs['orderType']):
+        #         for order in node.getElementsByTagName('order'):
+        #             row = []
+        #             row.append(method.getElementsByTagName('item')[0].firstChild.data)
+        #             row.append(method.getElementsByTagName('itemname')[0].firstChild.data)
+        #             row.append(order.getElementsByTagName('region')[0].firstChild.data)
+        #             row.append(order.getElementsByTagName('station')[0].firstChild.data)
+        #             row.append(order.getElementsByTagName('station_name')[0].firstChild.data)
+        #             row.append(order.getElementsByTagName('security')[0].firstChild.data)
+        #             row.append(order.getElementsByTagName('range')[0].firstChild.data)
+        #             row.append(order.getElementsByTagName('price')[0].firstChild.data)
+        #             row.append(order.getElementsByTagName('vol_remain')[0].firstChild.data)
+        #             row.append(order.getElementsByTagName('min_volume')[0].firstChild.data)
+        #             row.append(order.getElementsByTagName('expires')[0].firstChild.data)
+        #             row.append(order.getElementsByTagName('reported_time')[0].firstChild.data)
+        #             result.append(row)
+        #=======================================================================
+
         return result
 
     def quicklookGet(self, **kwargs):
