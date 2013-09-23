@@ -93,31 +93,25 @@ class EveCentral(object):
 
         result = []
 
-        tree = ElementTree.parse(tradeData)
+        orders = ElementTree.fromstring(tradeData)
 
-        for node in tree.getiterator():
-            print node.tag, node.attrib
-
-        #=======================================================================
-        # xmldoc = minidom.parseString(tradeData)
-        # for method in xmldoc.getElementsByTagName('quicklook'):
-        #     for node in method.getElementsByTagName(kwargs['orderType']):
-        #         for order in node.getElementsByTagName('order'):
-        #             row = []
-        #             row.append(method.getElementsByTagName('item')[0].firstChild.data)
-        #             row.append(method.getElementsByTagName('itemname')[0].firstChild.data)
-        #             row.append(order.getElementsByTagName('region')[0].firstChild.data)
-        #             row.append(order.getElementsByTagName('station')[0].firstChild.data)
-        #             row.append(order.getElementsByTagName('station_name')[0].firstChild.data)
-        #             row.append(order.getElementsByTagName('security')[0].firstChild.data)
-        #             row.append(order.getElementsByTagName('range')[0].firstChild.data)
-        #             row.append(order.getElementsByTagName('price')[0].firstChild.data)
-        #             row.append(order.getElementsByTagName('vol_remain')[0].firstChild.data)
-        #             row.append(order.getElementsByTagName('min_volume')[0].firstChild.data)
-        #             row.append(order.getElementsByTagName('expires')[0].firstChild.data)
-        #             row.append(order.getElementsByTagName('reported_time')[0].firstChild.data)
-        #             result.append(row)
-        #=======================================================================
+        quicklook = orders.find('quicklook')
+        
+        for order in orders.getiterator(tag='order'):
+            row = []
+            row.append(quicklook.findtext('item'))
+            row.append(quicklook.findtext('itemname'))
+            row.append(order.findtext('region'))
+            row.append(order.findtext('station'))
+            row.append(order.findtext('station_name'))
+            row.append(order.findtext('security'))
+            row.append(order.findtext('range'))
+            row.append(order.findtext('price'))
+            row.append(order.findtext('vol_remain'))
+            row.append(order.findtext('min_volume'))
+            row.append(order.findtext('expires'))
+            row.append(order.findtext('reported_time'))
+            result.append(row)
 
         return result
 
