@@ -125,6 +125,9 @@ if __name__ == '__main__':
 
     emd = EveMarketData()
     emd.deleteOlderThan(OLDER_THAN_MINUTES_DEFAULT)
-    emd.fetchOrders(itemID = Strong_Blue_Pill_Booster_ID, orderType = 'sell_orders', ifOlderThanMinutes = OLDER_THAN_MINUTES_DEFAULT)
-
+    emd.deleteOlderThan(1)
+    
+    print "Fetching orders..."
+    emd.fetchOrders(itemID = Tritanium_ID, orderType = 'sell_orders', ifOlderThanMinutes = OLDER_THAN_MINUTES_DEFAULT)
+    print "Done"
     
