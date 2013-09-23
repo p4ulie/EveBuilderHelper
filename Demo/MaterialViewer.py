@@ -13,7 +13,7 @@ characterPESkillLvl = 5
 
 
 def main():
-    item = EveItem(DB, name='Anshar')
+    item = EveItem(DB, name='Ishtar')
     bp = item.getBlueprintObject()
 
     print("Name of item: %s") % (item.name)
