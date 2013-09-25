@@ -25,7 +25,7 @@ class EveMarketData(object):
 
     DB = ''
     
-    def execQuery(self, query):
+    def execQuery(self, query, data=None, executemany=True, commit=False):
         '''
         Main method for accessing the DB
         '''
@@ -34,7 +34,18 @@ class EveMarketData(object):
         try:
             dbcon = lite.connect(self.DB)
             cur = dbcon.cursor()
-            cur.execute(query)
+
+            if executemany and data:
+                cur.executemany(query, data)
+            else:
+                if data and not executemany:
+                    cur.execute(query, data)
+                else:
+                    cur.execute(query)
+
+            if commit:
+                dbcon.commit()
+
             rows = cur.fetchall()
         except lite.Error, e:
             print "Error %s:" % e.args[0]
@@ -53,26 +64,33 @@ class EveMarketData(object):
         result = ec.quicklookGetList(**kwargs)
 
         ts = time.time()
+
+        data = []
         for line in result:
-            query = """INSERT INTO prices
-                            (itemID,
-                            itemName,
-                            regionID,
-                            stationID,
-                            stationName,
-                            security,
-                            range,
-                            price,
-                            volRemain,
-                            minVolume,
-                            expires,
-                            reportedTime,
-                            orderType,
-                            timeStampFetch)
-                            values ('%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s')
-            """ % (line[0], line[1], line[2], line[3], line[4], line[5], line[6], line[7], line[8], line[9], line[10], line[11], kwargs['orderType'], ts)
-            data = self.execQuery(query)
-        data = self.execQuery('commit')
+            data.append((line[0], line[1], line[2], line[3], line[4], line[5], line[6], line[7], line[8], line[9], line[10], line[11], kwargs['orderType'], ts)
+                        )
+#        for line in result:
+        query = """INSERT INTO prices
+                        (itemID,
+                        itemName,
+                        regionID,
+                        stationID,
+                        stationName,
+                        security,
+                        range,
+                        price,
+                        volRemain,
+                        minVolume,
+                        expires,
+                        reportedTime,
+                        orderType,
+                        timeStampFetch)
+                        values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        """
+#         data = self.execQuery(query,
+#                               (line[0], line[1], line[2], line[3], line[4], line[5], line[6], line[7], line[8], line[9], line[10], line[11], kwargs['orderType'], ts),
+#                               commit=True)
+        data = self.execQuery(query, data=data, executemany=True, commit=True)
             
 #        self.con.commit()
         
@@ -80,13 +98,13 @@ class EveMarketData(object):
 
     def deleteAllOrders(self):
         query = """DELETE FROM prices"""
-        self.execQuery(query)
+        self.execQuery(query, commit=True)
         
     def deleteOlderThan(self, minutes=OLDER_THAN_MINUTES_DEFAULT):
         ts = time.time()
         olderThanMinutes = ts - (minutes * 60)
         query = """DELETE FROM prices WHERE timeStampFetch < %s""" % olderThanMinutes
-        self.execQuery(query)
+        self.execQuery(query, commit=True)
 
     def areThereOrderOlderThanMinutes(self, **kwargs):
         if 'itemID' in kwargs:
@@ -151,9 +169,10 @@ if __name__ == '__main__':
 
     emd = EveMarketData()
 #    emd.deleteOlderThan(OLDER_THAN_MINUTES_DEFAULT)
-    emd.deleteOlderThan(0)
-    
+#    emd.deleteOlderThan(0)
+    emd.deleteAllOrders()
+        
     print "Fetching orders..."
-    emd.fetchOrders(itemID = Tritanium_ID, orderType = 'sell_orders', ifOlderThanMinutes = OLDER_THAN_MINUTES_DEFAULT)
+    emd.fetchOrders(itemID = Strong_Blue_Pill_Booster_ID, orderType = 'sell_orders', ifOlderThanMinutes = OLDER_THAN_MINUTES_DEFAULT)
     print "Done"
     
