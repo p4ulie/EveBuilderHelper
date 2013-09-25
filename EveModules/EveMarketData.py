@@ -7,8 +7,10 @@ Created on 12.9.2013
 @author: PA
 '''
 
-import sqlite3
+import sqlite3 as lite
 import time
+import math
+import sys
 from EveModules.EveCentral import *
 
 OLDER_THAN_MINUTES_DEFAULT = 60
@@ -20,6 +22,27 @@ class EveMarketData(object):
     '''
     Class for Eve Market data fetching and storing 
     '''
+
+    DB = ''
+    
+    def execQuery(self, query):
+        '''
+        Main method for accessing the DB
+        '''
+        dbcon = ''
+        
+        try:
+            dbcon = lite.connect(self.DB)
+            cur = dbcon.cursor()
+            cur.execute(query)
+            rows = cur.fetchall()
+        except lite.Error, e:
+            print "Error %s:" % e.args[0]
+            sys.exit(1)
+        finally:
+            if dbcon:
+                dbcon.close()
+        return rows
     
     def fetchOrdersFromEveCentral(self, **kwargs):
         '''
@@ -31,7 +54,7 @@ class EveMarketData(object):
 
         ts = time.time()
         for line in result:
-            self.cur.execute("""INSERT INTO prices
+            query = """INSERT INTO prices
                             (itemID,
                             itemName,
                             regionID,
@@ -46,31 +69,34 @@ class EveMarketData(object):
                             reportedTime,
                             orderType,
                             timeStampFetch)
-                            values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-            """, (line[0], line[1], line[2], line[3], line[4], line[5], line[6], line[7],
-                  line[8], line[9], line[10], line[11], kwargs['orderType'], ts)
-            )
-        self.con.commit()
+                            values ('%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s')
+            """ % (line[0], line[1], line[2], line[3], line[4], line[5], line[6], line[7], line[8], line[9], line[10], line[11], kwargs['orderType'], ts)
+            data = self.execQuery(query)
+        data = self.execQuery('commit')
+            
+#        self.con.commit()
         
         return result
 
     def deleteAllOrders(self):
-        self.cur.execute("""DELETE FROM prices""")
-        self.con.commit()
+        query = """DELETE FROM prices"""
+        self.execQuery(query)
         
     def deleteOlderThan(self, minutes=OLDER_THAN_MINUTES_DEFAULT):
         ts = time.time()
         olderThanMinutes = ts - (minutes * 60)
-        self.cur.execute("""DELETE FROM prices WHERE timeStampFetch < ?""", (olderThanMinutes,))
-        self.con.commit()
+        query = """DELETE FROM prices WHERE timeStampFetch < %s""" % olderThanMinutes
+        self.execQuery(query)
 
     def areThereOrderOlderThanMinutes(self, **kwargs):
         if 'itemID' in kwargs:
             ts = time.time()
-            olderThanMinutes = ts - (kwargs['ifOlderThanMinutes'] * 60)
-            self.cur.execute("""SELECT count(*) FROM prices WHERE itemID = ? AND timeStampFetch < ?""", (kwargs['itemID'], olderThanMinutes))
-            result = self.cur.fetchone()[0]
-            if result > 0:
+            olderThanMinutes = math.floor(ts - (kwargs['ifOlderThanMinutes'] * 60))
+#            query = """SELECT * FROM prices WHERE itemID = %s AND max(timeStampFetch) < %s""" % (kwargs['itemID'], olderThanMinutes)
+            query = """SELECT max(timeStampFetch) FROM prices WHERE itemID = %s""" % (kwargs['itemID'])
+            data = self.execQuery(query)[0][0]
+
+            if data < olderThanMinutes:
                 return True
             else:
                 return False
@@ -82,7 +108,7 @@ class EveMarketData(object):
         '''
         
         # only update data if DB entries got older than ifOlderThanMinutes
-        if not self.areThereOrderOlderThanMinutes(**kwargs):
+        if self.areThereOrderOlderThanMinutes(**kwargs):
             # if not defined, set Eve-Central as default data source
             if not 'marketDataSource' in kwargs:
                 kwargs['marketDataSource'] = 'EveCentral'
@@ -96,10 +122,10 @@ class EveMarketData(object):
         '''
         Create a DB connection
         '''
-        self.con = sqlite3.connect(dbFile)
-        self.con.text_factory = str
-        self.cur = self.con.cursor()
-        self.cur.executescript("""
+
+        self.DB = dbFile
+        
+        query = """
             create table if not exists prices(
                 itemID integer,
                 itemName text,
@@ -116,16 +142,16 @@ class EveMarketData(object):
                 orderType text,
                 timeStampFetch real
             );
-            """)
-        self.con.commit()
+            """
+        self.execQuery(query)
     
 if __name__ == '__main__':
     Tritanium_ID = 34
     Strong_Blue_Pill_Booster_ID = 10156
 
     emd = EveMarketData()
-    emd.deleteOlderThan(OLDER_THAN_MINUTES_DEFAULT)
-    emd.deleteOlderThan(1)
+#    emd.deleteOlderThan(OLDER_THAN_MINUTES_DEFAULT)
+    emd.deleteOlderThan(0)
     
     print "Fetching orders..."
     emd.fetchOrders(itemID = Tritanium_ID, orderType = 'sell_orders', ifOlderThanMinutes = OLDER_THAN_MINUTES_DEFAULT)
