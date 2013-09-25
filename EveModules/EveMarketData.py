@@ -100,10 +100,13 @@ class EveMarketData(object):
         query = """DELETE FROM prices"""
         self.execQuery(query, commit=True)
         
-    def deleteOlderThan(self, minutes=OLDER_THAN_MINUTES_DEFAULT):
+    def deleteOlderThan(self, itemID=None, minutes=OLDER_THAN_MINUTES_DEFAULT):
         ts = time.time()
         olderThanMinutes = ts - (minutes * 60)
-        query = """DELETE FROM prices WHERE timeStampFetch < %s""" % olderThanMinutes
+        if itemID:
+            query = """DELETE FROM prices WHERE itemID = %s AND timeStampFetch < %s""" % (itemID, olderThanMinutes)
+        else:
+            query = """DELETE FROM prices WHERE timeStampFetch < %s""" % olderThanMinutes
         self.execQuery(query, commit=True)
 
     def areThereOrderOlderThanMinutes(self, **kwargs):
@@ -167,12 +170,14 @@ if __name__ == '__main__':
     Tritanium_ID = 34
     Strong_Blue_Pill_Booster_ID = 10156
 
+    itemID = Tritanium_ID
+    
     emd = EveMarketData()
 #    emd.deleteOlderThan(OLDER_THAN_MINUTES_DEFAULT)
-#    emd.deleteOlderThan(0)
-    emd.deleteAllOrders()
+    emd.deleteOlderThan(itemID, 1)
+#    emd.deleteAllOrders()
         
     print "Fetching orders..."
-    emd.fetchOrders(itemID = Strong_Blue_Pill_Booster_ID, orderType = 'sell_orders', ifOlderThanMinutes = OLDER_THAN_MINUTES_DEFAULT)
+    emd.fetchOrders(itemID = itemID, orderType = 'sell_orders', ifOlderThanMinutes = OLDER_THAN_MINUTES_DEFAULT)
     print "Done"
     
