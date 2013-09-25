@@ -18,6 +18,9 @@ OLDER_THAN_MINUTES_DEFAULT = 60
 defaultDBFile = 'marketdata.db'
 marketDataSources = ('EveCentral')
 
+JITA_STATION_NAME = r'Jita IV - Moon 4 - Caldari Navy Assembly Plant'
+JITA_STATION_ID = r'60003760'
+
 class EveMarketData(object):
     '''
     Class for Eve Market data fetching and storing 
@@ -87,13 +90,8 @@ class EveMarketData(object):
                         timeStampFetch)
                         values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         """
-#         data = self.execQuery(query,
-#                               (line[0], line[1], line[2], line[3], line[4], line[5], line[6], line[7], line[8], line[9], line[10], line[11], kwargs['orderType'], ts),
-#                               commit=True)
         data = self.execQuery(query, data=data, executemany=True, commit=True)
             
-#        self.con.commit()
-        
         return result
 
     def deleteAllOrders(self):
@@ -113,7 +111,6 @@ class EveMarketData(object):
         if 'itemID' in kwargs:
             ts = time.time()
             olderThanMinutes = math.floor(ts - (kwargs['ifOlderThanMinutes'] * 60))
-#            query = """SELECT * FROM prices WHERE itemID = %s AND max(timeStampFetch) < %s""" % (kwargs['itemID'], olderThanMinutes)
             query = """SELECT max(timeStampFetch) FROM prices WHERE itemID = %s""" % (kwargs['itemID'])
             data = self.execQuery(query)[0][0]
 
@@ -123,7 +120,7 @@ class EveMarketData(object):
                 return False
         return False
     
-    def fetchOrders(self, **kwargs):
+    def fetchNewOrders(self, **kwargs):
         '''
         Fetch data from various Market pages (Eve-Central, Eve market Data, ...)  
         '''
@@ -138,7 +135,45 @@ class EveMarketData(object):
                     # if we have some new data, delete all older
                     self.deleteOlderThan(kwargs['ifOlderThanMinutes'])
 
+    def getMinSell(self, itemID, regionID=None, stationID=None, stationName=None):
+        query = """SELECT min(price) FROM prices WHERE orderType = 'sell_orders' AND itemID = %s""" % itemID 
+        if regionID:
+            query += """ AND regionID = %s""" % regionID
+        if stationID:
+            query += """ AND stationID = %s""" % stationID
+        if stationName:
+            query += """ AND stationID = %s""" % stationName
 
+        result = self.execQuery(query)
+        return result
+
+    def getOrders(self, itemID, regionID=None, stationID=None, stationName=None, orderType=None):
+#        self.fetchNewOrders()
+        query = """SELECT * FROM prices WHERE itemID = %s""" % itemID 
+        if regionID:
+            query += """ AND regionID = %s""" % regionID
+        if stationID:
+            query += """ AND stationID = %s""" % stationID
+        if stationName:
+            query += """ AND stationID = %s""" % stationName
+        if orderType:
+            query += """ AND orderType = %s""" % orderType
+
+        result = self.execQuery(query)
+        return result
+
+    def getMaxBuy(self, itemID, regionID=None, stationID=None, stationName=None):
+        query = """SELECT max(price) FROM prices WHERE orderType = 'buy_orders' AND  itemID = %s""" % itemID 
+        if regionID:
+            query += """ AND regionID = %s""" % regionID
+        if stationID:
+            query += """ AND stationID = %s""" % stationID
+        if stationName:
+            query += """ AND stationID = %s""" % stationName
+
+        result = self.execQuery(query)
+        return result
+    
     def __init__(self, dbFile=defaultDBFile):
         '''
         Create a DB connection
