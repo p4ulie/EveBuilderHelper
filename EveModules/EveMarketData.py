@@ -28,7 +28,7 @@ class EveMarketData(object):
 
     DB = ''
     
-    def execQuery(self, query, data=None, executemany=True, commit=False):
+    def execQuery(self, query, param=None, executemany=False, commit=False):
         '''
         Main method for accessing the DB
         '''
@@ -38,11 +38,11 @@ class EveMarketData(object):
             dbcon = lite.connect(self.DB)
             cur = dbcon.cursor()
 
-            if executemany and data:
-                cur.executemany(query, data)
+            if executemany and param:
+                cur.executemany(query, param)
             else:
-                if data and not executemany:
-                    cur.execute(query, data)
+                if param and not executemany:
+                    cur.execute(query, param)
                 else:
                     cur.execute(query)
 
@@ -108,15 +108,17 @@ class EveMarketData(object):
         olderThanMinutes = math.floor(ts - (minutesThreshold * 60))
         
         if kwargs['itemID']:
-            query = """DELETE FROM prices WHERE itemID = %s AND timeStampFetch < %s""" % (kwargs['itemID'], olderThanMinutes)
+            query = """DELETE FROM prices WHERE itemID = ? AND timeStampFetch < ?"""
+            params = (kwargs['itemID'], olderThanMinutes)
         else:
-            query = """DELETE FROM prices WHERE timeStampFetch < %s""" % olderThanMinutes
-        self.execQuery(query, commit=True)
+            query = """DELETE FROM prices WHERE timeStampFetch < ?"""
+            param = (olderThanMinutes, )
+        self.execQuery(query, params, commit=True)
 
     def areOrdersTooOld(self, itemID, **kwargs):
         if itemID:
             ts = time.time()
-            if kwargs['ifOlderThanMinutes']:
+            if 'ifOlderThanMinutes' in kwargs.keys():
                 minutesThreshold = kwargs['ifOlderThanMinutes']
             else:
                 minutesThreshold = OLDER_THAN_MINUTES_DEFAULT
@@ -124,7 +126,8 @@ class EveMarketData(object):
             olderThanMinutes = math.floor(ts - (minutesThreshold * 60))
             
             query = """SELECT max(timeStampFetch) FROM prices WHERE itemID = ?"""
-            data = self.execQuery(query, itemID)[0][0]
+            param = (itemID,)
+            data = self.execQuery(query, param)[0][0]
 
             if data < olderThanMinutes:
                 return True
@@ -137,57 +140,100 @@ class EveMarketData(object):
         Fetch data from various Market pages (Eve-Central, Eve market Data, ...)  
         '''
         # if not defined, set Eve-Central as default data source
-        if not 'marketDataSource' in kwargs:
-            kwargs['marketDataSource'] = 'EveCentral'
-        if kwargs['marketDataSource'] == 'EveCentral':
+        if not 'marketDataSource' in kwargs.keys():
+            kwargs['marketDataSource'] = 'Eve-Central'
+
+        if kwargs['marketDataSource'] == 'Eve-Central':
             if self.fetchOrdersFromEveCentral(**kwargs):
-                # if we have some new data, delete all older
-                self.deleteOrdersOlderThanMinutes(**kwargs)
+                pass
+        elif kwargs['marketDataSource'] == 'Eve-MarketData':
+                pass
 
-    def getMinSellOrder(self, itemID, regionID=None, stationID=None, stationName=None):
-        query = """SELECT min(price) FROM prices WHERE orderType = 'sell_orders' AND itemID = %s""" % itemID 
-        if regionID:
-            query += """ AND regionID = %s""" % regionID
-        if stationID:
-            query += """ AND stationID = %s""" % stationID
-        if stationName:
-            query += """ AND stationID = %s""" % stationName
+#         # if we have some new data, delete all older
+#         self.deleteOrdersOlderThanMinutes(**kwargs)
+            
+    def getMinSellOrder(self, itemID, **kwargs):
+        '''
+        Get sell order with minimum price
+        '''
+        # only update data if DB entries got older than threshold
+        if self.areOrdersTooOld(itemID, **kwargs):
+            print "Old data detected, fetching current orders..."
+#            self.fetchOrders(**kwargs)
 
-        result = self.execQuery(query)
+        param = []
+
+        query = """SELECT min(price) FROM prices WHERE orderType = 'sell_orders' AND itemID = ?"""
+        param.append(itemID)
+         
+        if 'regionID' in kwargs.keys():
+            query += """ AND regionID = ?"""
+            param.append(kwargs['regionID'])
+        if 'stationID' in kwargs.keys():
+            query += """ AND stationID = ?"""
+            param.append(kwargs['stationID'])
+        if 'stationName' in kwargs.keys():
+            query += """ AND stationName = ?"""
+            param.append(kwargs['stationName'])
+
+        result = self.execQuery(query, param)
+        return result
+
+    def getMaxBuyOrder(self, itemID, **kwargs):
+        '''
+        Get buy order with maximum price
+        '''
+        # only update data if DB entries got older than threshold
+        if self.areOrdersTooOld(**kwargs):
+            print "Old data detected, fetching current orders..."
+#            self.fetchOrders(**kwargs)
+
+        param = []
+            
+        query = """SELECT max(price) FROM prices WHERE orderType = 'buy_orders' AND itemID = ?"""
+        param.append(itemID)
+         
+        if 'regionID' in kwargs.keys():
+            query += """ AND regionID = ?"""
+            param.append(kwargs['regionID'])
+        if 'stationID' in kwargs.keys():
+            query += """ AND stationID = ?"""
+            param.append(kwargs['stationID'])
+        if 'stationName' in kwargs.keys():
+            query += """ AND stationName = ?"""
+            param.append(kwargs['stationName'])
+
+        result = self.execQuery(query,param)
         return result
 
     def getOrders(self, itemID, **kwargs):
         '''
         Get orders. If older, get new list from external source 
         '''
-        # only update data if DB entries got older than threashhold
+        # only update data if DB entries got older than threshold
         if self.areOrdersTooOld(**kwargs):
             print "Old data detected, fetching current orders..."
             self.fetchOrders(**kwargs)
-            
-        query = """SELECT * FROM prices WHERE itemID = %s""" % itemID 
+
+        param = []
+        
+        query = """SELECT * FROM prices WHERE itemID = ?"""
+        param.append(itemID)
+         
         if kwargs['regionID']:
-            query += """ AND regionID = %s""" % kwargs['regionID']
+            query += """ AND regionID = ?"""
+            param.append(kwargs['regionID'])
         if kwargs['stationID']:
-            query += """ AND stationID = %s""" % kwargs['stationID']
+            query += """ AND stationID = ?"""
+            param.append(kwargs['stationID'])
         if kwargs['stationName']:
-            query += """ AND stationID = %s""" % kwargs['stationName']
+            query += """ AND stationName = ?"""
+            param.append(kwargs['stationName'])
         if kwargs['orderType']:
-            query += """ AND orderType = %s""" % kwargs['orderType']
+            query += """ AND orderType = ?"""
+            param.append(kwargs['orderType'])
 
-        result = self.execQuery(query)
-        return result
-
-    def getMaxBuyOrder(self, itemID, regionID=None, stationID=None, stationName=None):
-        query = """SELECT max(price) FROM prices WHERE orderType = 'buy_orders' AND  itemID = %s""" % itemID 
-        if regionID:
-            query += """ AND regionID = %s""" % regionID
-        if stationID:
-            query += """ AND stationID = %s""" % stationID
-        if stationName:
-            query += """ AND stationID = %s""" % stationName
-
-        result = self.execQuery(query)
+        result = self.execQuery(query, param)
         return result
     
     def __init__(self, dbFile=defaultDBFile):
@@ -221,15 +267,28 @@ if __name__ == '__main__':
     Tritanium_ID = 34
     Strong_Blue_Pill_Booster_ID = 10156
 
-#    itemID = Tritanium_ID
-    itemID = Strong_Blue_Pill_Booster_ID
+    itemID = Tritanium_ID
+#    itemID = Strong_Blue_Pill_Booster_ID
     
     emd = EveMarketData()
-#    emd.deleteOrdersOlderThanMinutes(OLDER_THAN_MINUTES_DEFAULT)
-#    emd.deleteOrdersOlderThanMinutes(itemID, 1)
-#    emd.deleteAllOrders()
         
-    print "Fetching orders..."
-    emd.fetchOrders(itemID = itemID, orderType = 'sell_orders', ifOlderThanMinutes = OLDER_THAN_MINUTES_DEFAULT)
-    print "Done"
+    print "Min sell order Jita: %s" % emd.getMinSellOrder(itemID = itemID, stationName=JITA_STATION_NAME)
+
+#===============================================================================
+#     select itemName, stationName, price, volRemain, round(((4.88 - price) * volRemain)/1000000) as savings, (volRemain * 0.01) as logi from prices
+# where
+# orderType = 'sell_orders' and
+# itemName = 'Tritanium' and
+# price <
+# (select max(price) from prices
+# where
+# itemName = 'Tritanium' and
+# stationName = 'Jita IV - Moon 4 - Caldari Navy Assembly Plant'
+# and orderType = 'buy_orders')
+# and
+# security > 0
+# order by savings desc
+# ;
+#===============================================================================
+
     
