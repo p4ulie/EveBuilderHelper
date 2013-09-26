@@ -96,22 +96,29 @@ class EveCentral(object):
         orders = ElementTree.fromstring(tradeData)
 
         quicklook = orders.find('quicklook')
+
+        orderLists = []
+        orderLists.append(('sell_orders', quicklook.find('sell_orders')))
+        orderLists.append(('buy_orders', quicklook.find('buy_orders')))
         
-        for order in orders.getiterator(tag='order'):
-            row = []
-            row.append(quicklook.findtext('item'))
-            row.append(quicklook.findtext('itemname'))
-            row.append(order.findtext('region'))
-            row.append(order.findtext('station'))
-            row.append(order.findtext('station_name'))
-            row.append(order.findtext('security'))
-            row.append(order.findtext('range'))
-            row.append(order.findtext('price'))
-            row.append(order.findtext('vol_remain'))
-            row.append(order.findtext('min_volume'))
-            row.append(order.findtext('expires'))
-            row.append(order.findtext('reported_time'))
-            result.append(row)
+#        for order in orders.getiterator(tag='order'):
+        for list in orderLists:
+            for order in list[1].getiterator(tag='order'):
+                row = []
+                row.append(quicklook.findtext('item'))
+                row.append(quicklook.findtext('itemname'))
+                row.append(order.findtext('region'))
+                row.append(order.findtext('station'))
+                row.append(order.findtext('station_name'))
+                row.append(order.findtext('security'))
+                row.append(order.findtext('range'))
+                row.append(order.findtext('price'))
+                row.append(order.findtext('vol_remain'))
+                row.append(order.findtext('min_volume'))
+                row.append(order.findtext('expires'))
+                row.append(order.findtext('reported_time'))
+                row.append(list[0])
+                result.append(row)
 
         return result
 
