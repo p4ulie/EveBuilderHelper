@@ -138,19 +138,19 @@ class EveCentral(object):
 
         xmlresult = ''
 
-        if 'itemID' in kwargs:
+        if 'itemID' in kwargs.keys():
             args.append(('typeid', kwargs['itemID']))
 
-            if 'setHours' in kwargs:
+            if 'setHours' in kwargs.keys():
                 args.append(('sethours', kwargs['setHours']))
 
-            if 'regionLimit' in kwargs:
+            if 'regionLimit' in kwargs.keys():
                 args.append(('regionlimit', kwargs['regionLimit']))
 
-            if 'useSystem' in kwargs:
+            if 'useSystem' in kwargs.keys():
                 args.append(('usesystem', kwargs['useSystem']))
 
-            if 'minQ' in kwargs:
+            if 'minQ' in kwargs.keys():
                 args.append(('minQ', kwargs['minQ']))
 
             encargs = urlencode(args, True)
