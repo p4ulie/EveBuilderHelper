@@ -4,10 +4,21 @@ Created on 27.9.2013
 @author: RIDB10157
 '''
 
-import locale
-locale.setlocale(locale.LC_ALL, '')
-
 import sys
+import locale
+
+if (sys.platform == 'win32'):
+
+    locale.setlocale(locale.LC_ALL, "us_us.1250")
+
+elif (sys.platform == 'darwin'):
+
+    locale.setlocale(locale.LC_ALL, "en_US")
+
+elif (sys.platform == 'linux2'):
+
+    locale.setlocale(locale.LC_ALL, "en_US.UTF-8")
+
 
 from EveModules.EveItem import * 
 from EveModules.EveGroup import * 
@@ -56,4 +67,5 @@ if __name__ == '__main__':
         print "List of sell orders (low and highsec) lower than Jita buy:"
             
         for order in orders:
-            print "Price: %.2f, Saving: '%s' for amount: '%s' in station: %s" % (order[2], locale.format('%d', order[4], 1), locale.format('%d', order[3], 1), order[1])
+            #print "Price: %.2f, Saving: '%s' for amount: '%s' in station: %s" % (order[2], locale.format('%d', order[4], 1), locale.format('%d', order[3], 1), order[1])
+            print "Price: %.2f, Saving: '%s' for amount: '%s' in station: %s" % (order[2], locale.currency(order[4], symbol=False, grouping=True), locale.format('%d', order[3], 1), order[1])
