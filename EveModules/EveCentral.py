@@ -29,9 +29,12 @@ class EveCentral(object):
         '''
         result = None
 
-        result = urlopen(url, args).read()
-
-        return result
+        try:
+            result = urlopen(url, args).read()
+        except Exception, e:
+            print e
+        finally:
+            return result
 
     def marketstatParse(self, tradeData, typeID, orderType, attributeName):
         '''
@@ -160,7 +163,9 @@ class EveCentral(object):
 
     def quicklookGetList(self, **kwargs):
         xmlresult = self.quicklookGet(**kwargs)
-        result = self.quicklookParse(xmlresult, **kwargs)
+        result = None
+        if xmlresult:
+            result = self.quicklookParse(xmlresult, **kwargs)
         
         return result
 
