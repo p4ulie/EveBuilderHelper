@@ -5,29 +5,27 @@ Created on 7.4.2013
 '''
 
 from EveDB import EveDB
-from EveBlueprint import EveBlueprint
-
 
 class EveItem(EveDB):
     '''
     Class for Item data reading and handling
     '''
 
-    itemID = ''
-    groupID = ''
+    itemID = None
+    groupID = None
     name = ''
     description = ''
-    graphicID = ''
-    radius = ''
-    mass = ''
-    volume = ''
-    capacity = ''
-    portionSize = ''
-    raceID = ''
-    basePrice = ''
-    published = ''
-    marketGroupID = ''
-    chanceOfDuplicating = ''
+    graphicID = None
+    radius = None
+    mass = None
+    volume = None
+    capacity = None
+    portionSize = None
+    raceID = None
+    basePrice = None
+    published = None
+    marketGroupID = None
+    chanceOfDuplicating = None
 
     def __getItem(self, query):
         '''
@@ -73,6 +71,26 @@ class EveItem(EveDB):
                     """ % name
             self.__getItem(query)
 
+    def getMetaGroup(self):
+        '''
+        Check real meta type of item
+        '''
+        metaType = 1
+        
+        if self.itemID:        
+            query = """
+                    SELECT *
+                    FROM invMetaTypes AS m
+                    WHERE m.typeID = %s
+                """ % self.itemID
+    
+            result = self.fetchData(query)
+
+            if result:
+                metaType = result[0][2]
+
+        return metaType
+
     def getBlueprintID(self):
         '''
         Get blueprintID for this item, if it exists
@@ -82,16 +100,14 @@ class EveItem(EveDB):
                     FROM invBlueprintTypes AS b
                     WHERE b.productTypeID = %s
                 """ % self.itemID
-        data = self.fetchData(query)[0]
-        return data
+        result = self.fetchData(query)
 
-    def getBlueprintObject(self):
-        '''
-        Get blueprintID for this item, if it exists
-        create and return an instance of EveBlueprint class
-        '''
-        blueprint = EveBlueprint(self.DB, blueprintID = self.getBlueprintID())
-        return blueprint
+        if result:
+            data = result[0] 
+        else:
+            data = None
+
+        return data
 
     def __init__(self, DB, itemID='', name=''):
         '''
