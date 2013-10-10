@@ -11,19 +11,19 @@ class EveBlueprint(EveDB):
     Class for invBlueprintType data reading and handling
     '''
 
-    blueprintID = ''
-    parentBlueprintID = ''
-    productID = ''
-    productionTime = ''
-    techLevel = ''
-    researchProductivityTime = ''
-    researchMaterialTime = ''
-    researchCopyTime = ''
-    researchTechTime = ''
-    productivityModifier = ''
-    materialModifier = ''
-    wasteFactor = ''
-    maxProductionLimit = ''
+    blueprintID = None
+    parentBlueprintID = None
+    productID = None
+    productionTime = None
+    techLevel = None
+    researchProductivityTime = None
+    researchMaterialTime = None
+    researchCopyTime = None
+    researchTechTime = None
+    productivityModifier = None
+    materialModifier = None
+    wasteFactor = None
+    maxProductionLimit = None
 
     # Researched levels of ME and PE
     researchLevelME = 0
@@ -116,11 +116,16 @@ class EveBlueprint(EveDB):
                         and r.typeID = %s;
                     """ % blueprintID
 
-            data = self.fetchData(query)[0]
+            result = self.fetchData(query)
+
+            if result:
+                data = result[0] 
+            else:
+                data = None
 
         return data
 
-    def getManufacturingMaterials(self, characterPESkillLvl=5):
+    def getManufacturingMaterials(self, skillPE=5):
         '''
         Generate a list of materials for production, IDs and quantities,
         waste is added from researched blueprint ME amount and PE skill level
@@ -164,7 +169,7 @@ class EveBlueprint(EveDB):
         # Compute and add waste to material list
         for materialID, quantity in materialList.iteritems():
             wasteME = self.__computeWasteFromResearchLevelME(quantity)
-            wastePE = self.__computeWasteFromCharacterSkillLevelPE(quantity, characterPESkillLvl)
+            wastePE = self.__computeWasteFromCharacterSkillLevelPE(quantity, skillPE)
             addMaterialToList(materialList, [materialID, wasteME + wastePE])
 
         materialExtraList = self.getExtraMaterialList()
@@ -183,14 +188,14 @@ class EveBlueprint(EveDB):
             waste = round(float(materialAmount) * (float(self.wasteFactor) / 100) * (1 - float(self.researchLevelME)))
         return int(waste)
 
-    def __computeWasteFromCharacterSkillLevelPE(self, materialAmount, PESkillLevel):
+    def __computeWasteFromCharacterSkillLevelPE(self, materialAmount, skillPE):
         '''
         Compute waste for trained Production Efficiency skill level
         '''
-        waste = round(((25 - (5 * float(PESkillLevel))) * float(materialAmount)) / 100)
+        waste = round(((25 - (5 * float(skillPE))) * float(materialAmount)) / 100)
         return int(waste)
 
-    def __init__(self, DB, blueprintID = '', productID = '', ResearchLevelME = '', ResearchLevelPE = ''):
+    def __init__(self, DB, blueprintID = '', productID = '', ResearchLevelME = None, ResearchLevelPE = None):
         '''
         Constructor, initial data load
         '''
@@ -214,13 +219,3 @@ class EveBlueprint(EveDB):
                     """ % blueprintID
 
         self.__getBlueprint(query)
-
-        if ResearchLevelME:
-            self.researchLevelME = ResearchLevelME
-        elif self.techLevel == 2:
-            self.researchLevelME = -4
-
-        if ResearchLevelPE:
-            self.researchLevelPE = ResearchLevelPE
-        elif self.techLevel == 2:
-            self.researchLevelPE = -4
