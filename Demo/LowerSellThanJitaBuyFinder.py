@@ -69,3 +69,5 @@ if __name__ == '__main__':
         for order in orders:
             #print "Price: %.2f, Saving: '%s' for amount: '%s' in station: %s" % (order[2], locale.format('%d', order[4], 1), locale.format('%d', order[3], 1), order[1])
             print "Price: %.2f, Saving: '%s' for amount: '%s' in station: %s" % (order[2], locale.currency(order[4], symbol=False, grouping=True), locale.format('%d', order[3], 1), order[1])
+
+        print
