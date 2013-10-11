@@ -33,15 +33,52 @@ def main():
 
     materialList = getMaterialList(item.itemID, blueprintME=ME, blueprintPE=PE, skillPE=character.getSkillLevel('Production Efficiency'))    
 
+    buyList = {}
+    buildList = {}
+    
+    # look up components for this item    
     for material, quantity in materialList.iteritems():
         itemMaterial = EveItem(DB, itemID = material)
-        print "Material %s (meta %s): %s units" % (itemMaterial.name, itemMaterial.getMetaGroup(), quantity)
+#        print "Material %s (meta %s): %s units" % (itemMaterial.name, itemMaterial.getMetaGroup(), quantity)
+
+        # doest the component have materials, is it buildable?
         materialListComponent = getMaterialList(itemMaterial.itemID, blueprintME=0, blueprintPE=0, skillPE=character.getSkillLevel('Production Efficiency'))    
+
         if materialListComponent is not None:
-            print "\tBuild list for %s:" % itemMaterial.name
+#            print "\tBuild list for %s:" % itemMaterial.name
+
+            if material in buildList.keys():
+                buildList[material] += quantity
+            else:
+                buildList[material] = quantity
+
+            # look up materials for this omponent
             for matComp, quantComp in materialListComponent.iteritems():
                 itemMaterialComponent = EveItem(DB, itemID = matComp)
-                print "\t\tMaterial %s: %s units" % (itemMaterialComponent.name, quantComp)
+#                print "\t\tMaterial %s: %s units" % (itemMaterialComponent.name, quantComp*quantity)
+
+                # buy the needd amount
+                if matComp in buyList.keys():
+                    buyList[matComp] += quantComp*quantity
+                else:
+                    buyList[matComp] = quantComp*quantity
+
+        # if its not buildable, buy it
+        else:
+            if material in buildList.keys():
+                buyList[material] += quantity
+            else:
+                buyList[material] = quantity
+
+    for m, q in buildList.iteritems():
+        i = EveItem(DB, itemID=m)
+        print "Build %s of %s" % (q, i.name)
+
+    print
+    
+    for m, q in buyList.iteritems():
+        i = EveItem(DB, itemID=m)
+        print "Buy %s of %s" % (q, i.name)
 
 if __name__ == '__main__':
     main()
