@@ -162,9 +162,10 @@ class EveBlueprint(EveDB):
         # In case of T2 item, subtract materials of T1 item needed for manufacturing (Wolf - Rifter) 
         if self.techLevel == 2:
             itemT1 = self.__getT1ItemForT2Blueprint()
-            materialT1List = self.getBaseMaterialList(itemT1)
-            for material in materialT1List:
-                subtractMaterialFromList(materialList, material)
+            if itemT1:
+                materialT1List = self.getBaseMaterialList(itemT1)
+                for material in materialT1List:
+                    subtractMaterialFromList(materialList, material)
 
         # Compute and add waste to material list
         for materialID, quantity in materialList.iteritems():
@@ -218,4 +219,9 @@ class EveBlueprint(EveDB):
                         WHERE b.blueprintTypeID = %s
                     """ % blueprintID
 
+        if ResearchLevelME:
+            self.researchLevelME = ResearchLevelME
+        if ResearchLevelPE:
+            self.researchLevelPE = ResearchLevelPE
+        
         self.__getBlueprint(query)
