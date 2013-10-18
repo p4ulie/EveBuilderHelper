@@ -6,12 +6,12 @@ Created on 7.4.2013
 
 from EveDB import EveDB
 
-class EveItem(EveDB):
+class EveInvType(EveDB):
     '''
     Class for Item data reading and handling
     '''
 
-    itemID = None
+    typeID = None
     groupID = None
     name = ''
     description = ''
@@ -33,7 +33,7 @@ class EveItem(EveDB):
         '''
         data = self.fetchData(query)
         if data:
-            self.itemID = data[0][0]
+            self.typeID = data[0][0]
             self.groupID = data[0][1]
             self.name = data[0][2]
             self.description = data[0][3]
@@ -77,12 +77,12 @@ class EveItem(EveDB):
         '''
         metaType = 1
         
-        if self.itemID:        
+        if self.typeID:        
             query = """
                     SELECT *
                     FROM invMetaTypes AS m
                     WHERE m.typeID = %s
-                """ % self.itemID
+                """ % self.typeID
     
             result = self.fetchData(query)
 
@@ -99,7 +99,7 @@ class EveItem(EveDB):
                     SELECT blueprintTypeID
                     FROM invBlueprintTypes AS b
                     WHERE b.productTypeID = %s
-                """ % self.itemID
+                """ % self.typeID
         result = self.fetchData(query)
 
         if result:

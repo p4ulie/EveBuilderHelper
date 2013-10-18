@@ -13,14 +13,14 @@ characterPESkillLvl = 5
 
 
 def main():
-    item = EveItem(DB, name='Ishtar')
+    item = EveInvType(DB, name='Ishtar')
     bp = item.getBlueprintObject()
 
     print("Name of item: %s") % (item.name)
 
     materialList = bp.getManufacturingMaterials(characterPESkillLvl=characterPESkillLvl)
     for material, quantity in materialList.iteritems():
-        it = EveItem(DB, itemID = material)
+        it = EveInvType(DB, itemID = material)
         print("Material %s: %s units") % (it.name, quantity)
 
 if __name__ == '__main__':

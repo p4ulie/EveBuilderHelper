@@ -37,7 +37,7 @@ if __name__ == '__main__':
 
     DB = '../../data/ody100-sqlite3-v1.db'
     eGroup = EveGroup(DB, groupName = 'Mineral')
-    eItem = EveItem(DB)
+    eItem = EveInvType(DB)
     
     for item in eItem.getItemsList(eGroup.groupID):
         itemID = item[0]

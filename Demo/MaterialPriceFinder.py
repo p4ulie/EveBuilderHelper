@@ -60,14 +60,14 @@ stationJita = 'Jita IV - Moon 4 - Caldari Navy Assembly Plant'
 
                
 def main():
-    item = EveItem(DB, name='Caldari Fuel Block')
+    item = EveInvType(DB, name='Caldari Fuel Block')
     bp = item.getBlueprintObject()
     bp.researchLevelME = 40
 
     materialList = bp.getManufacturingMaterials(characterPESkillLvl=characterPESkillLvl)
 
     #===========================================================================
-    # item = EveItem(DB, name='Robotics')
+    # item = EveInvType(DB, name='Robotics')
     # materialList = {}
     # materialList[item.itemID] = 0
     #===========================================================================
@@ -87,7 +87,7 @@ def main():
         
     for material in materialList.keys():
         # Get Jita price
-        matItem = EveItem(DB, itemID=material)
+        matItem = EveInvType(DB, itemID=material)
         print "Getting Jita price for item %s..." % matItem.name
         resultJita = ec.marketstatGet(material, useSystem=solarSys.solarSystemID)
         priceJitaBuyMax = float(ec.marketstatParse(resultJita, material, 'buy', 'max'))
@@ -114,15 +114,15 @@ def main():
                                 orderType,
                                 jitaBuyMax)
                                 values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'sell', ?)
-                """, (matItem.itemID, matItem.name, line[2], line[3], line[4], line[5], line[6], line[7],
+                """, (matItem.typeID, matItem.name, line[2], line[3], line[4], line[5], line[6], line[7],
                       line[8], line[9], line[10], line[11], priceJitaBuyMax)
                 )
 
     print "\nList of items:\n"
 
     for material in materialList.keys():
-        matItem = EveItem(DB, itemID=material)
-        print "\nItem: %s (Jita buy max: %s)\n" % (matItem.name, priceListJita[matItem.itemID])
+        matItem = EveInvType(DB, itemID=material)
+        print "\nItem: %s (Jita buy max: %s)\n" % (matItem.name, priceListJita[matItem.typeID])
         for order in cur.execute('''SELECT itemName, price, volRemain, stationName, (jitaBuyMax - price) * volRemain as savings
                                     FROM prices WHERE price < jitaBuyMax AND itemID = ?
                                     AND security > 0.4 AND volRemain > 1
