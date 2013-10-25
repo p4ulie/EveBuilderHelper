@@ -5,15 +5,16 @@ Created on 7.4.2013
 '''
 
 from EveDB import EveDB
+#from EveInvType import EveInvType
 
-class EveBlueprint(EveDB):
+class EveInvBlueprintType(EveDB):
     '''
     Class for invBlueprintType data reading and handling
     '''
 
-    blueprintID = None
-    parentBlueprintID = None
-    productID = None
+    blueprintTypeID = None
+    parentBlueprintTypeID = None
+    productTypeID = None
     productionTime = None
     techLevel = None
     researchProductivityTime = None
@@ -24,6 +25,7 @@ class EveBlueprint(EveDB):
     materialModifier = None
     wasteFactor = None
     maxProductionLimit = None
+    portionSize = None # amount produced in 1 run
 
     # Researched levels of ME and PE
     researchLevelME = 0
@@ -36,9 +38,9 @@ class EveBlueprint(EveDB):
 
         data = self.fetchData(query)
         if data:
-            self.blueprintID = data[0][0]
-            self.parentBlueprintID = data[0][1]
-            self.productID = data[0][2]
+            self.blueprintTypeID = data[0][0]
+            self.parentBlueprintTypeID = data[0][1]
+            self.productTypeID = data[0][2]
             self.productionTime = data[0][3]
             self.techLevel = data[0][4]
             self.researchProductivityTime = data[0][5]
@@ -50,15 +52,24 @@ class EveBlueprint(EveDB):
             self.wasteFactor = data[0][11]
             self.maxProductionLimit = data[0][12]
 
-    def getBaseMaterialList(self, itemID = ''):
+            query = """
+                        SELECT portionSize
+                        FROM invTypes AS t
+                        WHERE t.typeID = '%s'
+                    """ % self.productTypeID
+            data = self.fetchData(query)
+            if data:
+                self.portionSize = data[0][0]
+
+    def getBaseMaterialList(self, typeID = ''):
         '''
         Get base list of materials for InvType,
         equals amount of materials when recycling item
         (list of lists - [ID, quantity])
         '''
 
-        if not itemID:
-            itemID = self.productID 
+        if not typeID:
+            typeID = self.productTypeID 
 
         query = """
                     SELECT t.typeID, m.quantity
@@ -66,7 +77,7 @@ class EveBlueprint(EveDB):
                      INNER JOIN invTypes AS t
                       ON m.materialTypeID = t.typeID
                     WHERE m.typeID = %s
-                """ % itemID
+                """ % typeID
 
         data = self.fetchData(query)
         return data
@@ -78,7 +89,7 @@ class EveBlueprint(EveDB):
         '''
 
         if not blueprintID:
-            blueprintID = self.blueprintID 
+            blueprintID = self.blueprintTypeID 
 
         query = """
                     SELECT r.requiredTypeID, r.quantity, r.damagePerJob
@@ -104,7 +115,7 @@ class EveBlueprint(EveDB):
         
         if self.techLevel == 2:
             if not blueprintID:
-                blueprintID = self.blueprintID 
+                blueprintID = self.blueprintTypeID 
 
             query = """
                         select r.requiredTypeID from ramTypeRequirements as r
@@ -125,15 +136,16 @@ class EveBlueprint(EveDB):
 
         return data
 
-    def getManufacturingMaterials(self, skillPE=5):
+    def getManufacturingMaterialsList(self, skillPE=5):
         '''
         Generate a list of materials for production, IDs and quantities,
-        waste is added from researched blueprint ME amount and PE skill level
+        waste is added from researched blueprint ME amount and PE skill level.
+        Return the list of InvType objects
         '''
 
         def addMaterialToList(materialList, material):
             '''
-            Add specified amount of material (itemID, quantity) to materialList dictionary
+            Add specified amount of material (typeID, quantity) to materialList dictionary
             '''
            
             if material[0] in materialList:
@@ -143,7 +155,7 @@ class EveBlueprint(EveDB):
         
         def subtractMaterialFromList(materialList, material):
             '''
-            Substract specified amount of material (itemID, quantity) from materialList dictionary
+            Substract specified amount of material (typeID, quantity) from materialList dictionary
             '''
         
             if material[0] in materialList:
@@ -177,7 +189,13 @@ class EveBlueprint(EveDB):
         for material in materialExtraList:
             addMaterialToList(materialList, material)
 
-        return materialList
+        materialObjList = {}
+
+        if materialList:
+            for material,quantity in materialList.iteritems(): 
+                materialObjList[material] = quantity
+
+        return materialObjList
 
     def __computeWasteFromResearchLevelME(self, materialAmount):
         '''
@@ -196,7 +214,7 @@ class EveBlueprint(EveDB):
         waste = round(((25 - (5 * float(skillPE))) * float(materialAmount)) / 100)
         return int(waste)
 
-    def __init__(self, DB, blueprintID = '', productID = '', ResearchLevelME = None, ResearchLevelPE = None):
+    def __init__(self, DB, blueprintID = None, productID = None, ResearchLevelME = None, ResearchLevelPE = None):
         '''
         Constructor, initial data load
         '''
@@ -205,14 +223,14 @@ class EveBlueprint(EveDB):
 
         query = ""
 
-        if productID != '':
+        if productID :
             query = """
                         SELECT *
                         FROM invBlueprintTypes AS b
                         WHERE b.productTypeID = %s
                     """ % productID
 
-        if blueprintID != '':
+        if blueprintID:
             query = """
                         SELECT *
                         FROM invBlueprintTypes AS b

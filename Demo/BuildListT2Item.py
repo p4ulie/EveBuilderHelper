@@ -5,7 +5,7 @@ Created on 9.10.2013
 '''
 
 from Config import *
-from EveModules.EveItem import *
+from EveModules.EveInvType import *
 from EveModules.EveBlueprint import *
 from EveModules.EveCharacter import *
 
@@ -18,9 +18,9 @@ def getMaterialList(itemID, blueprintME=0, blueprintPE=0, skillPE=5):
     '''
     materialList = None
     
-    bp = EveBlueprint(DB, productID = itemID, ResearchLevelME = blueprintME, ResearchLevelPE = blueprintPE)
-    if bp.blueprintID is not None:
-        materialList = bp.getManufacturingMaterials(skillPE=skillPE)
+    bp = EveInvBlueprintType(DB, productID = itemID, ResearchLevelME = blueprintME, ResearchLevelPE = blueprintPE)
+    if bp.blueprintTypeID is not None:
+        materialList = bp.getManufacturingMaterialsList(skillPE=skillPE)
 
     return materialList 
 
@@ -29,7 +29,7 @@ def main():
     character.addSkill('Production Efficiency', 5) 
     
     item = EveInvType(DB, name='Ishtar')
-    print "Name of item: %s, Meta: %s" % (item.name, item.getMetaGroup())
+    print "Name of item: %s, Meta: %s" % (item.__typeName, item.loadMetaGroup())
 
     materialList = getMaterialList(item.typeID, blueprintME=ME, blueprintPE=PE, skillPE=character.getSkillLevel('Production Efficiency'))    
 
@@ -39,7 +39,7 @@ def main():
     # look up components for this item    
     for material, quantity in materialList.iteritems():
         itemMaterial = EveInvType(DB, itemID = material)
-#        print "Material %s (meta %s): %s units" % (itemMaterial.name, itemMaterial.getMetaGroup(), quantity)
+#        print "Material %s (meta %s): %s units" % (itemMaterial.name, itemMaterial.loadMetaGroup(), quantity)
 
         # doest the component have materials, is it buildable?
         materialListComponent = getMaterialList(itemMaterial.typeID, blueprintME=0, blueprintPE=0, skillPE=character.getSkillLevel('Production Efficiency'))    
@@ -72,13 +72,13 @@ def main():
 
     for m, q in buildList.iteritems():
         i = EveInvType(DB, itemID=m)
-        print "Build %s of %s" % (q, i.name)
+        print "Build %s of %s" % (q, i.__typeName)
 
     print
     
     for m, q in buyList.iteritems():
         i = EveInvType(DB, itemID=m)
-        print "Buy %s of %s" % (q, i.name)
+        print "Buy %s of %s" % (q, i.__typeName)
 
 if __name__ == '__main__':
     main()
