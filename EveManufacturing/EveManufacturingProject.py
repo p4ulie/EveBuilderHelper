@@ -4,8 +4,34 @@ Created on Oct 13, 2013
 @author: paulie
 '''
 
-from EveManufacturingTask import EveManufacturingTask
+from Config import *
 
+from EveManufacturingTask import EveManufacturingTask
+from EveModules.EveInvType import EveInvType
+
+class EveManufacturingMaterial(EveInvType):
+    '''
+    Class for material, used in manufacturing projects
+    '''
+    
+    __quantity = None
+    
+    def getQuantity(self):
+        '''
+        Return quantity
+        '''
+        return self.__quantity     
+
+    def setQuantity(self, quantity):
+        '''
+        Set quantity
+        '''
+        if quantity:
+            self.__quantity = quantity
+
+        return self.__quantity     
+    
+    
 class EveManufacturingProject(object):
     '''
     Class for manufacturing projects in Eve Online
@@ -39,23 +65,34 @@ class EveManufacturingProject(object):
             self.__name = name
         return self.__name
     
-    def getProjectMaterialList(self):
+    def getMaterialList(self):
         '''
         Colllect and return material list for all tasks
         '''
         projectMaterialList = {}
+        projectMaterialObjList = []
         
-        listOfMaterialLists = [task.getMaterialList() for task in self.__taskList]
+        listOfTaskMaterialLists = [task.getMaterialList() for task in self.__taskList]
 
-        for list in listOfMaterialLists:
-            for material,quantity in list.iteritems():
-                if material in projectMaterialList.keys():
-                    projectMaterialList[material] += quantity
-                else:
-                    projectMaterialList[material] = quantity
-
-        return projectMaterialList
-    
+        for taskMaterialList in listOfTaskMaterialLists:
+            for material,quantity in taskMaterialList.iteritems():
+#                 print "%s: %s" % (material,quantity)
+#                 if material in projectMaterialList.keys():
+#                     projectMaterialList[material] += quantity
+#                 else:
+#                     projectMaterialList[material] = quantity
+                quantityInc = False                
+                for mat in projectMaterialObjList:
+                    if mat.getTypeID() == material:
+                        mat.setQuantity(int(mat.getQuantity) + quantity)
+                        quantityInc = True
+                # if quantity was not incremented, add new entry and set it
+                if quantityInc == False:
+                    materialObj = EveManufacturingMaterial(DB, typeID=material)
+                    materialObj.setQuantity(quantity)
+                    projectMaterialObjList.append(materialObj)
+                    
+        return projectMaterialObjList
 
     def getTaskCount(self):
         '''
@@ -63,20 +100,34 @@ class EveManufacturingProject(object):
         '''
         return len(self.__taskList)
     
+    def getTaskNamesList(self):
+        '''
+        Return list of task names
+        '''
+        return [task.getName() for task in self.__taskList]
+
     def getTaskList(self):
         '''
         Return list of tasks
         '''
-        return [task.getName() for task in self.__taskList]
+        return self.__taskList
+
+    def getTask(self, name):
+        '''
+        Return reference to task object
+        '''
+        return [(task if task.getName() == name else None) for task in self.__taskList][0]
         
-    def addTask(self, name=None, typeID=None):
+    def addTask(self, name=None, blueprint=None, quantity=None):
         '''
         Add new task
         '''
         if not name:
             taskCount = self.getTaskCount()
-            name = "Task-%s" % format(taskCount + 1, "03d")
+            name = "Task-%s" % format(taskCount + 1, "04d")
             
-        task = EveManufacturingTask(name, typeID=typeID)
+        task = EveManufacturingTask(name, blueprint=blueprint)
         self.__taskList.append(task)
+        
+        return task
         

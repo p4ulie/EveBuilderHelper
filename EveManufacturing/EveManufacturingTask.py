@@ -11,31 +11,61 @@ class EveManufacturingTask(object):
 
     __id = None
     __name = None
+    __quantity = 1
     __typeID = None
-    __blueprint = None # placeholder for blueprint object
+    __blueprint = None # blueprint object (not DB blueprintID)
+    __blueprintRuns = None # blueprint runs needed to manufacture specified quantity
     __taskType = None # manufacturing, invention
     __taskTime = None # duration of task
     __startDate = None
     __finishDate = None
     __taskLevel = None # to determine priority of building
     
-    __materialList = {}
-
-    def __init__(self,name=None, typeID=None):
+    def __init__(self, name, blueprint=None, quantity=1):
         '''
         Constructor
         '''
         self.__name = name
-        self.__typeID = typeID
+        self.__quantity = quantity 
+        self.setBlueprint(blueprint) 
 
     def getName(self):
         '''
         Return task name
         '''
         return self.__name     
-        
-    def getMaterialList(self):
+
+    def setName(self, name=None):
+        '''
+        Set task name
+        '''
+        if name:
+            self.__name = name
+
+        return self.__name     
+
+    def getBlueprint(self):
+        '''
+        Return blueprint object
+        '''
+        return self.__blueprint     
+
+    def setBlueprint(self, blueprint=None):
+        '''
+        Set blueprint
+        '''
+        if blueprint:
+            self.__blueprint = blueprint
+            self.__blueprintRuns = (int(self.__quantity) / int(self.__blueprint.portionSize)) + 1
+
+        return self.__blueprint     
+
+    def getMaterialList(self,skillPE=5):
         '''
         Return material list for task
         '''
-        return self.__materialList     
+        result = None
+        if self.__blueprint:
+            result = self.__blueprint.getManufacturingMaterialsList(skillPE=skillPE)
+
+        return result     
