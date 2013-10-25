@@ -4,6 +4,10 @@ Created on Oct 13, 2013
 @author: paulie
 '''
 
+from Config import *
+
+from EveManufacturingMaterial import EveManufacturingMaterial
+
 class EveManufacturingTask(object):
     '''
     Class for manufacturing tasks in Eve Online
@@ -11,10 +15,10 @@ class EveManufacturingTask(object):
 
     __id = None
     __name = None
-    __quantity = 1
+    __manufacturingQuantity = 1
     __typeID = None
     __blueprint = None # blueprint object (not DB blueprintID)
-    __blueprintRuns = None # blueprint runs needed to manufacture specified quantity
+    __blueprintNecessaryRuns = None # blueprint runs needed to manufacture specified quantity
     __taskType = None # manufacturing, invention
     __taskTime = None # duration of task
     __startDate = None
@@ -44,6 +48,21 @@ class EveManufacturingTask(object):
 
         return self.__name     
 
+    def getQuantity(self):
+        '''
+        Return task name
+        '''
+        return self.__manufacturingQuantity     
+
+    def setQuantity(self, quantity=None):
+        '''
+        Set task name
+        '''
+        if quantity:
+            self.__manufacturingQuantity = quantity
+
+        return self.__manufacturingQuantity     
+
     def getBlueprint(self):
         '''
         Return blueprint object
@@ -56,7 +75,7 @@ class EveManufacturingTask(object):
         '''
         if blueprint:
             self.__blueprint = blueprint
-            self.__blueprintRuns = (int(self.__quantity) / int(self.__blueprint.portionSize)) + 1
+            self.__blueprintNecessaryRuns = (int(self.__quantity) / int(self.__blueprint.portionSize)) + 1
 
         return self.__blueprint     
 
@@ -64,8 +83,11 @@ class EveManufacturingTask(object):
         '''
         Return material list for task
         '''
-        result = None
+        materialList = []
         if self.__blueprint:
-            result = self.__blueprint.getManufacturingMaterialsList(skillPE=skillPE)
-
-        return result     
+            materialListUnit = self.__blueprint.getManufacturingMaterialsList(skillPE=skillPE)
+            for material,quantity in materialListUnit.iteritems():
+                materialList.append(EveManufacturingMaterial(DB, typeID=material, quantity=quantity * self.__manufacturingQuantity))
+#                materialList[material] = quantity * self.__manufacturingQuantity
+             
+        return materialList     

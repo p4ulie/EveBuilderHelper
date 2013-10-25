@@ -7,31 +7,8 @@ Created on Oct 13, 2013
 from Config import *
 
 from EveManufacturingTask import EveManufacturingTask
-from EveModules.EveInvType import EveInvType
+from EveManufacturingMaterial import EveManufacturingMaterial
 
-class EveManufacturingMaterial(EveInvType):
-    '''
-    Class for material, used in manufacturing projects
-    '''
-    
-    __quantity = None
-    
-    def getQuantity(self):
-        '''
-        Return quantity
-        '''
-        return self.__quantity     
-
-    def setQuantity(self, quantity):
-        '''
-        Set quantity
-        '''
-        if quantity:
-            self.__quantity = quantity
-
-        return self.__quantity     
-    
-    
 class EveManufacturingProject(object):
     '''
     Class for manufacturing projects in Eve Online
@@ -81,10 +58,13 @@ class EveManufacturingProject(object):
 #                     projectMaterialList[material] += quantity
 #                 else:
 #                     projectMaterialList[material] = quantity
+
+#                print [(mat if mat.getTypeID() == material else break) for mat in projectMaterialObjList]
+                
                 quantityInc = False                
                 for mat in projectMaterialObjList:
                     if mat.getTypeID() == material:
-                        mat.setQuantity(int(mat.getQuantity) + quantity)
+                        mat.setQuantity(int(mat.getQuantity()) + quantity)
                         quantityInc = True
                 # if quantity was not incremented, add new entry and set it
                 if quantityInc == False:
