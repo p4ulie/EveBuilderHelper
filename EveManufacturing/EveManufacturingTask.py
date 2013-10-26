@@ -30,7 +30,7 @@ class EveManufacturingTask(object):
         Constructor
         '''
         self.name = name
-        self.quantity = quantity 
+        self.manufacturingQuantity = quantity 
         self.__blueprint = blueprint 
 
     @property
