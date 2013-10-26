@@ -9,6 +9,7 @@ Created on 8.7.2012
 import sys
 import sqlite3 as lite
 
+from Config import *
 
 class EveDB(object):
     '''
@@ -88,7 +89,7 @@ class EveDB(object):
         data = self.fetchData(query)
         return data
 
-    def __init__(self, DB):
+    def __init__(self):
         '''
         Constructor
         '''

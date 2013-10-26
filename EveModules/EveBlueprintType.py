@@ -4,8 +4,9 @@ Created on 7.4.2013
 @author: Pavol Antalik
 '''
 
+from Config import *
+
 from EveDB import EveDB
-#from EveInvType import EveInvType
 
 class EveInvBlueprintType(EveDB):
     '''
@@ -214,7 +215,7 @@ class EveInvBlueprintType(EveDB):
         waste = round(((25 - (5 * float(skillPE))) * float(materialAmount)) / 100)
         return int(waste)
 
-    def __init__(self, DB, blueprintID = None, productID = None, ResearchLevelME = None, ResearchLevelPE = None):
+    def __init__(self, blueprintID = None, productID = None, ResearchLevelME = None, ResearchLevelPE = None):
         '''
         Constructor, initial data load
         '''
