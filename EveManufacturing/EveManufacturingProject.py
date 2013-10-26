@@ -46,32 +46,23 @@ class EveManufacturingProject(object):
         '''
         Colllect and return material list for all tasks
         '''
-        projectMaterialList = {}
+
         projectMaterialObjList = []
         
         listOfTaskMaterialLists = [task.getMaterialList() for task in self.__taskList]
 
         for taskMaterialList in listOfTaskMaterialLists:
-            for material,quantity in taskMaterialList.iteritems():
-#                 print "%s: %s" % (material,quantity)
-#                 if material in projectMaterialList.keys():
-#                     projectMaterialList[material] += quantity
-#                 else:
-#                     projectMaterialList[material] = quantity
+            for taskMaterial in taskMaterialList:
 
-#                print [(mat if mat.getTypeID() == material else break) for mat in projectMaterialObjList]
+                newMaterialFound = True
+                for projMaterial in projectMaterialObjList:
+                    if projMaterial.typeID == taskMaterial.typeID:
+                        newMaterialFound = False
+                        projMaterial.quantity += taskMaterial.quantity
                 
-                quantityInc = False                
-                for mat in projectMaterialObjList:
-                    if mat.getTypeID() == material:
-                        mat.setQuantity(int(mat.getQuantity()) + quantity)
-                        quantityInc = True
-                # if quantity was not incremented, add new entry and set it
-                if quantityInc == False:
-                    materialObj = EveManufacturingMaterial(typeID=material)
-                    materialObj.setQuantity(quantity)
-                    projectMaterialObjList.append(materialObj)
-                    
+                if newMaterialFound:
+                    projectMaterialObjList.append(EveManufacturingMaterial(typeID=taskMaterial.typeID, quantity=taskMaterial.quantity))
+                
         return projectMaterialObjList
 
     def getTaskCount(self):
