@@ -13,81 +13,52 @@ class EveManufacturingTask(object):
     Class for manufacturing tasks in Eve Online
     '''
 
-    __id = None
-    __name = None
-    __manufacturingQuantity = 1
-    __typeID = None
+    id = None
+    name = None
+    manufacturingQuantity = 1
+    typeID = None
     __blueprint = None # blueprint object (not DB blueprintID)
-    __blueprintNecessaryRuns = None # blueprint runs needed to manufacture specified quantity
-    __taskType = None # manufacturing, invention
-    __taskTime = None # duration of task
-    __startDate = None
-    __finishDate = None
-    __taskLevel = None # to determine priority of building
+    blueprintNecessaryRuns = None # blueprint runs needed to manufacture specified quantity
+    taskType = None # manufacturing, invention
+    taskTime = None # duration of task
+    startDate = None
+    finishDate = None
+    taskLevel = None # to determine priority of building
     
     def __init__(self, name, blueprint=None, quantity=1):
         '''
         Constructor
         '''
-        self.__name = name
-        self.__quantity = quantity 
-        self.setBlueprint(blueprint) 
+        self.name = name
+        self.quantity = quantity 
+        self.__blueprint = blueprint 
 
-    def getName(self):
+    @property
+    def blueprint(self):
         '''
-        Return task name
-        '''
-        return self.__name     
-
-    def setName(self, name=None):
-        '''
-        Set task name
-        '''
-        if name:
-            self.__name = name
-
-        return self.__name     
-
-    def getQuantity(self):
-        '''
-        Return task name
-        '''
-        return self.__manufacturingQuantity     
-
-    def setQuantity(self, quantity=None):
-        '''
-        Set task name
-        '''
-        if quantity:
-            self.__manufacturingQuantity = quantity
-
-        return self.__manufacturingQuantity     
-
-    def getBlueprint(self):
-        '''
-        Return blueprint object
+        Set blueprint
         '''
         return self.__blueprint     
 
-    def setBlueprint(self, blueprint=None):
+    @blueprint.setter
+    def blueprint(self, blueprint):
         '''
         Set blueprint
         '''
         if blueprint:
             self.__blueprint = blueprint
-            self.__blueprintNecessaryRuns = (int(self.__quantity) / int(self.__blueprint.portionSize)) + 1
+            self.blueprintNecessaryRuns = (int(self.quantity) / int(self.__blueprint.portionSize)) + 1
 
-        return self.__blueprint     
+        return self.blueprint     
 
-    def getMaterialList(self,skillPE=5):
+    def getMaterialList(self, skillPE=5):
         '''
         Return material list for task
         '''
         materialList = []
-        if self.__blueprint:
-            materialListUnit = self.__blueprint.getManufacturingMaterialsList(skillPE=skillPE)
+        if self.blueprint:
+            materialListUnit = self.blueprint.getManufacturingMaterialsList(skillPE=skillPE)
             for material,quantity in materialListUnit.iteritems():
-                materialList.append(EveManufacturingMaterial(DB, typeID=material, quantity=quantity * self.__manufacturingQuantity))
-#                materialList[material] = quantity * self.__manufacturingQuantity
+                materialList.append(EveManufacturingMaterial(typeID=material, quantity=(quantity * self.manufacturingQuantity)))
              
         return materialList     
