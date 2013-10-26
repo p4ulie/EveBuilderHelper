@@ -68,7 +68,7 @@ class EveManufacturingProject(object):
                         quantityInc = True
                 # if quantity was not incremented, add new entry and set it
                 if quantityInc == False:
-                    materialObj = EveManufacturingMaterial(DB, typeID=material)
+                    materialObj = EveManufacturingMaterial(typeID=material)
                     materialObj.setQuantity(quantity)
                     projectMaterialObjList.append(materialObj)
                     
