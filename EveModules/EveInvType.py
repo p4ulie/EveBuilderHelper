@@ -4,6 +4,8 @@ Created on 7.4.2013
 @author: Pavol Antalik
 '''
 
+from Config import *
+
 from EveDB import EveDB
 
 class EveInvType(EveDB):
@@ -11,24 +13,24 @@ class EveInvType(EveDB):
     Class for Item data reading and handling
     '''
 
-    __typeID = None
-    __groupID = None
-    __typeName = ''
-    __description = ''
-    __graphicID = None
-    __radius = None
-    __mass = None
-    __volume = None
-    __capacity = None
-    __portionSize = None
-    __raceID = None
-    __basePrice = None
-    __published = None
-    __marketGroupID = None
-    __chanceOfDuplicating = None
+    typeID = None
+    groupID = None
+    typeName = ''
+    description = ''
+    graphicID = None
+    radius = None
+    mass = None
+    volume = None
+    capacity = None
+    portionSize = None
+    raceID = None
+    basePrice = None
+    published = None
+    marketGroupID = None
+    chanceOfDuplicating = None
 
-    __metaGroup = None
-    __blueprintTypeID = None
+    metaGroup = None
+    blueprintTypeID = None
 
     def __loadItem(self, query):
         '''
@@ -36,22 +38,22 @@ class EveInvType(EveDB):
         '''
         data = self.fetchData(query)
         if data:
-            self.__typeID = data[0][0]
-            self.__groupID = data[0][1]
-            self.__typeName = data[0][2]
-            self.__description = data[0][3]
-            self.__mass = data[0][4]
-            self.__volume = data[0][5]
-            self.__capacity = data[0][6]
-            self.__portionSize = data[0][7]
-            self.__raceID = data[0][8]
-            self.__basePrice = data[0][9]
-            self.__published = data[0][10]
-            self.__marketGroupID = data[0][11]
-            self.__chanceOfDuplicating = data[0][12]
+            self.typeID = data[0][0]
+            self.groupID = data[0][1]
+            self.typeName = data[0][2]
+            self.description = data[0][3]
+            self.mass = data[0][4]
+            self.volume = data[0][5]
+            self.capacity = data[0][6]
+            self.portionSize = data[0][7]
+            self.raceID = data[0][8]
+            self.basePrice = data[0][9]
+            self.published = data[0][10]
+            self.marketGroupID = data[0][11]
+            self.chanceOfDuplicating = data[0][12]
             
-            self.__metaGroup = self.loadMetaGroup()
-            self.__blueprintTypeID = self.loadBlueprintTypeID()
+            self.metaGroup = self.loadMetaGroup()
+            self.blueprintTypeID = self.loadBlueprintTypeID()
 
     def loadItemByID(self, typeID=''):
         '''
@@ -83,12 +85,12 @@ class EveInvType(EveDB):
         '''
         metaType = 1
         
-        if self.__typeID:        
+        if self.typeID:        
             query = """
                     SELECT *
                     FROM invMetaTypes AS m
                     WHERE m.typeID = %s
-                """ % self.__typeID
+                """ % self.typeID
     
             result = self.fetchData(query)
 
@@ -105,7 +107,7 @@ class EveInvType(EveDB):
                     SELECT blueprintTypeID
                     FROM invBlueprintTypes AS b
                     WHERE b.productTypeID = %s
-                """ % self.__typeID
+                """ % self.typeID
         result = self.fetchData(query)
 
         if result:
@@ -119,15 +121,15 @@ class EveInvType(EveDB):
         '''
         Return typeID
         '''
-        return self.__typeID     
+        return self.typeID     
 
     def getTypeName(self):
         '''
         Return typeName
         '''
-        return self.__typeName     
+        return self.typeName     
     
-    def __init__(self, DB, typeID='', name=''):
+    def __init__(self, typeID='', name=''):
         '''
         Constructor, initial data load
         '''
