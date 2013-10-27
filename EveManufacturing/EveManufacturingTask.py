@@ -23,7 +23,7 @@ class EveManufacturingTask(object):
     taskTime = None # duration of task
     startDate = None
     finishDate = None
-    taskLevel = None # to determine priority of building
+    taskPriority = None # higher priority needs to be build sooner (Construction Components before ship hull)
     
     def __init__(self, name, blueprint=None, quantity=1):
         '''
@@ -47,7 +47,7 @@ class EveManufacturingTask(object):
         '''
         if blueprint:
             self.__blueprint = blueprint
-            self.blueprintNecessaryRuns = (int(self.quantity) / int(self.__blueprint.portionSize)) + 1
+#            self.blueprintNecessaryRuns = (int(self.quantity) / int(self.__blueprint.portionSize)) + 1
 
         return self.blueprint     
 
