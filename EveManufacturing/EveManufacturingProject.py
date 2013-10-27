@@ -14,13 +14,13 @@ class EveManufacturingProject(object):
     Class for manufacturing projects in Eve Online
     '''
 
-    __id = None
-    __name = None
-    __description = None
-    __notes = None
-    __productList = {}
-    __stockMaterialList = {} # material in stock, assigned to project
-    __taskList = []
+    id = None
+    name = None
+    description = None
+    notes = None
+    productList = {}
+    stockMaterialList = {} # material in stock, assigned to project
+    taskList = []
     
     def __init__(self, name):
         '''
@@ -28,20 +28,6 @@ class EveManufacturingProject(object):
         '''
         self.__name = name
 
-    def getName(self):
-        '''
-        Get name of project
-        '''
-        return self.__name
-
-    def setName(self, name):
-        '''
-        Set name of project
-        '''
-        if name != '':
-            self.__name = name
-        return self.__name
-    
     def getMaterialList(self):
         '''
         Colllect and return material list for all tasks
@@ -101,4 +87,18 @@ class EveManufacturingProject(object):
         self.__taskList.append(task)
         
         return task
+
+    def deleteTask(self, id=None, name=None):
+        '''
+        Delete task
+        '''
+        for task in self.taskList:
+            if id:
+                if task.id == id:
+                    self.taskList.remove(task)
+            elif name:
+                if task.name == name:
+                    self.taskList.remove(task)
+                
+
         
