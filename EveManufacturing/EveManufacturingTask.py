@@ -23,15 +23,18 @@ class EveManufacturingTask(object):
     taskTime = None # duration of task
     startDate = None
     finishDate = None
-    taskPriority = None # higher priority needs to be build sooner (Construction Components before ship hull)
-    
-    def __init__(self, name, blueprint=None, quantity=1):
+
+    taskPriority = 0 # higher priority needs to be build sooner (Construction Components before ship hull)
+    parentTask = None # parent of current task
+        
+    def __init__(self, name, blueprint=None, quantity=1, parent=None):
         '''
         Constructor
         '''
         self.name = name
         self.manufacturingQuantity = quantity 
-        self.__blueprint = blueprint 
+        self.__blueprint = blueprint
+        self.parentTask = parent
 
     @property
     def blueprint(self):
