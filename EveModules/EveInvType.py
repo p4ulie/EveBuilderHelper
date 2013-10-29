@@ -111,7 +111,7 @@ class EveInvType(EveDB):
         result = self.fetchData(query)
 
         if result:
-            data = result[0] 
+            data = result[0][0]
         else:
             data = None
 
