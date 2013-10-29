@@ -20,7 +20,7 @@ class EveManufacturingProject(object):
     notes = None
     productList = {}
     stockMaterialList = {} # material in stock, assigned to project
-    taskList = []
+    __taskList = []
     
     def __init__(self, name):
         '''
@@ -75,7 +75,7 @@ class EveManufacturingProject(object):
         '''
         return [(task if task.getName() == name else None) for task in self.__taskList][0]
         
-    def addTask(self, name=None, blueprint=None, quantity=None):
+    def addTask(self, name=None, blueprint=None, quantity=None, parent=None):
         '''
         Add new task
         '''
@@ -83,22 +83,45 @@ class EveManufacturingProject(object):
             taskCount = self.getTaskCount()
             name = "Task-%s" % format(taskCount + 1, "04d")
             
-        task = EveManufacturingTask(name, blueprint=blueprint)
+        task = EveManufacturingTask(name,
+                                    blueprint=blueprint,
+                                    quantity=quantity,
+                                    parent=parent)
+        if parent is not None:
+            task.taskPriority = parent.taskPriority + 1
         self.__taskList.append(task)
         
         return task
 
-    def deleteTask(self, id=None, name=None):
+    def addSubTasks(self, task, recursive=False):
+        '''
+        Add subtasks of a task, automatically recurse deeper if specified
+        '''
+#        print task.getMaterialList()
+        for subTaskMaterial in [mat for mat in task.getMaterialList()]:
+            if subTaskMaterial.blueprintTypeID is not None:
+                newTask = self.addTask(name=subTaskMaterial.typeName,
+                                       blueprint=subTaskMaterial.blueprintTypeID,
+                                       quantity=subTaskMaterial.quantity, 
+                                       parent=task)
+        
+    def deleteTask(self, task=None, id=None, name=None):
         '''
         Delete task
         '''
-        for task in self.taskList:
-            if id:
-                if task.id == id:
-                    self.taskList.remove(task)
-            elif name:
-                if task.name == name:
-                    self.taskList.remove(task)
-                
+        if task == None:
+            if id is not None:
+                task = [task for task in self.__taskList if task.id == id]
+            elif name is not None:
+                task = [task for task in self.__taskList if task.name == name]
 
+        if task is not None:
+            children = [child for child in self.__taskList if child.parentTask == task]
+
+            # recursively delete all children tasks
+            for child in children:
+                self.deleteTask(child)             
+
+            self.__taskList.remove(task)
+        
         
