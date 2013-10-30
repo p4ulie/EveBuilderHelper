@@ -6,6 +6,7 @@ Created on Oct 13, 2013
 
 from Config import *
 
+from EveModules.EveInvBlueprintType import EveInvBlueprintType
 from EveManufacturingTask import EveManufacturingTask
 from EveManufacturingMaterial import EveManufacturingMaterial
 
@@ -100,8 +101,10 @@ class EveManufacturingProject(object):
 #        print task.getMaterialList()
         for subTaskMaterial in [mat for mat in task.getMaterialList()]:
             if subTaskMaterial.blueprintTypeID is not None:
+                bp = None
+                bp = EveInvBlueprintType(blueprintTypeID = subTaskMaterial.blueprintTypeID, ResearchLevelME = 0, ResearchLevelPE = 0)
                 newTask = self.addTask(name=subTaskMaterial.typeName,
-                                       blueprint=subTaskMaterial.blueprintTypeID,
+                                       blueprint=bp,
                                        quantity=subTaskMaterial.quantity, 
                                        parent=task)
         
