@@ -83,14 +83,14 @@ class EveInvBlueprintType(EveDB):
         data = self.fetchData(query)
         return data
 
-    def getExtraMaterialList(self, blueprintID = ''):
+    def getExtraMaterialList(self, blueprintTypeID = ''):
         '''
         Get list of materials for InvType, inclusive R.A.M.
         (list of lists - [ID, quantity])
         '''
 
-        if not blueprintID:
-            blueprintID = self.blueprintTypeID 
+        if not blueprintTypeID:
+            blueprintTypeID = self.blueprintTypeID 
 
         query = """
                     SELECT r.requiredTypeID, r.quantity, r.damagePerJob
@@ -102,7 +102,7 @@ class EveInvBlueprintType(EveDB):
                     WHERE r.typeID = %s
                      AND r.activityID = 1
                      AND g.categoryID != 16;
-                """ % blueprintID
+                """ % blueprintTypeID
 
         data = self.fetchData(query)
         return data
@@ -215,7 +215,7 @@ class EveInvBlueprintType(EveDB):
         waste = round(((25 - (5 * float(skillPE))) * float(materialAmount)) / 100)
         return int(waste)
 
-    def __init__(self, blueprintID = None, productID = None, ResearchLevelME = None, ResearchLevelPE = None):
+    def __init__(self, blueprintTypeID = None, productID = None, ResearchLevelME = None, ResearchLevelPE = None):
         '''
         Constructor, initial data load
         '''
@@ -231,12 +231,12 @@ class EveInvBlueprintType(EveDB):
                         WHERE b.productTypeID = %s
                     """ % productID
 
-        if blueprintID:
+        if blueprintTypeID:
             query = """
                         SELECT *
                         FROM invBlueprintTypes AS b
                         WHERE b.blueprintTypeID = %s
-                    """ % blueprintID
+                    """ % blueprintTypeID
 
         if ResearchLevelME:
             self.researchLevelME = ResearchLevelME
