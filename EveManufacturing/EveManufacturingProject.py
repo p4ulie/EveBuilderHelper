@@ -15,7 +15,7 @@ class EveManufacturingProject(object):
     Class for manufacturing projects in Eve Online
     '''
 
-    id = None
+    projectID = None
     name = None
     description = None
     notes = None
@@ -76,7 +76,7 @@ class EveManufacturingProject(object):
         '''
         return [(task if task.getName() == name else None) for task in self.__taskList][0]
         
-    def addTask(self, name=None, blueprint=None, quantity=None, parent=None):
+    def addTask(self, name=None, blueprint=None, quantity=None, parent=None, recursive=False):
         '''
         Add new task
         '''
@@ -92,29 +92,35 @@ class EveManufacturingProject(object):
             task.taskPriority = parent.taskPriority + 1
         self.__taskList.append(task)
         
+        if recursive:
+            self.addSubTasks(task, recursive)
+
         return task
 
-    def addSubTasks(self, task, recursive=False):
+    def addSubTasks(self, parentTask, recursive=False):
         '''
         Add subtasks of a task, automatically recurse deeper if specified
         '''
 #        print task.getMaterialList()
-        for subTaskMaterial in [mat for mat in task.getMaterialList()]:
+        for subTaskMaterial in [mat for mat in parentTask.getMaterialList()]:
             if subTaskMaterial.blueprintTypeID is not None:
                 bp = None
                 bp = EveInvBlueprintType(blueprintTypeID = subTaskMaterial.blueprintTypeID, ResearchLevelME = 0, ResearchLevelPE = 0)
                 newTask = self.addTask(name=subTaskMaterial.typeName,
                                        blueprint=bp,
                                        quantity=subTaskMaterial.quantity, 
-                                       parent=task)
+                                       parent=parentTask)
+                if recursive:
+                    self.addSubTasks(newTask, recursive)
+                
         
-    def deleteTask(self, task=None, id=None, name=None):
+    def deleteTask(self, task=None, taskID=None, name=None):
         '''
         Delete task
         '''
         if task == None:
-            if id is not None:
-                task = [task for task in self.__taskList if task.id == id]
+            if taskID is not None:
+                task = [task for task in self.__taskList if task.taskID == taskID]
             elif name is not None:
                 task = [task for task in self.__taskList if task.name == name]
 
