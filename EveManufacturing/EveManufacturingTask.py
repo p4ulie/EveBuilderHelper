@@ -13,7 +13,7 @@ class EveManufacturingTask(object):
     Class for manufacturing tasks in Eve Online
     '''
 
-    id = None
+    taskID = None
     name = None
     manufacturingQuantity = 1
     typeID = None
