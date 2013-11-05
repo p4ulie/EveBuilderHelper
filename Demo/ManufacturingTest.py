@@ -16,13 +16,8 @@ def main():
 
     # add task to project, based on blueprint
     invType = EveInvType(name='Ishtar')
-    bp = EveInvBlueprintType(productID = invType.typeID, ResearchLevelME = -4, ResearchLevelPE = -4)
-    task = proj.addTask(name=invType.typeName, blueprint=bp, quantity = 1, recursive=True)
-
-    # add task to project, based on blueprint
-    invType = EveInvType(name='Myrmidon')
-    bp = EveInvBlueprintType(productID = invType.typeID, ResearchLevelME = 0, ResearchLevelPE = 0)
-    task = proj.addTask(name=invType.typeName, blueprint=bp, quantity = 1, recursive=True)
+    bp = EveInvBlueprintType(productID = invType.typeID, ResearchLevelME = -1, ResearchLevelPE = -1)
+    task = proj.addTask(name=invType.typeName, blueprint=bp, quantity = 20, recursive=True)
 
     print "Number of task in project: %d\n" % proj.getTaskCount()
     print "List of tasks in project:\n"
