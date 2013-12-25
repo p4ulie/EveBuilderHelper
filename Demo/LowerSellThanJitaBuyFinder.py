@@ -20,7 +20,7 @@ elif (sys.platform == 'linux2'):
     locale.setlocale(locale.LC_ALL, "en_US.UTF-8")
 
 
-from EveModules.EveItem import * 
+from EveModules.EveInvType import * 
 from EveModules.EveGroup import * 
 from EveModules.EveMarketData import *
 
@@ -35,7 +35,7 @@ if __name__ == '__main__':
 
 #    emd.deleteAllOrders()
 
-    DB = '../../data/ody100-sqlite3-v1.db'
+    DB = 'Data/ody100-sqlite3-v1.db'
     eGroup = EveGroup(DB, groupName = 'Mineral')
     eItem = EveInvType(DB)
     
