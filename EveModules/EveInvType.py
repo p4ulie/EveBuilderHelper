@@ -117,7 +117,7 @@ class EveInvType(EveDB):
 
         return data
 
-    def __init__(self, typeID='', name=''):
+    def __init__(self, DB, typeID='', name=''):
         '''
         Constructor, initial data load
         '''
