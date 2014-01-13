@@ -215,7 +215,7 @@ class EveInvBlueprintType(EveDB):
         waste = round(((25 - (5 * float(skillPE))) * float(materialAmount)) / 100)
         return int(waste)
 
-    def __init__(self, blueprintTypeID = None, productID = None, ResearchLevelME = None, ResearchLevelPE = None):
+    def __init__(self, DB, blueprintTypeID = None, productID = None, ResearchLevelME = None, ResearchLevelPE = None):
         '''
         Constructor, initial data load
         '''
