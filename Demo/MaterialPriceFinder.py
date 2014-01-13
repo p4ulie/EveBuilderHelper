@@ -16,8 +16,8 @@ elif (sys.platform == 'linux2'):
     locale.setlocale(locale.LC_ALL, "en_US.UTF-8")
 
 from Config import *
-from EveModules.EveItem import *
-from EveModules.EveBlueprint import *
+from EveModules.EveInvType import *
+from EveModules.EveInvBlueprintType import *
 
 from EveModules.EveMapRegion import *
 from EveModules.EveMapSolarSystem import *
@@ -60,17 +60,10 @@ stationJita = 'Jita IV - Moon 4 - Caldari Navy Assembly Plant'
 
                
 def main():
-    item = EveInvType(DB, name='Caldari Fuel Block')
-    bp = item.getBlueprintObject()
-    bp.researchLevelME = 40
+    item = EveInvType(DB, name='Composites')
+    bp = EveInvBlueprintType(DB, blueprintTypeID = item.blueprintTypeID, ResearchLevelME = 40)
 
-    materialList = bp.getManufacturingMaterials(characterPESkillLvl=characterPESkillLvl)
-
-    #===========================================================================
-    # item = EveInvType(DB, name='Robotics')
-    # materialList = {}
-    # materialList[item.itemID] = 0
-    #===========================================================================
+    materialList = bp.getManufacturingMaterialsList(skillPE = characterPESkillLvl)
 
     print("Name of item: %s\n") % (item.name)
 
