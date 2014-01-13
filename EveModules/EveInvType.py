@@ -52,8 +52,8 @@ class EveInvType(EveDB):
             self.marketGroupID = data[0][11]
             self.chanceOfDuplicating = data[0][12]
             
-            self.metaGroup = self.loadMetaGroup()
             self.blueprintTypeID = self.loadBlueprintTypeID()
+            self.__loadMetaGroup()
 
     def loadItemByID(self, typeID=''):
         '''
@@ -79,7 +79,7 @@ class EveInvType(EveDB):
                     """ % name
             self.__loadItem(query)
 
-    def loadMetaGroup(self):
+    def __loadMetaGroup(self):
         '''
         Check real meta type of item
         '''
@@ -97,7 +97,7 @@ class EveInvType(EveDB):
             if result:
                 metaType = result[0][2]
 
-        return metaType
+        self.metaGroup = metaType
 
     def loadBlueprintTypeID(self):
         '''
