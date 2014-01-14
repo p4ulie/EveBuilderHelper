@@ -89,7 +89,7 @@ class EveDB(object):
         data = self.fetchData(query)
         return data
 
-    def __init__(self):
+    def __init__(self, DB):
         '''
         Constructor
         '''
