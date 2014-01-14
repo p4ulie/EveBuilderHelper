@@ -1,7 +1,7 @@
 '''
 Created on 14.1.2014
 
-@author: Administrator
+@author: paulie
 '''
 
 from EveModules.EveInvType import * 
