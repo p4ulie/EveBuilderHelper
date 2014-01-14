@@ -6,7 +6,7 @@ Created on 14.1.2014
 import unittest
 from EveModules.EveDB import *
 
-class Test(unittest.TestCase):
+class TestEveDB(unittest.TestCase):
 
     DB = 'Data/ody100-sqlite3-v1.db'
     eveDB = None
