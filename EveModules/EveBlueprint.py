@@ -27,6 +27,10 @@ class EveBlueprint(EveDB):
         EveDB.__init__(self, self.__dbAccessObj)
 
         query = ''
+
+        self.blueprintTypeID = None
+        self.parentBlueprintTypeID = None
+        self.productTypeID = None
         
         if blueprintTypeID:
             query = """
@@ -122,7 +126,7 @@ class EveBlueprint(EveDB):
 
         data = self.__dbAccessObj.fetchData(query)
 
-        if data:
+        if data is not None:
             data = dict((requiredTypeID, quantity) for (requiredTypeID, quantity, damagePerJob) in data)
 
         return data
@@ -146,7 +150,7 @@ class EveBlueprint(EveDB):
             result = self.__dbAccessObj.fetchData(query)
 
             if result:
-                data = result[0] 
+                data = result[0][0] 
             else:
                 data = None
 
@@ -171,8 +175,11 @@ class EveBlueprint(EveDB):
             if itemT1:
                 bpT1 = EveBlueprint(self.__dbAccessObj, productTypeID=itemT1)
                 # subtract base materials of T1 from list        
-                for material, quantity in bpT1.getListOfBaseMaterials().iteritems():
-                    listOfTotalManufacturingMaterials[material] = listOfTotalManufacturingMaterials.get(material, 0) - quantity
+                if bpT1.blueprintTypeID:
+                    for material, quantity in bpT1.getListOfBaseMaterials().iteritems():
+                        listOfTotalManufacturingMaterials[material] = listOfTotalManufacturingMaterials.get(material, 0) - quantity
+                        if listOfTotalManufacturingMaterials[material] <= 0:
+                            del listOfTotalManufacturingMaterials[material]
 
         # Calculate and add waste to list of materials
         for material, quantity in listOfTotalManufacturingMaterials.iteritems():
