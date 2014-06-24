@@ -55,7 +55,7 @@ class EveDB(object):
         '''
         query = """
                     SELECT *
-                    FROM invTypes AS t
+                    FROM invtypes AS t
                     WHERE t.published = '1'
                 """ % groupID
         if groupID:
@@ -76,14 +76,14 @@ class EveDB(object):
         if typeID:
             query = """
                         SELECT *
-                        FROM invTypes AS t
+                        FROM invtypes AS t
                         WHERE t.typeID = '%s'
                     """ % typeID
         else:
             if typeName:
                 query = """
                             SELECT *
-                            FROM invTypes AS t
+                            FROM invtypes AS t
                             WHERE t.typeName = '%s'
                         """ % typeName
 
