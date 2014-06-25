@@ -48,6 +48,8 @@ def main():
                                               typeID=materialPart)
                 print "\t %s: %s" % (partMatItem.typeName,
                                      quantityPart)
+
+    dbAccess.close()
     
 if __name__ == '__main__':
     main()
