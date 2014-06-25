@@ -1,8 +1,10 @@
 .gitignore
-*.pyc
+*.sqlite
+**.pyc
 .project
 .pydevproject
 *.bak
 *~
 .settings/*
 *.db
+*.exe

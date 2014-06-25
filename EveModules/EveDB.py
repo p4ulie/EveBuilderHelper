@@ -1,63 +1,23 @@
 '''
-Classes for accessing Eve Online data dump DB
-
-Created on 8.7.2012
+Created on 18.6.2014
 
 @author: Pavol Antalik
 '''
 
-import sys
-import sqlite3 as lite
-
-from Config import *
-
 class EveDB(object):
     '''
-    Base class for interacting with Eve Online data dump Sqlite DB
+    Class for containing EVE Online data dump data and methods
     '''
 
-    DB = ''
+    def __init__(self,
+                 dbAccessObj):
+        '''
+        Constructor
+        '''
 
-    def fetchData(self, query):
-        '''
-        Main method for accessing the DB
-        '''
-        dbcon = ''
-        
-        try:
-            dbcon = lite.connect(self.DB)
-            cur = dbcon.cursor()
-            cur.execute(query)
-            rows = cur.fetchall()
-        except lite.Error, e:
-            print "Error %s:" % e.args[0]
-            sys.exit(1)
-        finally:
-            if dbcon:
-                dbcon.close()
-        return rows
-
-    def getItemsList(self, groupID=''):
-        '''
-        Get list of items, possibly from specific group
-        '''
-        if groupID != '':
-            query = """
-                        SELECT *
-                        FROM invTypes AS t
-                        WHERE t.published = '1'
-                        AND t.groupID = '%s'
-                    """ % groupID
-        else:
-            query = """
-                        SELECT *
-                        FROM invTypes AS t
-                        WHERE t.published = '1'
-                    """
-        data = self.fetchData(query)
-        return data
-
-    def getCategoriesList(self):
+        self.__dbAccessObj = dbAccessObj
+    
+    def getListOfInvCategories(self):
         '''
         Get list of categories
         '''
@@ -66,31 +26,85 @@ class EveDB(object):
                     FROM invCategories AS c
                     WHERE c.published = 1
                 """
-        data = self.fetchData(query)
-        return data
 
-    def getGroupsList(self, categoryID=''):
+        data = self.__dbAccessObj.fetchData(query)
+
+        return data
+        
+    def getListOfInvGroups(self, categoryID = None):
         '''
         Get list of groups
         '''
-        if categoryID is '':
-            query = """
-                        SELECT g.groupID, g.categoryID, g.groupName, g.description
-                        FROM invGroups AS g
-                        WHERE g.published = '1'
-                    """
-        else:
-            query = """
-                        SELECT g.groupID, g.categoryID, g.groupName, g.description
-                        FROM invGroups AS g
-                        WHERE g.published = '1'
-                        and g.categoryID = '%s'
+        query = """
+                    SELECT g.groupID, g.categoryID, g.groupName, g.description
+                    FROM invGroups AS g
+                    WHERE g.published = '1'
+                """
+        if categoryID:
+            query += """
+                        AND g.categoryID = '%s'
                     """ % categoryID
-        data = self.fetchData(query)
+
+        data = self.__dbAccessObj.fetchData(query)
+
+        return data
+    
+    def getListOfInvItems(self, groupID = None):
+        '''
+        Get list of items, possibly from specific group
+        '''
+        query = """
+                    SELECT *
+                    FROM invtypes AS t
+                    WHERE t.published = '1'
+                """ % groupID
+        if groupID:
+            query += """
+                        AND t.groupID = '%s'
+                    """
+
+        data = self.__dbAccessObj.fetchData(query)
+
         return data
 
-    def __init__(self, DB):
+    def getInvItem(self, typeID = None, typeName = None):
         '''
-        Constructor
+        Get item by ID or name
         '''
-        self.DB = DB
+        query = ''
+        
+        if typeID:
+            query = """
+                        SELECT *
+                        FROM invtypes AS t
+                        WHERE t.typeID = '%s'
+                    """ % typeID
+        else:
+            if typeName:
+                query = """
+                            SELECT *
+                            FROM invtypes AS t
+                            WHERE t.typeName = '%s'
+                        """ % typeName
+
+        if query is not '':
+            # only one row of data
+            data = self.__dbAccessObj.fetchData(query)[0]
+        else:
+            data = None
+
+        return data
+
+    def getInvItemIDByName(self, typeName):
+        '''
+        Get item ID by name
+        '''
+        return self.getInvItem(typeName = typeName)[0]
+    
+    def getInvItemNameByID(self, typeID):
+        '''
+        Get item ID by name
+        '''
+        return self.getInvItem(typeID = typeID)[2]
+    
+    
