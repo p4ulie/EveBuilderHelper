@@ -29,6 +29,7 @@ class DBAccessSQLite(object):
         '''
         try:
             self.dbcon = sqlite.connect(self.DB)
+            self.dbcon.text_factory = str
             self.cur = self.dbcon.cursor()
         except sqlite.Error, e:
             print "Error %s:" % e.args[0]
@@ -41,12 +42,12 @@ class DBAccessSQLite(object):
         if self.dbcon:
             self.dbcon.close()
 
-    def fetchData(self, query):
+    def fetchData(self, query, *args):
         '''
         Main method for accessing the DB
         '''
         try:
-            self.cur.execute(query)
+            self.cur.execute(query, args)
             rows = self.cur.fetchall()
         except sqlite.Error, e:
             print "Error %s:" % e.args[0]
