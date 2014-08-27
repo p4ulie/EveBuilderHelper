@@ -4,52 +4,43 @@ Created on 17.6.2014
 @author: Pavol Antalik
 '''
 
+import math
+
 from DBAccessSQLite import DBAccessSQLite
 
+from EveMath.EveMathConstants import * 
+
 from EveModules import EveDB
-from EveModules import EveItem
-from EveModules import EveBlueprint
+from EveMath import EveMathIndustry 
+
+DB = 'data/eve.db'
 
 def main():
-#    DB = 'Data/ody100-sqlite3-v1.db'
-#    DB = 'Data/rub110-sqlite3-v1.db'
-    DB = 'Data/sqlite-latest.sqlite'
     
-    dbAccess = DBAccessSQLite(DB)
     eDB = EveDB.EveDB(dbAccess)
+
+    # get only 1st row of result, then second value from tuple 
+    item =  eDB.getInvItem(typeName = 'Guardian').items()[0][1]
+    itemTypeID = item['typeID']
     
-    item = EveItem.EveItem(dbAccess, typeName="Guardian")
-
-    bp = EveBlueprint.EveBlueprint(dbAccess,
-                                   productTypeID=item.typeID,
-                                   ResearchLevelME = -2,
-                                   ResearchLevelTE = -1)
-
-
-    print "Manufactured item: %s\n" % item.typeName
+    blueprintTypeID = eDB.getBlueprintIDForItem(itemTypeID) 
     
-    matList = bp.getListOfManufacturingMaterials(characterTEskillLevel = 5)
-    
-    for material, quantity in matList.iteritems():
-        matItem = EveItem.EveItem(dbAccess,
-                                  typeID=material)
+    materials = eDB.getMaterialsForBlueprint(blueprintTypeID, activityID = EVE_ACTIVITY_MANUFACTURING)
 
-        print "%s: %s" % (matItem.typeName,
-                          quantity)
+    for ramAssemblyLineTypes in eDB.getListOfRamAssemblyLineTypes().values():
+        print ramAssemblyLineTypes
+            
+    for i,m in materials.iteritems():
+        mat = eDB.getInvItem(typeID = m['materialTypeID']).items()[0][1]
+        print "Quantity %i (%i) of %s" % (m['quantity'],
+                                        math.ceil(m['quantity'] * EveMathIndustry.calculateMEMultiplier(8, FACILITY_ME_BONUS_POS_ASSEMBLY_ARRAY)),
+                                        mat['typeName'])
 
-        # if the part is buildable, list the materials
-        if matItem.blueprintTypeID:
-            bpOfPart = EveBlueprint.EveBlueprint(dbAccess,
-                                                 blueprintTypeID=matItem.blueprintTypeID)
-            partMatList = bpOfPart.getListOfManufacturingMaterials(characterTEskillLevel = 5)
-
-            for materialPart, quantityPart in partMatList.iteritems():
-                partMatItem = EveItem.EveItem(dbAccess,
-                                              typeID=materialPart)
-                print "\t %s: %s" % (partMatItem.typeName,
-                                     quantityPart)
-
-    dbAccess.close()
+    print eDB.getActivityBonusForRamAssemblyLineType(assemblyLineTypeName = "Medium Ship Assembly Array")
     
 if __name__ == '__main__':
+    dbAccess = DBAccessSQLite(DB)
+
     main()
+    
+    dbAccess.close()    
