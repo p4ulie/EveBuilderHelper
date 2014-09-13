@@ -5,7 +5,8 @@ Created on 18.6.2014
 '''
 
 #import syck
-from EveMath.EveMathConstants import * 
+from EveMath.EveMathConstants import *
+
 
 class EveDB(object):
     '''
@@ -19,7 +20,7 @@ class EveDB(object):
         '''
 
         self.__dbAccessObj = dbAccessObj
-    
+
     def getListOfInvCategories(self):
         '''
         Get list of categories
@@ -27,7 +28,10 @@ class EveDB(object):
         data = None
 
         query = """
-                    SELECT c.categoryID, c.categoryName, c.description, c.iconID
+                    SELECT c.categoryID,
+                            c.categoryName,
+                            c.description,
+                            c.iconID
                     FROM invCategories AS c
                     WHERE c.published = 1
                 """
@@ -42,16 +46,20 @@ class EveDB(object):
                                  'iconID': row[3]}
 
         return data
-        
-    def getListOfInvGroups(self, categoryID = None):
+
+    def getListOfInvGroups(self, categoryID=None):
         '''
         Get list of groups
         '''
         data = None
-        
+
         if categoryID is not None:
             query = """
-                        SELECT g.groupID, g.categoryID, g.groupName, g.description, g.iconID
+                        SELECT g.groupID,
+                                g.categoryID,
+                                g.groupName,
+                                g.description,
+                                g.iconID
                         FROM invGroups AS g
                         WHERE g.published = '1'
                         AND g.categoryID = ?
@@ -59,7 +67,11 @@ class EveDB(object):
             result = self.__dbAccessObj.fetchData(query, categoryID)
         else:
             query = """
-                        SELECT g.groupID, g.categoryID, g.groupName, g.description, g.iconID
+                        SELECT g.groupID,
+                                g.categoryID,
+                                g.groupName,
+                                g.description,
+                                g.iconID
                         FROM invGroups AS g
                         WHERE g.published = '1'
                     """
@@ -76,17 +88,26 @@ class EveDB(object):
 
         return data
 
-    def getListOfInvItems(self, typeName = None, groupID = None):
+    def getListOfInvItems(self, typeName=None, groupID=None):
         '''
         Get list of items by (part of) name or groupID
         '''
         query = ''
         result = None
-        
+
         if typeName is not None:
             query = """
-                        SELECT t.typeID, t.groupID, t.typeName, t.description, t.mass, t.volume, t.capacity,
-                                t.portionSize, t.raceID, t.basePrice, t.marketGroupID
+                        SELECT t.typeID,
+                                t.groupID,
+                                t.typeName,
+                                t.description,
+                                t.mass,
+                                t.volume,
+                                t.capacity,
+                                t.portionSize,
+                                t.raceID,
+                                t.basePrice,
+                                t.marketGroupID
                         FROM invtypes AS t
                         WHERE t.published = '1'
                         AND t.typeName like '%?%'
@@ -95,14 +116,23 @@ class EveDB(object):
         else:
             if groupID is not None:
                 query = """
-                            SELECT t.typeID, t.groupID, t.typeName, t.description, t.mass, t.volume, t.capacity,
-                                t.portionSize, t.raceID, t.basePrice, t.marketGroupID
+                            SELECT t.typeID,
+                                    t.groupID,
+                                    t.typeName,
+                                    t.description,
+                                    t.mass,
+                                    t.volume,
+                                    t.capacity,
+                                    t.portionSize,
+                                    t.raceID,
+                                    t.basePrice,
+                                    t.marketGroupID
                             FROM invtypes AS t
                             WHERE t.published = '1'
                             AND t.groupID = ?
                         """
                 result = self.__dbAccessObj.fetchData(query, groupID)
-                
+
         if result is not None:
             data = {}
             for row in result:
@@ -122,17 +152,26 @@ class EveDB(object):
 
         return data
 
-    def getInvItem(self, typeID = None, typeName = None, groupID = None):
+    def getInvItem(self, typeID=None, typeName=None, groupID=None):
         '''
         Get item by ID or name
         '''
         query = ''
         result = None
-        
+
         if typeID is not None:
             query = """
-                        SELECT t.typeID, t.groupID, t.typeName, t.description, t.mass, t.volume, t.capacity,
-                            t.portionSize, t.raceID, t.basePrice, t.marketGroupID
+                        SELECT t.typeID,
+                                t.groupID,
+                                t.typeName,
+                                t.description,
+                                t.mass,
+                                t.volume,
+                                t.capacity,
+                                t.portionSize,
+                                t.raceID,
+                                t.basePrice,
+                                t.marketGroupID
                         FROM invtypes AS t
                         WHERE t.published = '1'
                         AND t.typeID = ?
@@ -141,35 +180,45 @@ class EveDB(object):
         else:
             if typeName is not None:
                 query = """
-                            SELECT t.typeID, t.groupID, t.typeName, t.description, t.mass, t.volume, t.capacity,
-                                    t.portionSize, t.raceID, t.basePrice, t.marketGroupID
+                            SELECT t.typeID,
+                                    t.groupID,
+                                    t.typeName,
+                                    t.description,
+                                    t.mass,
+                                    t.volume,
+                                    t.capacity,
+                                    t.portionSize,
+                                    t.raceID,
+                                    t.basePrice,
+                                    t.marketGroupID
                             FROM invtypes AS t
                             WHERE t.published = '1'
                             AND t.typeName = ?
                         """
                 result = self.__dbAccessObj.fetchData(query, typeName)
-                
+
         if result is not None:
-            data = {}
             # take only the first row
             row = result[0]
-            data[row[0]] = {'typeID': row[0],
-                             'groupID': row[1],
-                             'typeName': row[2],
-                             'description': row[3],
-                             'mass': row[4],
-                             'volume': row[5],
-                             'capacity': row[6],
-                             'portionSize': row[7],
-                             'raceID': row[8],
-                             'basePrice': row[9],
-                             'marketGroupID': row[0]}
+            data = {'typeID': row[0],
+                     'groupID': row[1],
+                     'typeName': row[2],
+                     'description': row[3],
+                     'mass': row[4],
+                     'volume': row[5],
+                     'capacity': row[6],
+                     'portionSize': row[7],
+                     'raceID': row[8],
+                     'basePrice': row[9],
+                     'marketGroupID': row[0]}
         else:
             data = None
 
         return data
 
-    def getBlueprintIDForItem(self, typeID = None, activityID = EVE_ACTIVITY_MANUFACTURING):
+    def getBlueprintIDForItem(self,
+                              typeID=None,
+                              activityID=EVE_ACTIVITY_MANUFACTURING):
         '''
         Get Blueprint typeID from Item typeID
         '''
@@ -185,20 +234,26 @@ class EveDB(object):
             data = result[0][0]
         else:
             data = None
-            
+
         return data
 
-    def getMaterialsForBlueprint(self, blueprintTypeID, activityID = EVE_ACTIVITY_MANUFACTURING):
+    def getMaterialsForBlueprint(self,
+                                 blueprintTypeID,
+                                 activityID=EVE_ACTIVITY_MANUFACTURING):
         '''
         Get list of materials for specified blueprint typeID and activityID
         '''
         query = """
-                    SELECT materialTypeID, quantity, consume
+                    SELECT i.materialTypeID,
+                            i.quantity,
+                            i.consume
                     FROM industryactivitymaterials AS i
                     WHERE i.typeID = ?
                     and i.activityID = ?
                 """
-        result = self.__dbAccessObj.fetchData(query, blueprintTypeID, activityID)
+        result = self.__dbAccessObj.fetchData(query,
+                                              blueprintTypeID,
+                                              activityID)
 
         if result is not None:
             data = {}
@@ -211,9 +266,12 @@ class EveDB(object):
 
         return data
 
-    def getTimeForBlueprint(self, blueprintTypeID, activityID = EVE_ACTIVITY_MANUFACTURING):
+    def getTimeForBlueprint(self,
+                            blueprintTypeID,
+                            activityID=EVE_ACTIVITY_MANUFACTURING):
         '''
-        Get time of industry action for specified blueprint typeID and activityID
+        Get time of industry action for specified blueprint typeID
+        and activityID
         '''
         query = """
                     SELECT time
@@ -221,7 +279,9 @@ class EveDB(object):
                     WHERE i.typeID = ?
                     and i.activityID = ?
                 """
-        result = self.__dbAccessObj.fetchData(query, blueprintTypeID, activityID)
+        result = self.__dbAccessObj.fetchData(query,
+                                              blueprintTypeID,
+                                              activityID)
 
         if result is not None:
             data = result[0][0]
@@ -235,7 +295,10 @@ class EveDB(object):
         Get list of ramActivities
         '''
         query = """
-                    SELECT r.activityID, r.activityName, r.iconNo, r.description
+                    SELECT r.activityID,
+                            r.activityName,
+                            r.iconNo,
+                            r.description
                     FROM ramActivities AS r
                     WHERE r.published = '1'
                 """
@@ -254,14 +317,21 @@ class EveDB(object):
 
         return data
 
-    def getListOfRamAssemblyLineTypes(self, activityID = EVE_ACTIVITY_MANUFACTURING):
+    def getListOfRamAssemblyLineTypes(self,
+                                      activityID=EVE_ACTIVITY_MANUFACTURING):
         '''
         Get list of ramassemblylinetypes
         '''
         query = """
-                    SELECT r.assemblyLineTypeID, r.assemblyLineTypeName, r.description,
-                            r.baseTimeMultiplier, r.baseMaterialMultiplier, r.baseCostMultiplier,
-                            r.volume, r.activityID, r.minCostPerHour
+                    SELECT r.assemblyLineTypeID,
+                            r.assemblyLineTypeName,
+                            r.description,
+                            r.baseTimeMultiplier,
+                            r.baseMaterialMultiplier,
+                            r.baseCostMultiplier,
+                            r.volume,
+                            r.activityID,
+                            r.minCostPerHour
                     FROM ramassemblylinetypes AS r
                     WHERE r.activityID = ?
                 """
@@ -284,31 +354,46 @@ class EveDB(object):
 
         return data
 
-    def getActivityBonusForRamAssemblyLineType(self, assemblyLineTypeID = None, assemblyLineTypeName = None, activityID = EVE_ACTIVITY_MANUFACTURING):
+    def getActivityBonusForRamAssemblyLineType(self,
+                                               assemblyLineTypeID=None,
+                                               assemblyLineTypeName=None,
+                                               activityID=EVE_ACTIVITY_MANUFACTURING):
         '''
         Get bonus multiplier for specified activity and assembly line type
         '''
         result = None
-        
+
         if assemblyLineTypeID is not None:
             query = """
-                            SELECT r.baseTimeMultiplier, r.baseMaterialMultiplier, r.baseCostMultiplier,
-                                    r.volume, r.activityID, r.minCostPerHour
+                            SELECT r.baseTimeMultiplier,
+                                    r.baseMaterialMultiplier,
+                                    r.baseCostMultiplier,
+                                    r.volume,
+                                    r.activityID,
+                                    r.minCostPerHour
                             FROM ramassemblylinetypes AS r
                             WHERE r.activityID = ?
                             AND r.assemblyLineTypeID = ?
                     """
-            result = self.__dbAccessObj.fetchData(query, activityID, assemblyLineTypeID)
+            result = self.__dbAccessObj.fetchData(query,
+                                                  activityID,
+                                                  assemblyLineTypeID)
         else:
             if assemblyLineTypeName is not None:
                 query = """
-                            SELECT r.baseTimeMultiplier, r.baseMaterialMultiplier, r.baseCostMultiplier,
-                                    r.volume, r.activityID, r.minCostPerHour
+                            SELECT r.baseTimeMultiplier,
+                                    r.baseMaterialMultiplier,
+                                    r.baseCostMultiplier,
+                                    r.volume,
+                                    r.activityID,
+                                    r.minCostPerHour
                             FROM ramassemblylinetypes AS r
                             WHERE r.activityID = ?
                             AND r.assemblyLineTypeName = ?
                         """
-                result = self.__dbAccessObj.fetchData(query, activityID, assemblyLineTypeName)
+                result = self.__dbAccessObj.fetchData(query,
+                                                      activityID,
+                                                      assemblyLineTypeName)
 
         if result is not None:
             row = result[0]
