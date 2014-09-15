@@ -19,7 +19,7 @@ class EveDB(object):
         Constructor
         '''
 
-        self.__dbAccessObj = dbAccessObj
+        self.dbAccessObj = dbAccessObj
 
     def getListOfInvCategories(self):
         '''
@@ -35,7 +35,7 @@ class EveDB(object):
                     FROM invCategories AS c
                     WHERE c.published = 1
                 """
-        result = self.__dbAccessObj.fetchData(query)
+        result = self.dbAccessObj.fetchData(query)
 
         if result is not None:
             data = {}
@@ -64,7 +64,7 @@ class EveDB(object):
                         WHERE g.published = '1'
                         AND g.categoryID = ?
                     """
-            result = self.__dbAccessObj.fetchData(query, categoryID)
+            result = self.dbAccessObj.fetchData(query, categoryID)
         else:
             query = """
                         SELECT g.groupID,
@@ -75,7 +75,7 @@ class EveDB(object):
                         FROM invGroups AS g
                         WHERE g.published = '1'
                     """
-            result = self.__dbAccessObj.fetchData(query)
+            result = self.dbAccessObj.fetchData(query)
 
         if result is not None:
             data = {}
@@ -112,7 +112,7 @@ class EveDB(object):
                         WHERE t.published = '1'
                         AND t.typeName like '%?%'
                     """
-            result = self.__dbAccessObj.fetchData(query, typeName)
+            result = self.dbAccessObj.fetchData(query, typeName)
         else:
             if groupID is not None:
                 query = """
@@ -131,7 +131,7 @@ class EveDB(object):
                             WHERE t.published = '1'
                             AND t.groupID = ?
                         """
-                result = self.__dbAccessObj.fetchData(query, groupID)
+                result = self.dbAccessObj.fetchData(query, groupID)
 
         if result is not None:
             data = {}
@@ -176,7 +176,7 @@ class EveDB(object):
                         WHERE t.published = '1'
                         AND t.typeID = ?
                     """
-            result = self.__dbAccessObj.fetchData(query, typeID)
+            result = self.dbAccessObj.fetchData(query, typeID)
         else:
             if typeName is not None:
                 query = """
@@ -195,7 +195,7 @@ class EveDB(object):
                             WHERE t.published = '1'
                             AND t.typeName = ?
                         """
-                result = self.__dbAccessObj.fetchData(query, typeName)
+                result = self.dbAccessObj.fetchData(query, typeName)
 
         if result is not None:
             # take only the first row
@@ -222,18 +222,20 @@ class EveDB(object):
         '''
         Get Blueprint typeID from Item typeID
         '''
-        query = """
-                    SELECT typeID
-                    FROM industryactivityproducts AS i
-                    WHERE i.productTypeID = ?
-                    and i.activityID = ?
-                """
-        result = self.__dbAccessObj.fetchData(query, typeID, activityID)
 
-        if (result is not None) and (len(result) > 0):
-            data = result[0][0]
-        else:
-            data = None
+        data = None
+
+        if typeID is not None:
+            query = """
+                        SELECT typeID
+                        FROM industryactivityproducts AS i
+                        WHERE i.productTypeID = ?
+                        and i.activityID = ?
+                    """
+            result = self.dbAccessObj.fetchData(query, typeID, activityID)
+    
+            if (result is not None) and (len(result) > 0):
+                data = result[0][0]
 
         return data
 
@@ -251,7 +253,7 @@ class EveDB(object):
                     WHERE i.typeID = ?
                     and i.activityID = ?
                 """
-        result = self.__dbAccessObj.fetchData(query,
+        result = self.dbAccessObj.fetchData(query,
                                               blueprintTypeID,
                                               activityID)
 
@@ -279,7 +281,7 @@ class EveDB(object):
                     WHERE i.typeID = ?
                     and i.activityID = ?
                 """
-        result = self.__dbAccessObj.fetchData(query,
+        result = self.dbAccessObj.fetchData(query,
                                               blueprintTypeID,
                                               activityID)
 
@@ -302,7 +304,7 @@ class EveDB(object):
                     FROM ramActivities AS r
                     WHERE r.published = '1'
                 """
-        result = self.__dbAccessObj.fetchData(query)
+        result = self.dbAccessObj.fetchData(query)
 
         if result is not None:
             data = {}
@@ -335,7 +337,7 @@ class EveDB(object):
                     FROM ramassemblylinetypes AS r
                     WHERE r.activityID = ?
                 """
-        result = self.__dbAccessObj.fetchData(query, activityID)
+        result = self.dbAccessObj.fetchData(query, activityID)
 
         if result is not None:
             data = {}
@@ -375,7 +377,7 @@ class EveDB(object):
                             WHERE r.activityID = ?
                             AND r.assemblyLineTypeID = ?
                     """
-            result = self.__dbAccessObj.fetchData(query,
+            result = self.dbAccessObj.fetchData(query,
                                                   activityID,
                                                   assemblyLineTypeID)
         else:
@@ -391,7 +393,7 @@ class EveDB(object):
                             WHERE r.activityID = ?
                             AND r.assemblyLineTypeName = ?
                         """
-                result = self.__dbAccessObj.fetchData(query,
+                result = self.dbAccessObj.fetchData(query,
                                                       activityID,
                                                       assemblyLineTypeName)
 

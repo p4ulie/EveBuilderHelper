@@ -10,7 +10,7 @@ from DBAccessSQLite import DBAccessSQLite
 
 from EveMath.EveMathConstants import *
 
-from EveModules import EveDB
+from EveModules import EveDB, EveItem
 from EveMath import EveMathIndustry
 
 DB = 'data/eve.db'
@@ -22,13 +22,10 @@ BUILD_PRODUCT_PE = 18
 
 def main():
     eDB = EveDB.EveDB(dbAccess)
+    
+    eItem = EveItem.EveItem(dbAccess, typeName=BUILD_PRODUCT_NAME)
 
-    item = eDB.getInvItem(typeName=BUILD_PRODUCT_NAME)
-    itemTypeID = item['typeID']
-
-    blueprintTypeID = eDB.getBlueprintIDForItem(itemTypeID)
-
-    materials = eDB.getMaterialsForBlueprint(blueprintTypeID,
+    materials = eDB.getMaterialsForBlueprint(eItem.blueprintTypeID,
                                              activityID=EVE_ACTIVITY_MANUFACTURING)
 
     blueprintME = BUILD_PRODUCT_ME
