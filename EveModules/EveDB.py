@@ -230,7 +230,7 @@ class EveDB(object):
                 """
         result = self.__dbAccessObj.fetchData(query, typeID, activityID)
 
-        if result is not None:
+        if (result is not None) and (len(result) > 0):
             data = result[0][0]
         else:
             data = None
