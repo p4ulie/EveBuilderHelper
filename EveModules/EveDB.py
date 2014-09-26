@@ -152,7 +152,7 @@ class EveDB(object):
 
         return data
 
-    def getInvItem(self, typeID=None, typeName=None, groupID=None):
+    def getInvItem(self, typeID=None, typeName=None):
         '''
         Get item by ID or name
         '''
@@ -233,7 +233,7 @@ class EveDB(object):
                         and i.activityID = ?
                     """
             result = self.dbAccessObj.fetchData(query, typeID, activityID)
-    
+
             if (result is not None) and (len(result) > 0):
                 data = result[0][0]
 
