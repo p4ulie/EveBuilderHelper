@@ -13,67 +13,67 @@ class EveItem(EveDB):
     Class for data and methods for Items in Eve Online
     '''
 
-    typeID = None
-    groupID = None
-    typeName = ''
+    type_id = None
+    group_id = None
+    type_name = ''
     description = ''
     mass = None
     volume = None
     capacity = None
-    portionSize = None
-    raceID = None
-    basePrice = None
-    marketGroupID = None
+    portion_size = None
+    race_id = None
+    base_price = None
+    market_group_id = None
 
-    graphicID = None
+    graphic_id = None
     radius = None
     published = None
-    chanceOfDuplicating = None
+    chance_of_duplicating = None
 
-    metaGroup = None
-    blueprintTypeID = None
+    meta_group = None
+    blueprint_type_id = None
 
-    def __init__(self, dbAccessObj, typeID=None, typeName=None):
+    def __init__(self, db_access_obj, type_id=None, type_name=None):
         '''
         Constructor
         '''
 
-        self.dbAccessObj = dbAccessObj
+        EveDB.__init__(self, db_access_obj)
 
-        self.getItem(typeID=typeID, typeName=typeName)
+        self.get_item(type_id=type_id, type_name=type_name)
 
-    def getItem(self, typeID=None, typeName=None):
+    def get_item(self, type_id=None, type_name=None):
         '''
         Get item by ID or name
         '''
 
-        item = self.getInvItem(typeID=typeID, typeName=typeName)
+        item = self.get_inv_item(type_id=type_id, type_name=type_name)
 
         if item is not None:
-            for n, v in item.iteritems():
-                setattr(self, n, v)
-            self.blueprintTypeID = self.getBlueprintIDForItem(typeID=self.typeID)
-            result = self.typeID
+            for attr_name, attr_value in item.iteritems():
+                setattr(self, attr_name, attr_value)
+            self.blueprint_type_id = self.get_blueprint_id_for_item(type_id=self.type_id)
+            result = self.type_id
         else:
-            self.typeID = None
-            self.groupID = None
-            self.typeName = ''
+            self.type_id = None
+            self.group_id = None
+            self.type_name = ''
             self.description = ''
             self.mass = None
             self.volume = None
             self.capacity = None
-            self.portionSize = None
-            self.raceID = None
-            self.basePrice = None
-            self.marketGroupID = None
+            self.portion_size = None
+            self.race_id = None
+            self.base_price = None
+            self.market_group_id = None
 
-            self.graphicID = None
+            self.graphic_id = None
             self.radius = None
             self.published = None
-            self.chanceOfDuplicating = None
+            self.chance_of_duplicating = None
 
-            self.metaGroup = None
-            self.blueprintTypeID = None
+            self.meta_group = None
+            self.blueprint_type_id = None
 
             result = None
 

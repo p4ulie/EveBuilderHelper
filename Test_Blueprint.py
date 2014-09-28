@@ -8,7 +8,7 @@ Created on 17.6.2014
 
 from DBAccessSQLite import DBAccessSQLite
 
-from EveMath.EveMathConstants import *
+from EveMath.EveMathConstants import EVE_ACTIVITY_MANUFACTURING
 
 #from EveModules import EveDB, EveItem
 #from EveMath import EveMathIndustry
@@ -23,37 +23,41 @@ BUILD_PRODUCT_PE = 18
 
 
 def main():
-    blueprintME = BUILD_PRODUCT_ME
+    '''
+    Main function for testing the classes
+    '''
+
+    blueprint_me = BUILD_PRODUCT_ME
 #    blueprintPE = BUILD_PRODUCT_PE
 
-    eMnf = EveManufacturing.EveManufacturing(dbAccess, typeName=BUILD_PRODUCT_NAME)
+    e_manuf = EveManufacturing.EveManufacturing(db_access_object, type_name=BUILD_PRODUCT_NAME)
 
-    facilityBonusShip = eMnf.getActivityBonusForRamAssemblyLineType(assemblyLineTypeName="Advanced Medium Ship Assembly Array",
-                                                                 activityID=EVE_ACTIVITY_MANUFACTURING)['baseMaterialMultiplier']
+    facility_bonus_ship = e_manuf.get_bonus_for_assembly_line_type(assembly_line_type_name="Advanced Medium Ship Assembly Array",
+                                                                             activity_id=EVE_ACTIVITY_MANUFACTURING)['base_material_multiplier']
 
-    eMnf.calcBBList(activityID=EVE_ACTIVITY_MANUFACTURING,
-                    blueprintME=blueprintME,
-                    facilityBonus=facilityBonusShip,
+    e_manuf.calculate_build_buy_list(activity_id=EVE_ACTIVITY_MANUFACTURING,
+                    blueprint_me=blueprint_me,
+                    facility_bonus=facility_bonus_ship,
                     runs=BUILD_PRODUCT_COUNT)
 
-    print "Building: %s" % eMnf.typeName
+    print "Building: %s" % e_manuf.type_name
 
-    for buildTypeID, buildQuantity in eMnf.buildList.iteritems():
-        buildName = eMnf.getInvItem(typeID=buildTypeID)
-        if buildName is not None:
-            print "Build %s\t%d" % (buildName["typeName"], buildQuantity)
+    for build_type_id, build_quantity in e_manuf.build_list.iteritems():
+        build_name = e_manuf.get_inv_item(type_id=build_type_id)
+        if build_name is not None:
+            print "Build %s\t%d" % (build_name["type_name"], build_quantity)
 
     print
 
-    for buyTypeID, buyQuantity in eMnf.buyList.iteritems():
-        buyName = eMnf.getInvItem(typeID=buyTypeID)
-        if buyName is not None:
-            print "Buy %s\t%d" % (buyName["typeName"], buyQuantity)
+    for buy_type_id, buy_quantity in e_manuf.buy_list.iteritems():
+        buy_name = e_manuf.get_inv_item(type_id=buy_type_id)
+        if buy_name is not None:
+            print "Buy %s\t%d" % (buy_name["type_name"], buy_quantity)
 
 
 if __name__ == '__main__':
-    dbAccess = DBAccessSQLite(DB)
+    db_access_object = DBAccessSQLite(DB)
 
     main()
 
-    dbAccess.close()
+    db_access_object.close()
