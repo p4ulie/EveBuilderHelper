@@ -8,11 +8,9 @@ Created on 17.6.2014
 
 from DBAccessSQLite import DBAccessSQLite
 
-from EveMath.EveMathConstants import EVE_ACTIVITY_MANUFACTURING
+from EveOnline.EveMathConstants import EVE_ACTIVITY_MANUFACTURING
 
-#from EveModules import EveDB, EveItem
-#from EveMath import EveMathIndustry
-from EveManufacturing import EveManufacturing
+from EveOnline import EveManufacturing
 
 DB = 'data/eve.db'
 

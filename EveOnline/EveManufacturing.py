@@ -7,9 +7,9 @@ Created on Sep 15, 2014
 
 import math
 
-from EveModules.EveItem import EveItem
-from EveMath.EveMathConstants import EVE_ACTIVITY_MANUFACTURING
-from EveMath import EveMathIndustry
+from EveOnline.EveItem import EveItem
+from EveOnline.EveMathConstants import EVE_ACTIVITY_MANUFACTURING
+from EveOnline import EveMathIndustry
 
 
 class EveManufacturing(EveItem):

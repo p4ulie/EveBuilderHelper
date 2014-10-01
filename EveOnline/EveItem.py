@@ -5,7 +5,7 @@ Created on Sep 15, 2014
 '''
 
 
-from EveModules.EveDB import EveDB
+from EveOnline.EveDB import EveDB
 
 
 class EveItem(EveDB):

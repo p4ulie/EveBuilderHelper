@@ -5,7 +5,7 @@ Created on 18.6.2014
 '''
 
 #import syck
-from EveMath.EveMathConstants import EVE_ACTIVITY_MANUFACTURING
+from EveOnline.EveMathConstants import EVE_ACTIVITY_MANUFACTURING
 
 
 class EveDB(object):
