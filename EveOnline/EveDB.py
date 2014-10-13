@@ -197,7 +197,7 @@ class EveDB(object):
                         """
                 result = self.db_access_obj.fetchData(query, type_name)
 
-        if result is not None:
+        if (result is not None) and (len(result) != 0):
             # take only the first row
             row = result[0]
             data = {'type_id': row[0],
