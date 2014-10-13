@@ -7,23 +7,23 @@ Various functions to handle Eve Online industry related math (material calculati
 '''
 
 
-def calculateMEMultiplier(blueprintMELevel=0, facilityBonus=0):
+def calculate_me_multiplier(blueprint_me_level=0, facility_bonus=0):
     '''
     Calculate material multiplier for specified ME Blueprint Research level
     and facility bonus
     '''
-    multiplier = ((100 - float(blueprintMELevel)) / 100) * facilityBonus
+    multiplier = ((100 - float(blueprint_me_level)) / 100) * facility_bonus
 
     return multiplier
 
 
-def calculateTEMultiplier(blueprintTELevel=0, facilityBonus=0):
+def calculate_te_multiplier(blueprint_te_level=0, facility_bonus=0):
     '''
     Calculate material multiplier for specified TE Blueprint Research level
     and character skills
     '''
 
-    multiplier = ((100 - float(blueprintTELevel)) / 100) * facilityBonus
+    multiplier = ((100 - float(blueprint_te_level)) / 100) * facility_bonus
 
     return multiplier
 
