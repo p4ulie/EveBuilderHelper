@@ -356,7 +356,7 @@ class EveDB(object):
 
         return data
 
-    def get_bonus_for_assembly_line_type(self,
+    def get_bonuses_for_assembly_line_type(self,
                                                assembly_line_type_id=None,
                                                assembly_line_type_name=None,
                                                activity_id=EVE_ACTIVITY_MANUFACTURING):
@@ -397,7 +397,7 @@ class EveDB(object):
                                                       activity_id,
                                                       assembly_line_type_name)
 
-        if result is not None:
+        if (result is not None) and (len(result) != 0):
             row = result[0]
             data = {'base_time_multiplier': row[0],
                      'base_material_multiplier': row[1],
