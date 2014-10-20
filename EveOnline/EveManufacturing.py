@@ -17,6 +17,10 @@ class EveManufacturing(EveItem):
     Class for manufacturing in Eve Online
     '''
 
+    material_list = {}
+    build_list = {}
+    buy_list = {}
+
     def __init__(self, db_access_obj, type_id=None, type_name=None):
         '''
         Constructor
@@ -26,20 +30,21 @@ class EveManufacturing(EveItem):
 
         self.get_item(type_id=type_id, type_name=type_name)
 
-    def calculate_build_buy_list(self,
-                                 blueprint_type_id=None,
-                                 activity_id=EVE_ACTIVITY_MANUFACTURING,
-                                 facility_bonus=1,
-                                 blueprint_me=0,
-                                 runs=1,
-                                 asset_list=None):
+    def calculate_build(self,
+                        blueprint_type_id=None,
+                        activity_id=EVE_ACTIVITY_MANUFACTURING,
+                        facility_bonus=1,
+                        blueprint_me=0,
+                        runs=1,
+                        asset_list=None):
         '''
         Method for calculating Build and Buy list with amounts of components
         and materials to build an item
         '''
 
-        build_list = {}
-        buy_list = {}
+        self.material_list = {}
+        self.build_list = {}
+        self.buy_list = {}
 
         if blueprint_type_id is not None:
             base_material_list = self.get_materials_for_blueprint(blueprint_type_id,
@@ -65,6 +70,7 @@ class EveManufacturing(EveItem):
                                                                                             facility_bonus)) * \
                                                                                             runs
 
+                    self.material_list[material_id] = adjusted_quantity
                     quantity_additional_to_get = adjusted_quantity
 
                     #do we already have some in assets?
@@ -78,9 +84,12 @@ class EveManufacturing(EveItem):
                     # is it player-buildable?
                     if material_blueprint_id is not None:
                         if quantity_additional_to_get > 0:
-                            build_list[material_id] = quantity_additional_to_get
+                            self.build_list[material_id] = quantity_additional_to_get
                     else:
                         if quantity_additional_to_get > 0:
-                            buy_list[material_id] = quantity_additional_to_get
+                            self.buy_list[material_id] = quantity_additional_to_get
 
-        return {"build_list": build_list, "buy_list": buy_list, "asset_list": asset_list}
+        return {"material_list": self.material_list,
+                "build_list": self.build_list,
+                "buy_list": self.buy_list,
+                "asset_list": asset_list}
