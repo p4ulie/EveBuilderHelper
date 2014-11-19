@@ -356,7 +356,7 @@ class EveDB(object):
 
         return data
 
-    def get_bonuses_for_assembly_line_type(self,
+    def get_assembly_line_type(self,
                                                assembly_line_type_id=None,
                                                assembly_line_type_name=None,
                                                activity_id=EVE_ACTIVITY_MANUFACTURING):
@@ -365,16 +365,21 @@ class EveDB(object):
         '''
         result = None
 
+        query = """SELECT r.assemblyLineTypeID,
+                            r.assemblyLineTypeName,
+                            r.description,
+                            r.baseTimeMultiplier,
+                            r.baseMaterialMultiplier,
+                            r.baseCostMultiplier,
+                            r.volume,
+                            r.activityId,
+                            r.minCostPerHour
+                    FROM ramassemblylinetypes AS r
+                    WHERE r.activityId = ?
+                """
+
         if assembly_line_type_id is not None:
-            query = """
-                            SELECT r.baseTimeMultiplier,
-                                    r.baseMaterialMultiplier,
-                                    r.baseCostMultiplier,
-                                    r.volume,
-                                    r.activityId,
-                                    r.minCostPerHour
-                            FROM ramassemblylinetypes AS r
-                            WHERE r.activityId = ?
+            query += """
                             AND r.assemblyLineTypeId = ?
                     """
             result = self.db_access_obj.fetchData(query,
@@ -382,15 +387,7 @@ class EveDB(object):
                                                   assembly_line_type_id)
         else:
             if assembly_line_type_name is not None:
-                query = """
-                            SELECT r.baseTimeMultiplier,
-                                    r.baseMaterialMultiplier,
-                                    r.baseCostMultiplier,
-                                    r.volume,
-                                    r.activityId,
-                                    r.minCostPerHour
-                            FROM ramassemblylinetypes AS r
-                            WHERE r.activityId = ?
+                query += """
                             AND r.assemblyLineTypeName = ?
                         """
                 result = self.db_access_obj.fetchData(query,
@@ -399,12 +396,15 @@ class EveDB(object):
 
         if (result is not None) and (len(result) != 0):
             row = result[0]
-            data = {'base_time_multiplier': row[0],
-                     'base_material_multiplier': row[1],
-                     'base_cost_multiplier': row[2],
-                     'volume': row[3],
-                     'activity_id': row[4],
-                     'min_cost_per_hour': row[5]}
+            data = {'assemblyLineTypeID': row[0],
+                     'assemblyLineTypeName': row[1],
+                     'description': row[2],
+                     'base_time_multiplier': row[3],
+                     'base_material_multiplier': row[4],
+                     'base_cost_multiplier': row[5],
+                     'volume': row[6],
+                     'activity_id': row[7],
+                     'min_cost_per_hour': row[8]}
         else:
             data = None
 
