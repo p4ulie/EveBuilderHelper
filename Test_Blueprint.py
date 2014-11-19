@@ -11,14 +11,16 @@ from DBAccessSQLite import DBAccessSQLite
 
 from EveOnline.EveMathConstants import EVE_ACTIVITY_MANUFACTURING
 
-from EveOnline import EveManufacturing
+from EveOnline import EveItem
+
+from EveOnline import EveManufacturingJob
 
 DB = 'data/eve.db'
 
 BUILD_PRODUCT_NAME = 'Kronos'
 BUILD_PRODUCT_COUNT = 1
 BUILD_PRODUCT_ME = 10
-BUILD_PRODUCT_PE = 18
+BUILD_PRODUCT_TE = 18
 
 ASSETS_LIST = '''Morphite\t13,010\tMineral\t
 Tritanium\t6,818,891\tMineral\t
@@ -27,32 +29,7 @@ Pulse Shield Emitter\t3385\tConstruction Components\t
 Fusion Reactor Unit\t193\tConstruction Components\t
 '''
 
-
-def build(type_id=None,
-            type_name=None,
-            blueprint_me=0,
-            runs=1,
-            asset_list=None):
-    '''
-    Calculate build/buy list
-    '''
-    eve_manufacturing = EveManufacturing.EveManufacturing(db_access_object, type_id=type_id, type_name=type_name)
-
-    facility_bonus_product = eve_manufacturing.get_bonuses_for_assembly_line_type(assembly_line_type_name="Component Assembly Array")['base_material_multiplier']
-
-    industrial_plan = eve_manufacturing.calculate_build(blueprint_me=blueprint_me,
-                                                       facility_bonus=facility_bonus_product,
-                                                       runs=runs,
-                                                       asset_list=asset_list)
-
-    for build_type_id, build_quantity in industrial_plan['build_list'].iteritems():
-        build(type_id=build_type_id,
-              blueprint_me=10,
-              runs=build_quantity,
-              asset_list=asset_list)
-
-    return industrial_plan
-
+#ASSETS_LIST = ''
 
 def create_asset_list(line_list):
     '''
@@ -60,7 +37,7 @@ def create_asset_list(line_list):
     '''
     asset_dict = {}
 
-    e_asset = EveManufacturing.EveManufacturing(db_access_object)
+    e_asset = EveItem.EveItem(db_access_object)
 
     for line in line_list.splitlines():
         match = re.match(r"^(\D+)\t([\d\,]*)\t(\D+)\t.*", line)
@@ -83,59 +60,61 @@ def create_asset_list(line_list):
 
     return asset_dict
 
+def write_material_list(material_list,
+                        asset_list,
+                        format_string):
+
+    for material_type_id, material_quantity in material_list.iteritems():
+        material_item = EveItem.EveItem(db_access_object,
+                                 type_id=material_type_id)
+        material_name = material_item.get_inv_item(type_id=material_type_id)
+        if material_name is not None:
+            if material_type_id in asset_list.iterkeys():
+                asset_quantity = asset_list[material_type_id]
+            else:
+                asset_quantity = 0
+
+            print format_string % (material_name["type_name"], material_quantity, asset_quantity)
+
 
 def main():
     '''
     Main function for testing the classes
     '''
 
-    blueprint_me = BUILD_PRODUCT_ME
-#    blueprintPE = BUILD_PRODUCT_PE
-
-    e_manuf = EveManufacturing.EveManufacturing(db_access_object, type_name=BUILD_PRODUCT_NAME)
-
     asset_dict = create_asset_list(ASSETS_LIST)
-    asset_list = asset_dict.copy()
-    asset_list2 = asset_dict.copy()
 
-    build(type_name=BUILD_PRODUCT_NAME,
-          blueprint_me=BUILD_PRODUCT_ME,
-          runs=BUILD_PRODUCT_COUNT,
-          asset_list=asset_list2)
+    e_built_item = EveItem.EveItem(db_access_object,
+                             type_name=BUILD_PRODUCT_NAME)
+ 
+    facility_id = e_built_item.get_assembly_line_type(assembly_line_type_name="Component Assembly Array")['assemblyLineTypeID']
 
-    industrial_plan = e_manuf.calculate_build(activity_id=EVE_ACTIVITY_MANUFACTURING,
-                                                       blueprint_me=blueprint_me,
-                                                       runs=BUILD_PRODUCT_COUNT,
-                                                       asset_list=asset_list)
+    e_manuf_job = EveManufacturingJob.EveManufacturingJob(db_access_object,
+                                                          type_id=e_built_item.type_id,
+                                                          runs=1,
+                                                          bp_me=BUILD_PRODUCT_TE,
+                                                          bp_te=0,
+                                                          asset_list=asset_dict,
+                                                          assembly_line_type_id=facility_id)
 
-    print "Building: %s\n" % e_manuf.type_name
+    print "Building: %s\n" % e_manuf_job.type_name
 
-    for material_type_id, material_quantity in industrial_plan['material_list'].iteritems():
-        material_name = e_manuf.get_inv_item(type_id=material_type_id)
-        if material_name is not None:
-
-            if material_type_id in asset_dict.iterkeys():
-                asset_quantity = asset_dict[material_type_id]
-            else:
-                asset_quantity = 0
-
-            print "Material %s\t%d (in assets %d)" % (material_name["type_name"], material_quantity, asset_quantity)
+    write_material_list(e_manuf_job.material_list,
+                        asset_dict,
+                        "Material %s\t%d (in assets %d)")
 
     print
 
-    for build_type_id, build_quantity in industrial_plan['build_list'].iteritems():
-        build_name = e_manuf.get_inv_item(type_id=build_type_id)
-        if build_name is not None:
-            print "Build %s\t%d" % (build_name["type_name"], build_quantity)
+    write_material_list(e_manuf_job.build_list,
+                        asset_dict,
+                        "Build %s\t%d (in assets %d)")
 
     print
 
-    for buy_type_id, buy_quantity in industrial_plan['buy_list'].iteritems():
-        buy_name = e_manuf.get_inv_item(type_id=buy_type_id)
-        if buy_name is not None:
-            print "Buy %s\t%d" % (buy_name["type_name"], buy_quantity)
+    write_material_list(e_manuf_job.buy_list,
+                        asset_dict,
+                        "Buy %s\t%d (in assets %d)")
 
-    db_access_object.close()
 
 if __name__ == '__main__':
     db_access_object = DBAccessSQLite(DB)
