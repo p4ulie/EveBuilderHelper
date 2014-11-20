@@ -17,10 +17,10 @@ from EveOnline import EveManufacturingJob
 
 DB = 'data/eve.db'
 
-BUILD_PRODUCT_NAME = 'Kronos'
-BUILD_PRODUCT_COUNT = 1
-BUILD_PRODUCT_ME = 10
-BUILD_PRODUCT_TE = 18
+BUILD_PRODUCT_NAME = 'Guardian'
+BUILD_PRODUCT_RUNS = 1
+BUILD_PRODUCT_ME = 2
+BUILD_PRODUCT_TE = 4
 
 ASSETS_LIST = '''Morphite\t13,010\tMineral\t
 Tritanium\t6,818,891\tMineral\t
@@ -86,34 +86,41 @@ def main():
 
     e_built_item = EveItem.EveItem(db_access_object,
                              type_name=BUILD_PRODUCT_NAME)
- 
+
     facility_id = e_built_item.get_assembly_line_type(assembly_line_type_name="Component Assembly Array")['assemblyLineTypeID']
 
     e_manuf_job = EveManufacturingJob.EveManufacturingJob(db_access_object,
                                                           type_id=e_built_item.type_id,
-                                                          runs=1,
-                                                          bp_me=BUILD_PRODUCT_TE,
-                                                          bp_te=0,
+                                                          runs=BUILD_PRODUCT_RUNS,
+                                                          bp_me=BUILD_PRODUCT_ME,
+                                                          bp_te=BUILD_PRODUCT_TE,
                                                           asset_list=asset_dict,
                                                           assembly_line_type_id=facility_id)
 
     print "Building: %s\n" % e_manuf_job.type_name
 
-    write_material_list(e_manuf_job.material_list,
-                        asset_dict,
-                        "Material %s\t%d (in assets %d)")
+#===============================================================================
+#     write_material_list(e_manuf_job.material_list,
+#                         asset_dict,
+#                         "Material %s\t%d (in assets %d)")
+# 
+#     print
+# 
+#     write_material_list(e_manuf_job.build_list,
+#                         asset_dict,
+#                         "Build %s\t%d (in assets %d)")
+# 
+#     print
+# 
+#     write_material_list(e_manuf_job.buy_list,
+#                         asset_dict,
+#                         "Buy %s\t%d (in assets %d)")
+#===============================================================================
 
-    print
-
-    write_material_list(e_manuf_job.build_list,
-                        asset_dict,
-                        "Build %s\t%d (in assets %d)")
-
-    print
-
-    write_material_list(e_manuf_job.buy_list,
-                        asset_dict,
-                        "Buy %s\t%d (in assets %d)")
+    for job in e_manuf_job.get_job_queue():
+        print "%s: %d (job level %d)" % (job.type_name,
+                                   job.runs,
+                                   job.buil_queue_level)
 
 
 if __name__ == '__main__':

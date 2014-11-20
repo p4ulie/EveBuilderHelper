@@ -22,7 +22,8 @@ class EveManufacturingJob(EveItem):
                  bp_me=0,
                  bp_te=0,
                  asset_list=None,
-                 assembly_line_type_id=None):
+                 assembly_line_type_id=None,
+                 buil_queue_level=0):
         '''
         Constructor
         '''
@@ -45,10 +46,41 @@ class EveManufacturingJob(EveItem):
         self.bp_me = bp_me
         self.bp_te = bp_te
 
+        self.buil_queue_level = buil_queue_level
+        self.build_queue = []
+
         self.calculate_job()
+
+    def calculate_subjobs(self):
+        '''
+        Calculate jobs of jobs from building list
+        '''
+        for job_item_id, job_quantity in self.build_list.iteritems():
+            sub_job = EveManufacturingJob(self.db_access_obj,
+                                      type_id=job_item_id,
+                                      runs=job_quantity,
+                                      buil_queue_level=(self.buil_queue_level + 1))
+
+            self.build_queue.append(sub_job)
+
+    def get_job_queue(self):
+        '''
+        Return list of all jobs, build queue levels flattened
+        '''
+        job_list = []
+
+        job_list.append(self)
+
+        for job in self.build_queue:
+            job_subjobs = job.get_job_queue()
+            job_list.extend(job_subjobs)
+
+        return job_list
 
     def calculate_job(self):
         '''
+        Calculate material list for building,
+        build and buy lists (adjusted by materials already in assets)
         '''
         self.base_material_list = {}
         self.material_list = {}
@@ -61,11 +93,11 @@ class EveManufacturingJob(EveItem):
 
         if self.assembly_line_type_id is not None:
             facility = self.get_assembly_line_type(assembly_line_type_id=self.assembly_line_type_id)
-            facility_bonus = facility['base_material_multiplier']
-            if facility_bonus is None:
-                facility_bonus = 1
+            facility_multiplier = facility['base_material_multiplier']
+            if facility_multiplier is None:
+                facility_multiplier = 1
         else:
-            facility_bonus = 1
+            facility_multiplier = 1
 
         if self.base_material_list is not None:
 
@@ -78,7 +110,7 @@ class EveManufacturingJob(EveItem):
                 if material_id is not None:
                     adjusted_quantity = math.ceil(quantity * \
                                                   EveMathIndustry.calculate_me_multiplier(self.bp_me,
-                                                                                          facility_bonus)) * \
+                                                                                          facility_multiplier)) * \
                                                                                           self.runs
 
                     self.material_list[material_id] = adjusted_quantity
@@ -101,3 +133,5 @@ class EveManufacturingJob(EveItem):
                     else:
                         if quantity_to_acquire > 0:
                             self.buy_list[material_id] = quantity_to_acquire
+
+        self.calculate_subjobs()
