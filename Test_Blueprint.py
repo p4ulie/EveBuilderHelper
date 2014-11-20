@@ -22,11 +22,14 @@ BUILD_PRODUCT_RUNS = 1
 BUILD_PRODUCT_ME = 2
 BUILD_PRODUCT_TE = 4
 
-ASSETS_LIST = '''Morphite\t13,010\tMineral\t
+ASSETS_LIST = '''Morphite\t85\tMineral\t
 Tritanium\t6,818,891\tMineral\t
 Magnetometric Sensor Cluster\t3,817\tConstruction Components\t
 Pulse Shield Emitter\t3385\tConstruction Components\t
 Fusion Reactor Unit\t193\tConstruction Components\t
+Augoror\t20\tShips\t
+R.A.M.- Starship Tech\t20\tSomething\t
+
 '''
 
 #ASSETS_LIST = ''
@@ -99,28 +102,16 @@ def main():
 
     print "Building: %s\n" % e_manuf_job.type_name
 
-#===============================================================================
-#     write_material_list(e_manuf_job.material_list,
-#                         asset_dict,
-#                         "Material %s\t%d (in assets %d)")
-# 
-#     print
-# 
-#     write_material_list(e_manuf_job.build_list,
-#                         asset_dict,
-#                         "Build %s\t%d (in assets %d)")
-# 
-#     print
-# 
-#     write_material_list(e_manuf_job.buy_list,
-#                         asset_dict,
-#                         "Buy %s\t%d (in assets %d)")
-#===============================================================================
-
     for job in e_manuf_job.get_job_queue():
         print "%s: %d (job level %d)" % (job.type_name,
                                    job.runs,
                                    job.buil_queue_level)
+
+    print "\n"
+
+    write_material_list(e_manuf_job.get_shopping_list_total(),
+                        asset_dict,
+                        "Buy %s\t%d (in assets %d)")
 
 
 if __name__ == '__main__':

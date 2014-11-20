@@ -77,6 +77,21 @@ class EveManufacturingJob(EveItem):
 
         return job_list
 
+    def get_shopping_list_total(self):
+        '''
+        Return list of material to buy, total for all jobs
+        '''
+        buy_list = {}
+
+        for job in self.get_job_queue():
+            for buy_id, quantity in job.buy_list.iteritems():
+                if buy_id in buy_list.iterkeys():
+                    buy_list[buy_id] += quantity
+                else:
+                    buy_list[buy_id] = quantity
+
+        return buy_list
+
     def calculate_job(self):
         '''
         Calculate material list for building,
