@@ -28,6 +28,7 @@ Magnetometric Sensor Cluster\t3,817\tConstruction Components\t
 Pulse Shield Emitter\t3385\tConstruction Components\t
 Fusion Reactor Unit\t193\tConstruction Components\t
 Augoror\t20\tShips\t
+Tesseract Capacitor Unit\t0\tConstr\t
 R.A.M.- Starship Tech\t20\tSomething\t
 
 '''
@@ -105,7 +106,7 @@ def main():
     for job in e_manuf_job.get_job_queue():
         print "%s: %d (job level %d)" % (job.type_name,
                                    job.runs,
-                                   job.buil_queue_level)
+                                   job.build_queue_level)
 
     print "\n"
 

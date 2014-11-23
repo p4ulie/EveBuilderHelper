@@ -23,7 +23,7 @@ class EveManufacturingJob(EveItem):
                  bp_te=0,
                  asset_list=None,
                  assembly_line_type_id=None,
-                 buil_queue_level=0):
+                 build_queue_level=0):
         '''
         Constructor
         '''
@@ -46,12 +46,12 @@ class EveManufacturingJob(EveItem):
         self.bp_me = bp_me
         self.bp_te = bp_te
 
-        self.buil_queue_level = buil_queue_level
+        self.build_queue_level = build_queue_level
         self.build_queue = []
 
         self.calculate_job()
 
-    def calculate_subjobs(self):
+    def generate_subjobs(self):
         '''
         Calculate jobs of jobs from building list
         '''
@@ -59,7 +59,7 @@ class EveManufacturingJob(EveItem):
             sub_job = EveManufacturingJob(self.db_access_obj,
                                       type_id=job_item_id,
                                       runs=job_quantity,
-                                      buil_queue_level=(self.buil_queue_level + 1))
+                                      build_queue_level=(self.build_queue_level + 1))
 
             self.build_queue.append(sub_job)
 
@@ -101,6 +101,7 @@ class EveManufacturingJob(EveItem):
         self.material_list = {}
         self.build_list = {}
         self.buy_list = {}
+        self.build_queue = []
 
         if self.blueprint_type_id is not None:
             self.base_material_list = self.get_materials_for_blueprint(self.blueprint_type_id,
@@ -149,4 +150,4 @@ class EveManufacturingJob(EveItem):
                         if quantity_to_acquire > 0:
                             self.buy_list[material_id] = quantity_to_acquire
 
-        self.calculate_subjobs()
+        self.generate_subjobs()

@@ -357,9 +357,9 @@ class EveDB(object):
         return data
 
     def get_assembly_line_type(self,
-                                               assembly_line_type_id=None,
-                                               assembly_line_type_name=None,
-                                               activity_id=EVE_ACTIVITY_MANUFACTURING):
+                               assembly_line_type_id=None,
+                               assembly_line_type_name=None,
+                               activity_id=EVE_ACTIVITY_MANUFACTURING):
         '''
         Get bonus multiplier for specified activity and assembly line type
         '''
