@@ -13,14 +13,12 @@ from EveOnline.EveMathConstants import EVE_ACTIVITY_MANUFACTURING
 
 from EveOnline import EveItem
 
-from EveOnline import EveManufacturingJob
-
 DB = 'data/eve.db'
 
-BUILD_PRODUCT_NAME = 'Guardian'
+BUILD_PRODUCT_NAME = 'Augoror'
 BUILD_PRODUCT_RUNS = 1
-BUILD_PRODUCT_ME = 2
-BUILD_PRODUCT_TE = 4
+BUILD_PRODUCT_ME = 0
+BUILD_PRODUCT_TE = 0
 
 ASSETS_LIST = '''Morphite\t85\tMineral\t
 Tritanium\t6,818,891\tMineral\t
@@ -91,29 +89,46 @@ def main():
     e_built_item = EveItem.EveItem(db_access_object,
                              type_name=BUILD_PRODUCT_NAME)
 
-    facility_id = e_built_item.get_assembly_line_type(assembly_line_type_name="Component Assembly Array")['assemblyLineTypeID']
+    e_built_item.manufacturing_quantity = BUILD_PRODUCT_RUNS
+    e_built_item.blueprint_me_level = BUILD_PRODUCT_ME
+    e_built_item.assembly_line_type_id = e_built_item.get_assembly_line_type(assembly_line_type_name="Component Assembly Array")['assemblyLineTypeID']
 
-    e_manuf_job = EveManufacturingJob.EveManufacturingJob(db_access_object,
-                                                          type_id=e_built_item.type_id,
-                                                          runs=BUILD_PRODUCT_RUNS,
-                                                          bp_me=BUILD_PRODUCT_ME,
-                                                          bp_te=BUILD_PRODUCT_TE,
-                                                          asset_list=asset_dict,
-                                                          assembly_line_type_id=facility_id)
+    e_built_item.manufacturing_data_calculate()
 
-    print "Building: %s\n" % e_manuf_job.type_name
+    print "Building: %s\n" % e_built_item.type_name
 
-    for job in e_manuf_job.get_job_queue():
-        print "%s: %d (job level %d)" % (job.type_name,
-                                   job.runs,
-                                   job.build_queue_level)
+    manufacturing_job_list = e_built_item.get_manufacturing_job_list()
+    for job in manufacturing_job_list:
+        print "%s (%d): runs %d (level %d)" % (job.type_name,
+                                               job.type_id,
+                                                 job.manufacturing_quantity,
+                                                 job.build_queue_level)
 
-    print "\n"
+    #===========================================================================
+    # e_built_item.get_manufacturing_job(21027).blueprint_me = 10
+    # e_built_item.get_manufacturing_job(21027).manufacturing_quantity = 0
+    #===========================================================================
 
-    write_material_list(e_manuf_job.get_shopping_list_total(),
-                        asset_dict,
-                        "Buy %s\t%d (in assets %d)")
+    e_built_item.manufacturing_data_calculate()
 
+    print "Building: %s\n" % e_built_item.type_name
+
+    for mat, quant in e_built_item.get_material_list().iteritems():
+        print "%s: runs %d" % (mat, quant)
+
+
+#===============================================================================
+#     for job in e_built_item.get_job_queue():
+#         print "%s: %d (job level %d)" % (job.type_name,
+#                                    job.manufacturing_quantity,
+#                                    job.build_queue_level)
+# 
+#     print "\n"
+# 
+#     write_material_list(e_built_item.get_shopping_list_total(),
+#                         asset_dict,
+#                         "Buy %s\t%d (in assets %d)")
+#===============================================================================
 
 if __name__ == '__main__':
     db_access_object = DBAccessSQLite(DB)
