@@ -15,9 +15,9 @@ from EveOnline import EveItem
 
 DB = 'data/eve.db'
 
-BUILD_PRODUCT_NAME = 'Augoror'
+BUILD_PRODUCT_NAME = 'Ark'
 BUILD_PRODUCT_RUNS = 1
-BUILD_PRODUCT_ME = 0
+BUILD_PRODUCT_ME = 5
 BUILD_PRODUCT_TE = 0
 
 ASSETS_LIST = '''Morphite\t85\tMineral\t
@@ -91,7 +91,7 @@ def main():
 
     e_built_item.manufacturing_quantity = BUILD_PRODUCT_RUNS
     e_built_item.blueprint_me_level = BUILD_PRODUCT_ME
-    e_built_item.assembly_line_type_id = e_built_item.get_assembly_line_type(assembly_line_type_name="Component Assembly Array")['assemblyLineTypeID']
+#    e_built_item.assembly_line_type_id = e_built_item.get_assembly_line_type(assembly_line_type_name="Advanced Large Ship Assembly Array")['assemblyLineTypeID']
 
     e_built_item.manufacturing_data_calculate()
 
@@ -109,26 +109,18 @@ def main():
     # e_built_item.get_manufacturing_job(21027).manufacturing_quantity = 0
     #===========================================================================
 
-    e_built_item.manufacturing_data_calculate()
+#    print e_built_item.get_manufacturing_job_by_name("Providence").type_name
 
+    print 
+    
     print "Building: %s\n" % e_built_item.type_name
 
-    for mat, quant in e_built_item.get_material_list().iteritems():
-        print "%s: runs %d" % (mat, quant)
+    for mat_id, quant in e_built_item.get_material_list().iteritems():
+        e_material_item = EveItem.EveItem(db_access_object,
+                                          type_id=mat_id)
 
+        print "%s: runs %d" % (e_material_item.type_name, quant)
 
-#===============================================================================
-#     for job in e_built_item.get_job_queue():
-#         print "%s: %d (job level %d)" % (job.type_name,
-#                                    job.manufacturing_quantity,
-#                                    job.build_queue_level)
-# 
-#     print "\n"
-# 
-#     write_material_list(e_built_item.get_shopping_list_total(),
-#                         asset_dict,
-#                         "Buy %s\t%d (in assets %d)")
-#===============================================================================
 
 if __name__ == '__main__':
     db_access_object = DBAccessSQLite(DB)
