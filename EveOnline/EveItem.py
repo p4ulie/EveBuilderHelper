@@ -118,7 +118,7 @@ class EveItem(EveDB):
                     quantity = base_material["quantity"]
                     material_id = self.get_inv_item(type_id=base_material["material_type_id"])["type_id"]
 
-                    material = self.get_manufacturing_job(material_id)
+                    material = self.get_manufacturing_job_by_id(material_id)
                     if material is None:
                         # add material to list
                         material = EveItem(self.db_access_obj,
@@ -164,7 +164,7 @@ class EveItem(EveDB):
 
         return material_list
 
-    def get_manufacturing_job(self, type_id):
+    def get_manufacturing_job_by_id(self, type_id):
         '''
         Return object reference to job form job list,
         according to specified parameters
@@ -173,10 +173,25 @@ class EveItem(EveDB):
             return self
 
         for job in self.material_list:
-            if job.get_manufacturing_job(type_id) is not None:
+            if job.get_manufacturing_job_by_id(type_id) is not None:
                 return job
 
         return None
+
+    def get_manufacturing_job_by_name(self, type_name):
+        '''
+        Return object reference to job form job list,
+        according to specified parameters
+        '''
+        if type_name == self.type_name:
+            return self
+
+        for job in self.material_list:
+            if job.get_manufacturing_job_by_name(type_name) is not None:
+                return job
+
+        return None
+
 
     def get_manufacturing_job_list(self):
         '''
