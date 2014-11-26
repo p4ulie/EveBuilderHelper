@@ -192,7 +192,6 @@ class EveItem(EveDB):
 
         return None
 
-
     def get_manufacturing_job_list(self):
         '''
         Get list of objects representing manufacturing jobs
