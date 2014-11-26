@@ -143,9 +143,9 @@ class EveDB(object):
                                  'mass': row[4],
                                  'volume': row[5],
                                  'capacity': row[6],
-                                 'portionSize': row[7],
+                                 'portion_size': row[7],
                                  'race_id': row[8],
-                                 'basePrice': row[9],
+                                 'base_price': row[9],
                                  'market_group_id': row[0]}
         else:
             data = None
