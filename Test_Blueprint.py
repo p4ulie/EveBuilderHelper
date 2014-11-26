@@ -87,7 +87,7 @@ def main():
     asset_dict = create_asset_list(ASSETS_LIST)
 
     e_built_item = EveItem.EveItem(db_access_object,
-                             type_name=BUILD_PRODUCT_NAME)
+                                   type_name=BUILD_PRODUCT_NAME)
 
     e_built_item.manufacturing_quantity = BUILD_PRODUCT_RUNS
     e_built_item.blueprint_me_level = BUILD_PRODUCT_ME
@@ -98,6 +98,7 @@ def main():
     print "Building: %s\n" % e_built_item.type_name
 
     manufacturing_job_list = e_built_item.get_manufacturing_job_list()
+
     for job in manufacturing_job_list:
         print "%s (%d): runs %d (level %d)" % (job.type_name,
                                                job.type_id,
@@ -111,8 +112,8 @@ def main():
 
 #    print e_built_item.get_manufacturing_job_by_name("Providence").type_name
 
-    print 
-    
+    print
+
     print "Building: %s\n" % e_built_item.type_name
 
     for mat_id, quant in e_built_item.get_material_list().iteritems():
