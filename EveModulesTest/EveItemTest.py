@@ -42,7 +42,37 @@ class Test(unittest.TestCase):
         self.failUnlessEqual(job_list,
                              [job.type_name for job in self.eveItem.get_manufacturing_job_list()])
 
+    def test_get_manufacturing_job_list_with_assets(self):
+        job_list = ['Ark', 'Capital Radar Sensor Cluster', 'Capital Linear Shield Emitter', 'Capital Antimatter Reactor Unit', 'Capital Nanoelectrical Microprocessor', 'Capital Tungsten Carbide Armor Plate', 'R.A.M.- Starship Tech', 'Providence', 'Capital Propulsion Engine', 'Capital Cargo Bay', 'Capital Construction Parts', 'Capital Armor Plates', 'Capital Tesseract Capacitor Unit', 'Capital Fusion Thruster']
+
+        assets = {21025: 29}   # 21025: Capital Jump Drive
+
+        self.eveItem.get_item(type_name="Ark")
+        self.eveItem.blueprint_me_level = self.BUILD_PRODUCT_ME
+        self.eveItem.manufacturing_quantity = self.BUILD_PRODUCT_RUNS
+        self.eveItem.asset_list = assets
+
+        self.eveItem.manufacturing_data_calculate()
+
+        self.failUnlessEqual(job_list,
+                             [job.type_name for job in self.eveItem.get_manufacturing_job_list()])
+
     def test_get_material_list(self):
+        material_list = {16672: 11401167.0, 16678: 2976997.0, 34: 133069643.0, 35: 19441019.0, 36: 7163272.0, 37: 1089400.0, 38: 314014.0, 39: 1, 40: 20618.0, 16681: 40084.0, 16682: 13904.0, 11399: 3563.0, 33360: 44176.0, 16680: 76090.0, 3828: 2138.0, 16679: 1115444.0, 16683: 13673.0, 17317: 16258.0}
+
+        assets = {39: 51732}  # 39: Zydrine
+
+        self.eveItem.get_item(type_name="Ark")
+        self.eveItem.blueprint_me_level = self.BUILD_PRODUCT_ME
+        self.eveItem.manufacturing_quantity = self.BUILD_PRODUCT_RUNS
+        self.eveItem.asset_list = assets
+
+        self.eveItem.manufacturing_data_calculate()
+
+        self.failUnlessEqual(material_list,
+                             self.eveItem.get_material_list())
+
+    def test_get_material_list_with_assets(self):
         material_list = {16672: 11401167.0, 16678: 2976997.0, 34: 133069643.0, 35: 19441019.0, 36: 7163272.0, 37: 1089400.0, 38: 314014.0, 39: 51733.0, 40: 20618.0, 16681: 40084.0, 16682: 13904.0, 11399: 3563.0, 33360: 44176.0, 16680: 76090.0, 3828: 2138.0, 16679: 1115444.0, 16683: 13673.0, 17317: 16258.0}
 
         self.eveItem.get_item(type_name="Ark")

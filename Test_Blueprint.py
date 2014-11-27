@@ -28,10 +28,13 @@ Fusion Reactor Unit\t193\tConstruction Components\t
 Augoror\t20\tShips\t
 Tesseract Capacitor Unit\t0\tConstr\t
 R.A.M.- Starship Tech\t20\tSomething\t
-
 '''
 
-#ASSETS_LIST = ''
+ASSETS_LIST = '''Zydrine\t51732\tMineral\t
+Providence\t1\tShip\t
+'''
+
+ASSETS_LIST = ''
 
 def create_asset_list(line_list):
     '''
@@ -93,6 +96,7 @@ def main():
     e_built_item.blueprint_me_level = BUILD_PRODUCT_ME
 #    e_built_item.assembly_line_type_id = e_built_item.get_assembly_line_type(assembly_line_type_name="Advanced Large Ship Assembly Array")['assemblyLineTypeID']
 
+    e_built_item.asset_list = asset_dict
     e_built_item.manufacturing_data_calculate()
 
     print "Building: %s\n" % e_built_item.type_name
@@ -105,13 +109,6 @@ def main():
                                                  job.manufacturing_quantity,
                                                  job.build_queue_level)
 
-    #===========================================================================
-    # e_built_item.get_manufacturing_job(21027).blueprint_me = 10
-    # e_built_item.get_manufacturing_job(21027).manufacturing_quantity = 0
-    #===========================================================================
-
-#    print e_built_item.get_manufacturing_job_by_name("Providence").type_name
-
     print
 
     print "Building: %s\n" % e_built_item.type_name
@@ -120,7 +117,7 @@ def main():
         e_material_item = EveItem.EveItem(db_access_object,
                                           type_id=mat_id)
 
-        print "%s: runs %d" % (e_material_item.type_name, quant)
+        print "%s (id:%d): quantity %d" % (e_material_item.type_name, e_material_item.type_id, quant)
 
 
 if __name__ == '__main__':

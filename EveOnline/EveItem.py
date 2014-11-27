@@ -50,7 +50,7 @@ class EveItem(EveDB):
 
         self.build_queue_level = 0  # order in which materials have to be build
 
-        self.asset_list = None  # asset list to calculate in (need to buy less)
+        self.asset_list = {}  # asset list to calculate in (need to buy less)
 
         self.assembly_line_type_id = None   # assembly line used, for bonuses
 
@@ -115,15 +115,8 @@ class EveItem(EveDB):
 
                 for base_material in base_material_list.itervalues():
 
-                    quantity = base_material["quantity"]
+                    base_quantity = base_material["quantity"]
                     material_id = self.get_inv_item(type_id=base_material["material_type_id"])["type_id"]
-
-                    material = self.get_manufacturing_job_by_id(material_id)
-                    if material is None:
-                        # add material to list
-                        material = EveItem(self.db_access_obj,
-                                               type_id=material_id)
-                        self.material_list.append(material)
 
                     if self.assembly_line_type_id is not None:
                         facility = self.get_assembly_line_type(assembly_line_type_id=self.assembly_line_type_id)
@@ -133,15 +126,38 @@ class EveItem(EveDB):
                     else:
                         facility_multiplier = 1
 
-                    adjusted_quantity = math.ceil(quantity * \
+                    bonused_quantity = math.ceil(base_quantity * \
                                                   EveMathIndustry.calculate_me_multiplier(self.blueprint_me_level,
                                                                                           facility_multiplier)) * \
                                                                                           self.manufacturing_quantity
 
-                    material.manufacturing_quantity = adjusted_quantity
-#                    material.asset_list = asset_list
-                    material.build_queue_level = self.build_queue_level + 1
-                    material.manufacturing_data_calculate()
+                    manufacturing_quantity = bonused_quantity
+
+                    #===========================================================
+                    # if material_id == 39:
+                    #     print "Building %s, using %d of Zydrine" % (self.type_name, bonused_quantity)
+                    #===========================================================
+
+                    #do we already have some in assets?
+                    if len(self.asset_list) > 0:
+                        if material_id in self.asset_list.iterkeys():
+                            manufacturing_quantity = bonused_quantity - self.asset_list[material_id]
+                            self.asset_list[material_id] = self.asset_list[material_id] - bonused_quantity
+                            if self.asset_list[material_id] <= 0:
+                                del self.asset_list[material_id]
+
+                    if manufacturing_quantity > 0:
+                        material = self.get_manufacturing_job_by_id(material_id)
+                        if material is None:
+                            # add material to list
+                            material = EveItem(self.db_access_obj,
+                                                   type_id=material_id)
+                            self.material_list.append(material)
+
+                        material.manufacturing_quantity = manufacturing_quantity
+                        material.asset_list = self.asset_list
+                        material.build_queue_level = self.build_queue_level + 1
+                        material.manufacturing_data_calculate()
 
     def get_material_list(self):
         '''
