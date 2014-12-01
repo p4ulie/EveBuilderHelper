@@ -5,7 +5,7 @@ Created on Nov 25, 2014
 '''
 import unittest
 from DBAccessSQLite import DBAccessSQLite
-from EveOnline.EveItem import *
+from EveOnline.EveItem import EveItem
 
 
 class Test(unittest.TestCase):
@@ -20,8 +20,8 @@ class Test(unittest.TestCase):
 
     def setUp(self):
         self.dbAccess = DBAccessSQLite(self.DB)
-        self.eveItem = EveItem(self.dbAccess,
-                               type_name=self.BUILD_PRODUCT_NAME)
+        self.eveItem = EveItem.EveItem(self.dbAccess,
+                                       type_name=self.BUILD_PRODUCT_NAME)
 
     def tearDown(self):
         self.dbAccess.close()

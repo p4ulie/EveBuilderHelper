@@ -36,6 +36,7 @@ Providence\t1\tShip\t
 
 ASSETS_LIST = ''
 
+
 def create_asset_list(line_list):
     '''
     Generate asset list from text lines
@@ -48,7 +49,7 @@ def create_asset_list(line_list):
         match = re.match(r"^(\D+)\t([\d\,]*)\t(\D+)\t.*", line)
         if match is not None:
             type_name = match.group(1).strip()
-            quantity_string = match.group(2).replace(',','').strip()
+            quantity_string = match.group(2).replace(',', '').strip()
             if quantity_string == '':
                 quantity = 0
             else:
@@ -64,6 +65,7 @@ def create_asset_list(line_list):
                     asset_dict[type_id] = quantity
 
     return asset_dict
+
 
 def write_material_list(material_list,
                         asset_list,

@@ -6,7 +6,7 @@ Created on 14.1.2014
 
 import unittest
 from DBAccessSQLite import DBAccessSQLite
-from EveOnline.EveDB import *
+from EveOnline.EveDB import EveDB
 
 
 class TestEveDB(unittest.TestCase):
@@ -18,7 +18,7 @@ class TestEveDB(unittest.TestCase):
 
     def setUp(self):
         self.dbAccess = DBAccessSQLite(self.DB)
-        self.eveDB = EveDB(self.dbAccess)
+        self.eveDB = EveDB.EveDB(self.dbAccess)
 
     def tearDown(self):
         self.dbAccess.close()
@@ -54,7 +54,7 @@ class TestEveDB(unittest.TestCase):
                              self.eveDB.get_materials_for_blueprint(blueprint_type_id=32860))
 
     def test_get_time_for_blueprint(self):
-        time =  600
+        time = 600
         self.failUnlessEqual(time,
                              self.eveDB.get_time_for_blueprint(blueprint_type_id=32860))
 
