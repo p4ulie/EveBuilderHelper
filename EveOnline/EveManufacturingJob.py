@@ -46,6 +46,11 @@ class EveManufacturingJob(EveItem):
         self.bp_me = bp_me
         self.bp_te = bp_te
 
+        self.base_material_list = {}
+#        self.material_list = {}
+        self.build_list = {}
+        self.buy_list = {}
+
         self.build_queue_level = build_queue_level
         self.build_queue = []
 
