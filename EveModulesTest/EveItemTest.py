@@ -18,10 +18,12 @@ class Test(unittest.TestCase):
     BUILD_PRODUCT_ME = 5
     BUILD_PRODUCT_TE = 0
 
+
     def setUp(self):
         self.dbAccess = DBAccessSQLite(self.DB)
-        self.eveItem = EveItem.EveItem(self.dbAccess,
-                                       type_name=self.BUILD_PRODUCT_NAME)
+        self.maxDiff = None
+        self.eveItem = EveItem(self.dbAccess,
+                               type_name=self.BUILD_PRODUCT_NAME)
 
     def tearDown(self):
         self.dbAccess.close()
@@ -32,7 +34,7 @@ class Test(unittest.TestCase):
                              self.eveItem.type_name)
 
     def test_get_manufacturing_job_list(self):
-        job_list = ['Ark', 'Capital Jump Drive', 'Capital Radar Sensor Cluster', 'Capital Linear Shield Emitter', 'Capital Antimatter Reactor Unit', 'Capital Nanoelectrical Microprocessor', 'Capital Tungsten Carbide Armor Plate', 'R.A.M.- Starship Tech', 'Providence', 'Capital Propulsion Engine', 'Capital Cargo Bay', 'Capital Construction Parts', 'Capital Armor Plates', 'Capital Tesseract Capacitor Unit', 'Capital Fusion Thruster']
+        job_list = ['Ark', 'R.A.M.- Starship Tech', 'Providence', 'Capital Propulsion Engine', 'Capital Armor Plates', 'Capital Cargo Bay', 'Capital Construction Parts', 'Capital Jump Drive', 'Capital Antimatter Reactor Unit', 'Capital Fusion Thruster', 'Capital Linear Shield Emitter', 'Capital Nanoelectrical Microprocessor', 'Capital Radar Sensor Cluster', 'Capital Tesseract Capacitor Unit', 'Capital Tungsten Carbide Armor Plate']
 
         self.eveItem.get_item(type_name="Ark")
         self.eveItem.blueprint_me_level = self.BUILD_PRODUCT_ME
@@ -43,7 +45,7 @@ class Test(unittest.TestCase):
                              [job.type_name for job in self.eveItem.get_manufacturing_job_list()])
 
     def test_get_manufacturing_job_list_with_assets(self):
-        job_list = ['Ark', 'Capital Radar Sensor Cluster', 'Capital Linear Shield Emitter', 'Capital Antimatter Reactor Unit', 'Capital Nanoelectrical Microprocessor', 'Capital Tungsten Carbide Armor Plate', 'R.A.M.- Starship Tech', 'Providence', 'Capital Propulsion Engine', 'Capital Cargo Bay', 'Capital Construction Parts', 'Capital Armor Plates', 'Capital Tesseract Capacitor Unit', 'Capital Fusion Thruster']
+        job_list = ['Ark', 'R.A.M.- Starship Tech', 'Providence', 'Capital Propulsion Engine', 'Capital Armor Plates', 'Capital Cargo Bay', 'Capital Construction Parts', 'Capital Antimatter Reactor Unit', 'Capital Fusion Thruster', 'Capital Linear Shield Emitter', 'Capital Nanoelectrical Microprocessor', 'Capital Radar Sensor Cluster', 'Capital Tesseract Capacitor Unit', 'Capital Tungsten Carbide Armor Plate']
 
         assets = {21025: 29}   # 21025: Capital Jump Drive
 

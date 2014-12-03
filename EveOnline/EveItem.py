@@ -24,6 +24,7 @@ class EveItem(EveDB):
         # basic item attributes
         self.type_id = None
         self.group_id = None
+        self.category_id = None
         self.type_name = ''
         self.description = ''
         self.mass = None
@@ -43,8 +44,8 @@ class EveItem(EveDB):
 
         # manufacturing related attributes
         self.blueprint_type_id = None   # determines whether item is buildable
-        self.blueprint_me_level = 0
-        self.blueprint_te_level = 0
+        self.blueprint_me_level = 10
+        self.blueprint_te_level = 20
 
         self.manufacturing_quantity = 0
 
@@ -113,7 +114,7 @@ class EveItem(EveDB):
 
             if base_material_list is not None:
 
-                for base_material in base_material_list.itervalues():
+                for base_material in base_material_list:
 
                     base_quantity = base_material["quantity"]
                     material_id = self.get_inv_item(type_id=base_material["material_type_id"])["type_id"]
