@@ -11,7 +11,7 @@ from DBAccessSQLite import DBAccessSQLite
 
 from EveOnline.EveMathConstants import EVE_ACTIVITY_MANUFACTURING
 
-from EveOnline import EveItem
+from EveOnline.EveItem import EveItem
 
 DB = 'data/eve.db'
 
@@ -43,7 +43,7 @@ def create_asset_list(line_list):
     '''
     asset_dict = {}
 
-    e_asset = EveItem.EveItem(db_access_object)
+    e_asset = EveItem(db_access_object)
 
     for line in line_list.splitlines():
         match = re.match(r"^(\D+)\t([\d\,]*)\t(\D+)\t.*", line)
@@ -72,7 +72,7 @@ def write_material_list(material_list,
                         format_string):
 
     for material_type_id, material_quantity in material_list.iteritems():
-        material_item = EveItem.EveItem(db_access_object,
+        material_item = EveItem(db_access_object,
                                  type_id=material_type_id)
         material_name = material_item.get_inv_item(type_id=material_type_id)
         if material_name is not None:
@@ -91,7 +91,7 @@ def main():
 
     asset_dict = create_asset_list(ASSETS_LIST)
 
-    e_built_item = EveItem.EveItem(db_access_object,
+    e_built_item = EveItem(db_access_object,
                                    type_name=BUILD_PRODUCT_NAME)
 
     e_built_item.manufacturing_quantity = BUILD_PRODUCT_RUNS
@@ -116,7 +116,7 @@ def main():
     print "Building: %s\n" % e_built_item.type_name
 
     for mat_id, quant in e_built_item.get_material_list().iteritems():
-        e_material_item = EveItem.EveItem(db_access_object,
+        e_material_item = EveItem(db_access_object,
                                           type_id=mat_id)
 
         print "%s (id:%d): quantity %d" % (e_material_item.type_name, e_material_item.type_id, quant)
