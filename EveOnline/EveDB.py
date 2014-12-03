@@ -38,12 +38,12 @@ class EveDB(object):
         result = self.db_access_obj.fetchData(query)
 
         if result is not None:
-            data = {}
+            data = []
             for row in result:
-                data[row[0]] = {'category_id': row[0],
-                                 'category_name': row[1],
-                                 'description': row[2],
-                                 'icon_id': row[3]}
+                data.append({'category_id': row[0],
+                             'category_name': row[1],
+                             'description': row[2],
+                             'icon_id': row[3]})
 
         return data
 
@@ -53,38 +53,102 @@ class EveDB(object):
         '''
         data = None
 
+        query = """
+                    SELECT g.groupID,
+                            g.categoryID,
+                            g.groupName,
+                            g.description,
+                            g.iconID
+                    FROM invGroups AS g
+                    WHERE g.published = '1'
+                """
+
         if category_id is not None:
-            query = """
-                        SELECT g.groupID,
-                                g.categoryID,
-                                g.groupName,
-                                g.description,
-                                g.iconID
-                        FROM invGroups AS g
-                        WHERE g.published = '1'
+            query += """
                         AND g.categoryID = ?
                     """
             result = self.db_access_obj.fetchData(query, category_id)
         else:
-            query = """
-                        SELECT g.groupID,
-                                g.categoryID,
-                                g.groupName,
-                                g.description,
-                                g.iconID
-                        FROM invGroups AS g
-                        WHERE g.published = '1'
-                    """
             result = self.db_access_obj.fetchData(query)
 
         if result is not None:
-            data = {}
+            data = []
             for row in result:
-                data[row[0]] = {'group_id': row[0],
-                                 'category_id': row[1],
-                                 'group_name': row[2],
-                                 'description': row[3],
-                                 'icon_id': row[4]}
+                data.append({'group_id': row[0],
+                             'category_id': row[1],
+                             'group_name': row[2],
+                             'description': row[3],
+                             'icon_id': row[4]})
+
+        return data
+
+    def get_inv_category(self, category_id=None):
+        '''
+        Get category data
+        '''
+        data = None
+
+        if category_id is not None:
+            query = """
+                        SELECT c.categoryID,
+                               c.categoryName,
+                               c.description,
+                               c.iconID
+                        FROM invCategories AS c
+                        WHERE c.published = '1'
+                        AND c.categoryID = ?
+                    """
+            result = self.db_access_obj.fetchData(query, category_id)
+
+        if (result is not None) and (len(result) > 0):
+            data = []
+            for row in result:
+                data.append({'`category_id': row[0],
+                             'category_name': row[1],
+                             'description': row[2],
+                             'icon_id': row[3]})
+
+        return data
+
+    def get_inv_group(self, group_id=None):
+        '''
+        Get group data
+        '''
+        data = None
+
+        if group_id is not None:
+            query = """
+                        SELECT g.groupID,
+                               g.categoryID,
+                               g.groupName,
+                               g.description,
+                               g.iconID,
+                               g.useBasePrice,
+                               g.allowManufacture,
+                               g.allowRecycler,
+                               g.anchored,
+                               g.anchorable,
+                               g.fittableNonSingleton
+                        FROM invGroups AS g
+                        WHERE g.published = '1'
+                        AND g.groupID = ?
+                    """
+            result = self.db_access_obj.fetchData(query, group_id)
+
+        if (result is not None) and (len(result) > 0):
+            data = []
+            for row in result:
+                data.append({'group_id': row[0],
+                             'category_id': row[1],
+                             'group_name': row[2],
+                             'description': row[3],
+                             'icon_id': row[4],
+                             'use_base_price': row[5],
+                             'allow_manufacture': row[6],
+                             'allow_recycler': row[7],
+                             'anchored': row[8],
+                             'anchorable': row[9],
+                             'fittable_non_singleton': row[10]})
 
         return data
 
@@ -95,58 +159,48 @@ class EveDB(object):
         query = ''
         result = None
 
+        query = """
+                    SELECT t.typeID,
+                            t.groupID,
+                            t.typeName,
+                            t.description,
+                            t.mass,
+                            t.volume,
+                            t.capacity,
+                            t.portionSize,
+                            t.raceID,
+                            t.basePrice,
+                            t.marketGroupID
+                    FROM invtypes AS t
+                    WHERE t.published = '1'
+                """
+
         if type_name is not None:
-            query = """
-                        SELECT t.typeID,
-                                t.groupID,
-                                t.typeName,
-                                t.description,
-                                t.mass,
-                                t.volume,
-                                t.capacity,
-                                t.portionSize,
-                                t.raceID,
-                                t.basePrice,
-                                t.marketGroupID
-                        FROM invtypes AS t
-                        WHERE t.published = '1'
+            query += """
                         AND t.typeName like '%?%'
                     """
             result = self.db_access_obj.fetchData(query, type_name)
         else:
             if group_id is not None:
-                query = """
-                            SELECT t.typeID,
-                                    t.groupID,
-                                    t.typeName,
-                                    t.description,
-                                    t.mass,
-                                    t.volume,
-                                    t.capacity,
-                                    t.portionSize,
-                                    t.raceID,
-                                    t.basePrice,
-                                    t.marketGroupID
-                            FROM invtypes AS t
-                            WHERE t.published = '1'
+                query += """
                             AND t.groupID = ?
                         """
                 result = self.db_access_obj.fetchData(query, group_id)
 
         if result is not None:
-            data = {}
+            data = []
             for row in result:
-                data[row[0]] = {'type_id': row[0],
-                                 'group_id': row[1],
-                                 'type_name': row[2],
-                                 'description': row[3],
-                                 'mass': row[4],
-                                 'volume': row[5],
-                                 'capacity': row[6],
-                                 'portion_size': row[7],
-                                 'race_id': row[8],
-                                 'base_price': row[9],
-                                 'market_group_id': row[0]}
+                data.append({'type_id': row[0],
+                             'group_id': row[1],
+                             'type_name': row[2],
+                             'description': row[3],
+                             'mass': row[4],
+                             'volume': row[5],
+                             'capacity': row[6],
+                             'portion_size': row[7],
+                             'race_id': row[8],
+                             'base_price': row[9],
+                             'market_group_id': row[0]})
         else:
             data = None
 
@@ -159,40 +213,30 @@ class EveDB(object):
         query = ''
         result = None
 
+        query = """
+                    SELECT t.typeID,
+                            t.groupID,
+                            t.typeName,
+                            t.description,
+                            t.mass,
+                            t.volume,
+                            t.capacity,
+                            t.portionSize,
+                            t.raceID,
+                            t.basePrice,
+                            t.marketGroupID
+                    FROM invtypes AS t
+                    WHERE t.published = '1'
+                """
+
         if type_id is not None:
-            query = """
-                        SELECT t.typeID,
-                                t.groupID,
-                                t.typeName,
-                                t.description,
-                                t.mass,
-                                t.volume,
-                                t.capacity,
-                                t.portionSize,
-                                t.raceID,
-                                t.basePrice,
-                                t.marketGroupID
-                        FROM invtypes AS t
-                        WHERE t.published = '1'
+            query += """
                         AND t.typeID = ?
                     """
             result = self.db_access_obj.fetchData(query, type_id)
         else:
             if type_name is not None:
-                query = """
-                            SELECT t.typeID,
-                                    t.groupID,
-                                    t.typeName,
-                                    t.description,
-                                    t.mass,
-                                    t.volume,
-                                    t.capacity,
-                                    t.portionSize,
-                                    t.raceID,
-                                    t.basePrice,
-                                    t.marketGroupID
-                            FROM invtypes AS t
-                            WHERE t.published = '1'
+                query += """
                             AND t.typeName = ?
                         """
                 result = self.db_access_obj.fetchData(query, type_name)
@@ -239,12 +283,43 @@ class EveDB(object):
 
         return data
 
+    def get_materials_after_refining(self, type_id=None):
+        '''
+        Get list of materials for refining
+        '''
+        data = None
+
+        query = """
+                    SELECT m.materialTypeID,
+                            m.quantity
+                    FROM invTypeMaterials AS m
+                    WHERE m.typeID = ?
+                """
+
+        if type_id is not None:
+            result = self.db_access_obj.fetchData(query,
+                                                  type_id)
+        else:
+            result = self.db_access_obj.fetchData(query,
+                                                  self.type_id)
+
+        if result is not None:
+            data = []
+            for row in result:
+                data.append({'material_type_id': row[0],
+                             'quantity': row[1]})
+
+        return data
+
     def get_materials_for_blueprint(self,
-                                 blueprint_type_id,
-                                 activity_id=EVE_ACTIVITY_MANUFACTURING):
+                                    blueprint_type_id,
+                                    activity_id=EVE_ACTIVITY_MANUFACTURING):
         '''
         Get list of materials for specified blueprint typeID and activityId
         '''
+
+        data = None
+
         query = """
                     SELECT i.materialTypeID,
                             i.quantity,
@@ -258,19 +333,17 @@ class EveDB(object):
                                               activity_id)
 
         if result is not None:
-            data = {}
+            data = []
             for row in result:
-                data[row[0]] = {'material_type_id': row[0],
-                                 'quantity': row[1],
-                                 'consume': row[2]}
-        else:
-            data = None
+                data.append({'material_type_id': row[0],
+                             'quantity': row[1],
+                             'consume': row[2]})
 
         return data
 
     def get_time_for_blueprint(self,
-                            blueprint_type_id,
-                            activity_id=EVE_ACTIVITY_MANUFACTURING):
+                               blueprint_type_id,
+                               activity_id=EVE_ACTIVITY_MANUFACTURING):
         '''
         Get time of industry action for specified blueprint typeID
         and activityId
@@ -296,6 +369,8 @@ class EveDB(object):
         '''
         Get list of ramActivities
         '''
+        data = None
+
         query = """
                     SELECT r.activityId,
                             r.activityName,
@@ -307,15 +382,12 @@ class EveDB(object):
         result = self.db_access_obj.fetchData(query)
 
         if result is not None:
-            data = {}
+            data = []
             for row in result:
-                data[row[0]] = {'activity_id': row[0],
-                                 'activity_name': row[1],
-                                 'icon_no': row[2],
-                                 'description': row[3]}
-
-        else:
-            data = None
+                data.append({'activity_id': row[0],
+                             'activity_name': row[1],
+                             'icon_no': row[2],
+                             'description': row[3]})
 
         return data
 
@@ -324,6 +396,9 @@ class EveDB(object):
         '''
         Get list of ramassemblylinetypes
         '''
+
+        data = None
+
         query = """
                     SELECT r.assemblyLineTypeID,
                             r.assemblyLineTypeName,
@@ -340,19 +415,17 @@ class EveDB(object):
         result = self.db_access_obj.fetchData(query, activity_id)
 
         if result is not None:
-            data = {}
+            data = []
             for row in result:
-                data[row[0]] = {'assembly_line_type_id': row[0],
-                                 'assembly_line_type_name': row[1],
-                                 'description': row[2],
-                                 'base_time_multiplier': row[3],
-                                 'base_material_multiplier': row[4],
-                                 'base_cost_multiplier': row[5],
-                                 'volume': row[6],
-                                 'activity_id': row[7],
-                                 'min_cost_per_hour': row[8]}
-        else:
-            data = None
+                data.append({'assembly_line_type_id': row[0],
+                             'assembly_line_type_name': row[1],
+                             'description': row[2],
+                             'base_time_multiplier': row[3],
+                             'base_material_multiplier': row[4],
+                             'base_cost_multiplier': row[5],
+                             'volume': row[6],
+                             'activity_id': row[7],
+                             'min_cost_per_hour': row[8]})
 
         return data
 
