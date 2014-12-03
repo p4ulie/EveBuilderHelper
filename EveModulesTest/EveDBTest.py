@@ -58,10 +58,20 @@ class TestEveDB(unittest.TestCase):
         self.failUnlessEqual(blueprint,
                              self.eveDB.get_blueprint_id_for_item(type_id=3293))
 
-    def test_get_materials_after_refining(self):
+    def test_get_materials_for_refining(self):
         materials = [{'material_type_id': 34, 'quantity': 107}, {'material_type_id': 35, 'quantity': 213}, {'material_type_id': 36, 'quantity': 107}]
         self.failUnlessEqual(materials,
-                             self.eveDB.get_materials_after_refining(type_id=18))
+                             self.eveDB.get_materials_for_refining(type_id=18))
+
+    def test_get_materials_for_refining_adjusted(self):
+        materials = [{'material_type_id': 34, 'quantity': 82}, {'material_type_id': 35, 'quantity': 163}, {'material_type_id': 36, 'quantity': 82}]
+        self.failUnlessEqual(materials,
+                             self.eveDB.get_materials_for_refining_adjusted(type_id=18,
+                                                                                facility_base_yield=0.54,
+                                                                                reprocessing_skill_level=5,
+                                                                                reprocessing_efficiency_skill_level=5,
+                                                                                material_specific_processing_skill_level=5,
+                                                                                implant_bonus=1.02))
 
     def test_get_materials_for_blueprint(self):
         material = [{'consume': 1, 'material_type_id': 34, 'quantity': 1111}, {'consume': 1, 'material_type_id': 35, 'quantity': 444}]

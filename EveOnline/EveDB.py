@@ -4,7 +4,7 @@ Created on 18.6.2014
 @author: Pavol Antalik
 '''
 
-#import syck
+import math
 from EveOnline.EveMathConstants import EVE_ACTIVITY_MANUFACTURING
 
 
@@ -283,7 +283,7 @@ class EveDB(object):
 
         return data
 
-    def get_materials_after_refining(self, type_id=None):
+    def get_materials_for_refining(self, type_id=None):
         '''
         Get list of materials for refining
         '''
@@ -310,6 +310,39 @@ class EveDB(object):
                              'quantity': row[1]})
 
         return data
+
+    def get_materials_for_refining_adjusted(self,
+                                              type_id=None,
+                                              facility_base_yield=0.54,
+                                              reprocessing_skill_level=0,
+                                              reprocessing_efficiency_skill_level=0,
+                                              material_specific_processing_skill_level=0,
+                                              implant_bonus=1):
+        '''
+        Get refining output adjusted by yield coeficient
+        '''
+        refining_type_id = None
+        refining_list = []
+
+        if type_id is not None:
+            refining_type_id = type_id
+        else:
+            if self.type_id is not None:
+                refining_type_id = self.type_id
+
+        if refining_type_id is not None:
+            refining_list = self.get_materials_for_refining(type_id=type_id)
+
+            refining_yield_coeficienf = facility_base_yield *\
+                                        (1 + material_specific_processing_skill_level * 0.02) *\
+                                        (1 + reprocessing_skill_level * 0.03) *\
+                                        (1 + reprocessing_efficiency_skill_level * 0.02) *\
+                                        implant_bonus
+
+            for material in refining_list:
+                material['quantity'] = int(math.floor((material['quantity'] * refining_yield_coeficienf)))
+
+        return refining_list
 
     def get_materials_for_blueprint(self,
                                     blueprint_type_id,
