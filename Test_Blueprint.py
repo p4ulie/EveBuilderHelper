@@ -34,7 +34,10 @@ ASSETS_LIST = '''Zydrine\t51732\tMineral\t
 Providence\t1\tShip\t
 '''
 
-ASSETS_LIST = ''
+ASSETS_LIST = '''Capital Jump Drive\t29\tCapital Construction Components\t
+'''
+
+#ASSETS_LIST = ''
 
 
 def create_asset_list(line_list):
@@ -100,6 +103,8 @@ def main():
 
     e_built_item.asset_list = asset_dict
     e_built_item.manufacturing_data_calculate()
+
+    print [job.type_name for job in e_built_item.get_manufacturing_job_list()]
 
     print "Building: %s\n" % e_built_item.type_name
 
