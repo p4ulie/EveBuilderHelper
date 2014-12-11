@@ -7,11 +7,11 @@ Created on Dec 1, 2014
 DB = 'data/eve.db'
 
 from DBAccessSQLite import DBAccessSQLite
-from EveOnline.EveItem import EveItem
+from EveOnline.EveManufacturedItem import EveManufacturedItem
 
 
 def main():
-    ore1 = EveItem(db_access_object,
+    ore1 = EveManufacturedItem(db_access_object,
                    type_name='Plagioclase')
 
     print ore1.get_inv_group(group_id=12)
