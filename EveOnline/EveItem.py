@@ -134,11 +134,6 @@ class EveItem(EveDB):
 
                     manufacturing_quantity = bonused_quantity
 
-                    #===========================================================
-                    # if material_id == 39:
-                    #     print "Building %s, using %d of Zydrine" % (self.type_name, bonused_quantity)
-                    #===========================================================
-
                     #do we already have some in assets?
                     if len(self.asset_list) > 0:
                         if material_id in self.asset_list.iterkeys():
@@ -159,27 +154,6 @@ class EveItem(EveDB):
                         material.asset_list = self.asset_list
                         material.build_queue_level = self.build_queue_level + 1
                         material.manufacturing_data_calculate()
-
-    def get_material_list(self):
-        '''
-        Get list of objects representing materials
-        '''
-
-        material_list = {}
-
-        # is the item buildable ?
-        if self.blueprint_type_id is None:
-            material_list[self.type_id] = self.manufacturing_quantity
-        else:
-            for job in self.material_list:
-                mat_list = job.get_material_list()
-                for mat_id, quant in mat_list.iteritems():
-                    if mat_id in material_list.iterkeys():
-                        material_list[mat_id] += quant
-                    else:
-                        material_list[mat_id] = quant
-
-        return material_list
 
     def get_manufacturing_job_by_id(self, type_id):
         '''
@@ -211,7 +185,7 @@ class EveItem(EveDB):
 
     def get_manufacturing_job_list(self):
         '''
-        Get list of objects representing manufacturing jobs
+        Get list of objects representing buildable construction parts
         '''
 
         manufacturing_job_list = []
@@ -224,3 +198,25 @@ class EveItem(EveDB):
                 manufacturing_job_list.extend(job.get_manufacturing_job_list())
 
         return manufacturing_job_list
+
+    def get_manufacturing_material_list(self):
+        '''
+        Get list of objects representing materials
+        '''
+
+        material_list = {}
+
+        # is the item buildable ?
+        if self.blueprint_type_id is None:
+            material_list[self.type_id] = self.manufacturing_quantity
+        else:
+            for job in self.material_list:
+                mat_list = job.get_manufacturing_material_list()
+                for mat_id, quant in mat_list.iteritems():
+                    if mat_id in material_list.iterkeys():
+                        material_list[mat_id] += quant
+                    else:
+                        material_list[mat_id] = quant
+
+        return material_list
+

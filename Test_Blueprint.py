@@ -120,7 +120,7 @@ def main():
 
     print "Building: %s\n" % e_built_item.type_name
 
-    for mat_id, quant in e_built_item.get_material_list().iteritems():
+    for mat_id, quant in e_built_item.get_manufacturing_material_list().iteritems():
         e_material_item = EveItem(db_access_object,
                                           type_id=mat_id)
 
