@@ -43,8 +43,8 @@ class EveManufacturedItem(EveItem):
 
                 for base_material in base_material_list:
 
-                    base_quantity = base_material["quantity"]
                     material_id = self.get_inv_item(type_id=base_material["material_type_id"])["type_id"]
+                    base_quantity = base_material["quantity"]
 
                     if self.assembly_line_type_id is not None:
                         facility = self.get_assembly_line_type(assembly_line_type_id=self.assembly_line_type_id)
@@ -69,6 +69,7 @@ class EveManufacturedItem(EveItem):
                             if self.asset_list[material_id] <= 0:
                                 del self.asset_list[material_id]
 
+                    #if we need to manufacture more than already in assets
                     if manufacturing_quantity > 0:
                         material = self.get_manufacturing_job_by_id(material_id)
                         if material is None:
