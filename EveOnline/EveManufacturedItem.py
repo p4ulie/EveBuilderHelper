@@ -32,7 +32,7 @@ class EveManufacturedItem(EveItem):
         create build/buy lists for the materials
         '''
 
-        self.material_list = []
+#        self.material_list = []
 
         if (self.type_id is not None
         and self.blueprint_type_id is not None):
@@ -69,20 +69,25 @@ class EveManufacturedItem(EveItem):
                             if self.asset_list[material_id] <= 0:
                                 del self.asset_list[material_id]
 
+                    material = self.get_manufacturing_job_by_id(material_id)
+
                     #if we need to manufacture more than already in assets
                     if manufacturing_quantity > 0:
-                        material = self.get_manufacturing_job_by_id(material_id)
                         if material is None:
-                            # add material to list
+                            #add material to list
                             material = EveManufacturedItem(self.db_access_obj,
                                                    type_id=material_id)
                             material.parent = self
+                            material.build_queue_level = self.build_queue_level + 1
                             self.material_list.append(material)
 
                         material.manufacturing_quantity = manufacturing_quantity
                         material.asset_list = self.asset_list
-                        material.build_queue_level = self.build_queue_level + 1
                         material.manufacturing_data_calculate()
+                    else:
+                        #if new value calculated is 0, delete material from list
+                        if material is not None:
+                            self.material_list.remove(material)
 
     def get_manufacturing_job_by_id(self, type_id):
         '''
