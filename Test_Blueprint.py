@@ -184,7 +184,7 @@ def main():
 
     for job in manufacturing_job_list:
         if job.type_name[0:7] == 'Capital':
-            job.facility = e_built_item.get_assembly_line_type(assembly_line_type_name="Thukker Component Assembly Array")['assemblyLineTypeID']
+            job.assembly_line_type_id = e_built_item.get_assembly_line_type(assembly_line_type_name="Thukker Component Assembly Array")['assemblyLineTypeID']
 
     # Recalculate after setting facility
     asset_dict = create_asset_list(ASSETS_LIST)
