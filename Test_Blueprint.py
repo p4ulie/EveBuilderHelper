@@ -175,10 +175,6 @@ def main():
     #generate manufacturing job tree
     e_built_item.manufacturing_data_calculate()
 
-#    print [job.type_name for job in e_built_item.get_manufacturing_job_list()]
-
-    print "Building: %s\n" % e_built_item.type_name
-
     #set facility for all jobs
     manufacturing_job_list = e_built_item.get_manufacturing_job_list()
 
@@ -201,8 +197,6 @@ def main():
                                                   job.build_queue_level)
 
     print
-
-    print "Building: %s\n" % e_built_item.type_name
 
     for mat_id, quant in e_built_item.get_manufacturing_material_list().iteritems():
         e_material_item = EveManufacturedItem(db_access_object,
