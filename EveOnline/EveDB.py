@@ -425,7 +425,8 @@ class EveDB(object):
         return data
 
     def get_list_of_assembly_line_types(self,
-                                      activity_id=EVE_ACTIVITY_MANUFACTURING):
+                                        activity_id=EVE_ACTIVITY_MANUFACTURING,
+                                        group_id=None):
         '''
         Get list of ramassemblylinetypes
         '''
@@ -433,19 +434,31 @@ class EveDB(object):
         data = None
 
         query = """
-                    SELECT r.assemblyLineTypeID,
-                            r.assemblyLineTypeName,
-                            r.description,
-                            r.baseTimeMultiplier,
-                            r.baseMaterialMultiplier,
-                            r.baseCostMultiplier,
-                            r.volume,
-                            r.activityID,
-                            r.minCostPerHour
-                    FROM ramassemblylinetypes AS r
-                    WHERE r.activityID = ?
-                """
-        result = self.db_access_obj.fetchData(query, activity_id)
+                    SELECT rlt.assemblyLineTypeID,
+                           rlt.assemblyLineTypeName,
+                           rlt.description,
+                           rlt.baseTimeMultiplier,
+                           rlt.baseMaterialMultiplier,
+                           rlt.baseCostMultiplier,
+                           rlt.volume,
+                           rlt.activityID,
+                           rlt.minCostPerHour
+                    FROM
+        """
+
+        if groupID is None:
+            query += """
+                    ramAssemblyLineTypes as rlt
+                    WHERE rlt.activityID = ?
+            """
+            result = self.db_access_obj.fetchData(query, activity_id)
+        else
+            query += """
+                    ramAssemblyLineTypeDetailPerGroup as rg, ramAssemblyLineTypes as rlt
+                    WHERE rlt.assemblyLineTypeID = rg.assemblyLineTypeID and 
+                    rlt.activityID = ? and rg.groupID = ?
+            """
+            result = self.db_access_obj.fetchData(query, group_id, activity_id)
 
         if result is not None:
             data = []
