@@ -16,15 +16,34 @@ class EveManufacturedItem(EveItem):
     Class for data and methods for Items in Eve Online
     '''
 
-    def __init__(self, db_access_obj, type_id=None, type_name=None):
+    def __init__(self,
+                 db_access_obj,
+                 type_id=None,
+                 type_name=None,
+                 blueprint_me_level=10,
+                 blueprint_te_level=20,
+                 manufacturing_quantity=1,
+                 asset_list={},
+                 build_queue_level=0):
         '''
         Constructor
         '''
 
         # initialize object and get basic data
-        EveItem.__init__(self, db_access_obj, type_id=type_id, type_name=type_name)
+        EveItem.__init__(self,
+                         db_access_obj,
+                         type_id=type_id,
+                         type_name=type_name)
 
         self.get_item(type_id=type_id, type_name=type_name)
+
+        self.blueprint_me_level=blueprint_me_level
+        self.blueprint_te_level=blueprint_te_level
+        self.manufacturing_quantity=manufacturing_quantity
+        self.build_queue_level=build_queue_level
+        self.asset_list=asset_list
+
+        self.manufacturing_data_calculate()
 
     def manufacturing_data_calculate(self):
         '''
@@ -47,7 +66,7 @@ class EveManufacturedItem(EveItem):
                     base_quantity = base_material["quantity"]
 
                     if self.assembly_line_type_id is not None:
-                        facility = self.get_assembly_line_type(assembly_line_type_id=self.assembly_line_type_id)
+                        facility = self.get_detail_assembly_line_type(assembly_line_type_id=self.assembly_line_type_id)
                         facility_multiplier = facility['base_material_multiplier']
                         if facility_multiplier is None:
                             facility_multiplier = 1
@@ -76,9 +95,9 @@ class EveManufacturedItem(EveItem):
                         if material is None:
                             #add material to list
                             material = EveManufacturedItem(self.db_access_obj,
-                                                   type_id=material_id)
+                                                           type_id=material_id,
+                                                           build_queue_level=(self.build_queue_level + 1))
                             material.parent = self
-                            material.build_queue_level = self.build_queue_level + 1
                             self.material_list.append(material)
 
                         material.manufacturing_quantity = manufacturing_quantity

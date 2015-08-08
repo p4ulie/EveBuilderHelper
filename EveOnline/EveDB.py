@@ -424,9 +424,10 @@ class EveDB(object):
 
         return data
 
-    def get_list_of_assembly_line_types(self,
+    def get_list_ramAssemblyLineTypes(self,
                                         activity_id=EVE_ACTIVITY_MANUFACTURING,
-                                        group_id=None):
+                                        group_id=None,
+                                        filter_outposts=False):
         '''
         Get list of ramassemblylinetypes
         '''
@@ -446,36 +447,39 @@ class EveDB(object):
                     FROM
         """
 
-        if groupID is None:
+        if group_id is None:
             query += """
                     ramAssemblyLineTypes as rlt
                     WHERE rlt.activityID = ?
             """
             result = self.db_access_obj.fetchData(query, activity_id)
-        else
+        else:
             query += """
                     ramAssemblyLineTypeDetailPerGroup as rg, ramAssemblyLineTypes as rlt
-                    WHERE rlt.assemblyLineTypeID = rg.assemblyLineTypeID and 
+                    WHERE
+                    rlt.assemblyLineTypeID = rg.assemblyLineTypeID
+                    AND 
                     rlt.activityID = ? and rg.groupID = ?
             """
-            result = self.db_access_obj.fetchData(query, group_id, activity_id)
+            result = self.db_access_obj.fetchData(query, activity_id, group_id)
 
         if result is not None:
             data = []
             for row in result:
-                data.append({'assembly_line_type_id': row[0],
-                             'assembly_line_type_name': row[1],
-                             'description': row[2],
-                             'base_time_multiplier': row[3],
-                             'base_material_multiplier': row[4],
-                             'base_cost_multiplier': row[5],
-                             'volume': row[6],
-                             'activity_id': row[7],
-                             'min_cost_per_hour': row[8]})
+                if (filter_outposts and ("Outpost" in row[1])) == False:
+                    data.append({'assembly_line_type_id': row[0],
+                                 'assembly_line_type_name': row[1],
+                                 'description': row[2],
+                                 'base_time_multiplier': row[3],
+                                 'base_material_multiplier': row[4],
+                                 'base_cost_multiplier': row[5],
+                                 'volume': row[6],
+                                 'activity_id': row[7],
+                                 'min_cost_per_hour': row[8]})
 
         return data
 
-    def get_assembly_line_type(self,
+    def get_detail_ramAssemblyLineTypes(self,
                                assembly_line_type_id=None,
                                assembly_line_type_name=None,
                                activity_id=EVE_ACTIVITY_MANUFACTURING):
@@ -493,7 +497,7 @@ class EveDB(object):
                             r.volume,
                             r.activityId,
                             r.minCostPerHour
-                    FROM ramassemblylinetypes AS r
+                    FROM ramAssemblyLineTypes AS r
                     WHERE r.activityId = ?
                 """
 
@@ -515,8 +519,8 @@ class EveDB(object):
 
         if (result is not None) and (len(result) != 0):
             row = result[0]
-            data = {'assemblyLineTypeID': row[0],
-                     'assemblyLineTypeName': row[1],
+            data = {'assembly_line_type_id': row[0],
+                     'assembly_line_type_name': row[1],
                      'description': row[2],
                      'base_time_multiplier': row[3],
                      'base_material_multiplier': row[4],
