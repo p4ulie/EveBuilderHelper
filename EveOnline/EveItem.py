@@ -10,13 +10,13 @@ class EveItem(object):
     Class for data and methods for Items in Eve Online
     '''
 
-    def __init__(self, data_access_obj, type_id=None, type_name=None):
+    def __init__(self, data_access, type_id=None, type_name=None):
         '''
         Constructor
         '''
 
         # set data access object reference (to load data from DB, files, ...)
-        self.data_access_obj = data_access_obj
+        self.data_access = data_access
 
         # basic item attributes
         self.type_id = None
@@ -50,7 +50,8 @@ class EveItem(object):
         Get item by ID or name
         '''
 
-        data = self.data_access_obj.get_inv_item(type_id=type_id, type_name=type_name)
+        data = self.data_access.get_inv_item(type_id=type_id, type_name=type_name)
 
-        for key, value in data.iteritems():
-            setattr(self, key, value)
+        if data is not None:
+            for key, value in data.iteritems():
+                setattr(self, key, value)
