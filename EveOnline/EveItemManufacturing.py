@@ -26,20 +26,18 @@ class EveItemManufacturing(EveItem):
 
     build_queue_level = 0  # order in which materials have to be build
 
-    asset_list = {}  # asset list to calculate in (need to buy less)
-
     assembly_line_type_id = None   # assembly line used, for bonuses
 
     material_list = []
+    asset_list = {}  # asset list to calculate in (need to buy less)
 
     def __init__(self,
-                 data_access_obj,
+                 data_access,
                  type_id=None,
                  type_name=None,
                  blueprint_me_level=0,
                  blueprint_te_level=0,
                  manufacturing_quantity=1,
-                 asset_list={},
                  build_queue_level=0):
         '''
         Constructor
@@ -47,17 +45,20 @@ class EveItemManufacturing(EveItem):
 
         # initialize object and get basic data
         EveItem.__init__(self,
-                         data_access_obj,
+                         data_access,
                          type_id=type_id,
                          type_name=type_name)
 
         self.get_item(type_id=type_id, type_name=type_name)
+        self.blueprint_type_id = self.data_access.get_bp_id_for_item(self.type_id)
 
         self.blueprint_me_level = blueprint_me_level
         self.blueprint_te_level = blueprint_te_level
         self.manufacturing_quantity = manufacturing_quantity
         self.build_queue_level = build_queue_level
-        self.asset_list = asset_list
+
+        self.material_list = []
+        self.asset_list = {}
 
         self.manufacturing_data_calculate()
 
@@ -69,34 +70,32 @@ class EveItemManufacturing(EveItem):
 
 #        self.material_list = []
 
-        if (self.type_id is not None
-        and self.blueprint_type_id is not None):
-            base_material_list = self.get_materials_for_blueprint(self.blueprint_type_id,
-                                                                  activity_id=EVE_ACTIVITY_MANUFACTURING)
+        if (self.type_id is not None) and (self.blueprint_type_id is not None):
+            base_material_list = self.data_access.get_mat_for_bp(self.blueprint_type_id,
+                                                                 activity_id=EVE_ACTIVITY_MANUFACTURING)
 
             if base_material_list is not None:
 
                 for base_material in base_material_list:
 
-                    material_id = self.get_inv_item(type_id=base_material["material_type_id"])["type_id"]
+                    material_id = self.data_access.get_inv_item(type_id=base_material["material_type_id"])["type_id"]
                     base_quantity = base_material["quantity"]
 
                     if self.assembly_line_type_id is not None:
-                        facility = self.get_detail_assembly_line_type(assembly_line_type_id=self.assembly_line_type_id)
+                        facility = self.data_access.get_dtl_ram_asmb_line_types(assembly_line_type_id=self.assembly_line_type_id)
                         facility_multiplier = facility['base_material_multiplier']
                         if facility_multiplier is None:
                             facility_multiplier = 1
                     else:
                         facility_multiplier = 1
 
-                    bonused_quantity = math.ceil(base_quantity * \
-                                                  EveMathIndustry.calculate_me_multiplier(self.blueprint_me_level,
-                                                                                          facility_multiplier)) * \
-                                                                                          self.manufacturing_quantity
+                    bonused_quantity = (math.ceil(base_quantity *
+                                                  EveMathIndustry.calculate_me_multiplier(self.blueprint_me_level, facility_multiplier)) *
+                                        self.manufacturing_quantity)
 
                     manufacturing_quantity = bonused_quantity
 
-                    #do we already have some in assets?
+                    # do we already have some in assets?
                     if len(self.asset_list) > 0:
                         if material_id in self.asset_list.iterkeys():
                             manufacturing_quantity = bonused_quantity - self.asset_list[material_id]
@@ -104,15 +103,16 @@ class EveItemManufacturing(EveItem):
                             if self.asset_list[material_id] <= 0:
                                 del self.asset_list[material_id]
 
+                    # do we already have this material in job list (if its buildable)
                     material = self.get_manufacturing_job_by_id(material_id)
 
-                    #if we need to manufacture more than already in assets
+                    # if we need to manufacture more than already in assets
                     if manufacturing_quantity > 0:
                         if material is None:
-                            #add material to list
-                            material = EveItemManufacturing(self.db_access_obj,
-                                                           type_id=material_id,
-                                                           build_queue_level=(self.build_queue_level + 1))
+                            # add material to list
+                            material = EveItemManufacturing(self.data_access,
+                                                            type_id=material_id,
+                                                            build_queue_level=(self.build_queue_level + 1))
                             material.parent = self
                             self.material_list.append(material)
 
@@ -120,7 +120,7 @@ class EveItemManufacturing(EveItem):
                         material.asset_list = self.asset_list
                         material.manufacturing_data_calculate()
                     else:
-                        #if new value calculated is 0, delete material from list
+                        # if new value calculated is 0, delete material from list
                         if material is not None:
                             self.material_list.remove(material)
 
@@ -156,8 +156,6 @@ class EveItemManufacturing(EveItem):
         '''
         Get list of objects
         '''
-
-        manufacturing_list = []
 
         manufacturing_job_list = [self]
 
@@ -202,4 +200,3 @@ class EveItemManufacturing(EveItem):
                         material_list[mat_id] = quant
 
         return material_list
-
