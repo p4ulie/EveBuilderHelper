@@ -16,12 +16,28 @@ class EveItemManufacturing(EveItem):
     Class for data and methods for Items in Eve Online
     '''
 
+    # manufacturing related attributes
+    parent = None   # reference to parent object
+    blueprint_type_id = None   # determines whether item is buildable
+    blueprint_me_level = 0
+    blueprint_te_level = 0
+
+    manufacturing_quantity = 0
+
+    build_queue_level = 0  # order in which materials have to be build
+
+    asset_list = {}  # asset list to calculate in (need to buy less)
+
+    assembly_line_type_id = None   # assembly line used, for bonuses
+
+    material_list = []
+
     def __init__(self,
-                 db_access_obj,
+                 data_access_obj,
                  type_id=None,
                  type_name=None,
-                 blueprint_me_level=10,
-                 blueprint_te_level=20,
+                 blueprint_me_level=0,
+                 blueprint_te_level=0,
                  manufacturing_quantity=1,
                  asset_list={},
                  build_queue_level=0):
@@ -31,17 +47,17 @@ class EveItemManufacturing(EveItem):
 
         # initialize object and get basic data
         EveItem.__init__(self,
-                         db_access_obj,
+                         data_access_obj,
                          type_id=type_id,
                          type_name=type_name)
 
         self.get_item(type_id=type_id, type_name=type_name)
 
-        self.blueprint_me_level=blueprint_me_level
-        self.blueprint_te_level=blueprint_te_level
-        self.manufacturing_quantity=manufacturing_quantity
-        self.build_queue_level=build_queue_level
-        self.asset_list=asset_list
+        self.blueprint_me_level = blueprint_me_level
+        self.blueprint_te_level = blueprint_te_level
+        self.manufacturing_quantity = manufacturing_quantity
+        self.build_queue_level = build_queue_level
+        self.asset_list = asset_list
 
         self.manufacturing_data_calculate()
 

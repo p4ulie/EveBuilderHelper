@@ -10,7 +10,9 @@ from EveOnline.EveMathConstants import EVE_ACTIVITY_MANUFACTURING
 
 class EveDB(object):
     '''
-    Class for containing EVE Online data dump data and methods
+    Class for accessing EVE Online data dump data and methods
+    in a database.
+    db_access_obj can point to objects that access specific database types - SQLite, MySQL, ...
     '''
 
     def __init__(self,
@@ -35,7 +37,7 @@ class EveDB(object):
                     FROM invCategories AS c
                     WHERE c.published = 1
                 """
-        result = self.db_access_obj.fetchData(query)
+        result = self.db_access_obj.fetch_data(query)
 
         if result is not None:
             data = []
@@ -67,9 +69,9 @@ class EveDB(object):
             query += """
                         AND g.categoryID = ?
                     """
-            result = self.db_access_obj.fetchData(query, category_id)
+            result = self.db_access_obj.fetch_data(query, category_id)
         else:
-            result = self.db_access_obj.fetchData(query)
+            result = self.db_access_obj.fetch_data(query)
 
         if result is not None:
             data = []
@@ -98,7 +100,7 @@ class EveDB(object):
                         WHERE c.published = '1'
                         AND c.categoryID = ?
                     """
-            result = self.db_access_obj.fetchData(query, category_id)
+            result = self.db_access_obj.fetch_data(query, category_id)
 
         if (result is not None) and (len(result) > 0):
             data = []
@@ -133,7 +135,7 @@ class EveDB(object):
                         WHERE g.published = '1'
                         AND g.groupID = ?
                     """
-            result = self.db_access_obj.fetchData(query, group_id)
+            result = self.db_access_obj.fetch_data(query, group_id)
 
         if (result is not None) and (len(result) > 0):
             data = []
@@ -156,7 +158,6 @@ class EveDB(object):
         '''
         Get list of items by (part of) name or group_id
         '''
-        query = ''
         result = None
 
         query = """
@@ -179,13 +180,13 @@ class EveDB(object):
             query += """
                         AND t.typeName like '%?%'
                     """
-            result = self.db_access_obj.fetchData(query, type_name)
+            result = self.db_access_obj.fetch_data(query, type_name)
         else:
             if group_id is not None:
                 query += """
                             AND t.groupID = ?
                         """
-                result = self.db_access_obj.fetchData(query, group_id)
+                result = self.db_access_obj.fetch_data(query, group_id)
 
         if result is not None:
             data = []
@@ -210,7 +211,6 @@ class EveDB(object):
         '''
         Get item by ID or name
         '''
-        query = ''
         result = None
 
         query = """
@@ -233,36 +233,36 @@ class EveDB(object):
             query += """
                         AND t.typeID = ?
                     """
-            result = self.db_access_obj.fetchData(query, type_id)
+            result = self.db_access_obj.fetch_data(query, type_id)
         else:
             if type_name is not None:
                 query += """
                             AND t.typeName = ?
                         """
-                result = self.db_access_obj.fetchData(query, type_name)
+                result = self.db_access_obj.fetch_data(query, type_name)
 
         if (result is not None) and (len(result) != 0):
             # take only the first row
             row = result[0]
             data = {'type_id': row[0],
-                     'group_id': row[1],
-                     'type_name': row[2],
-                     'description': row[3],
-                     'mass': row[4],
-                     'volume': row[5],
-                     'capacity': row[6],
-                     'portion_size': row[7],
-                     'race_id': row[8],
-                     'base_price': row[9],
-                     'market_group_id': row[0]}
+                    'group_id': row[1],
+                    'type_name': row[2],
+                    'description': row[3],
+                    'mass': row[4],
+                    'volume': row[5],
+                    'capacity': row[6],
+                    'portion_size': row[7],
+                    'race_id': row[8],
+                    'base_price': row[9],
+                    'market_group_id': row[0]}
         else:
             data = None
 
         return data
 
-    def get_blueprint_id_for_item(self,
-                              type_id=None,
-                              activity_id=EVE_ACTIVITY_MANUFACTURING):
+    def get_bp_id_for_item(self,
+                           type_id=None,
+                           activity_id=EVE_ACTIVITY_MANUFACTURING):
         '''
         Get Blueprint typeID from Item typeID
         '''
@@ -276,14 +276,16 @@ class EveDB(object):
                         WHERE i.productTypeID = ?
                         and i.activityId = ?
                     """
-            result = self.db_access_obj.fetchData(query, type_id, activity_id)
+            result = self.db_access_obj.fetch_data(query,
+                                                   type_id,
+                                                   activity_id)
 
             if (result is not None) and (len(result) > 0):
                 data = result[0][0]
 
         return data
 
-    def get_materials_for_refining(self, type_id=None):
+    def get_lst_mat_for_rfn(self, type_id=None):
         '''
         Get list of materials for refining
         '''
@@ -297,56 +299,50 @@ class EveDB(object):
                 """
 
         if type_id is not None:
-            result = self.db_access_obj.fetchData(query,
-                                                  type_id)
-        else:
-            result = self.db_access_obj.fetchData(query,
-                                                  self.type_id)
+            result = self.db_access_obj.fetch_data(query,
+                                                   type_id)
 
-        if result is not None:
-            data = []
-            for row in result:
-                data.append({'material_type_id': row[0],
-                             'quantity': row[1]})
+            if result is not None:
+                data = []
+                for row in result:
+                    data.append({'material_type_id': row[0],
+                                 'quantity': row[1]})
 
         return data
 
-    def get_materials_for_refining_adjusted(self,
-                                              type_id=None,
-                                              facility_base_yield=0.54,
-                                              reprocessing_skill_level=0,
-                                              reprocessing_efficiency_skill_level=0,
-                                              material_specific_processing_skill_level=0,
-                                              implant_bonus=1):
+    def get_lst_mat_for_rfn_adj(self,
+                                type_id=None,
+                                fclt_base_yield=0.54,
+                                rprcs_skill_lvl=0,
+                                rprcs_eff_skill_lvl=0,
+                                mtrl_spcfc_prcs_skill_lvl=0,
+                                implant_bonus=1):
         '''
-        Get refining output adjusted by yield coeficient
+        Get refining output materials adjusted by yield coeficient
         '''
         refining_type_id = None
         refining_list = []
 
         if type_id is not None:
             refining_type_id = type_id
-        else:
-            if self.type_id is not None:
-                refining_type_id = self.type_id
 
         if refining_type_id is not None:
-            refining_list = self.get_materials_for_refining(type_id=type_id)
+            refining_list = self.get_lst_mat_for_rfn(type_id=type_id)
 
-            refining_yield_coeficienf = facility_base_yield *\
-                                        (1 + material_specific_processing_skill_level * 0.02) *\
-                                        (1 + reprocessing_skill_level * 0.03) *\
-                                        (1 + reprocessing_efficiency_skill_level * 0.02) *\
-                                        implant_bonus
+            refining_yield_coeficienf = (fclt_base_yield *
+                                         (1 + mtrl_spcfc_prcs_skill_lvl * 0.02) *
+                                         (1 + rprcs_skill_lvl * 0.03) *
+                                         (1 + rprcs_eff_skill_lvl * 0.02) *
+                                         implant_bonus)
 
             for material in refining_list:
                 material['quantity'] = int(math.floor((material['quantity'] * refining_yield_coeficienf)))
 
         return refining_list
 
-    def get_materials_for_blueprint(self,
-                                    blueprint_type_id,
-                                    activity_id=EVE_ACTIVITY_MANUFACTURING):
+    def get_mat_for_bp(self,
+                       blueprint_type_id,
+                       activity_id=EVE_ACTIVITY_MANUFACTURING):
         '''
         Get list of materials for specified blueprint typeID and activityId
         '''
@@ -361,9 +357,9 @@ class EveDB(object):
                     WHERE i.typeID = ?
                     and i.activityId = ?
                 """
-        result = self.db_access_obj.fetchData(query,
-                                              blueprint_type_id,
-                                              activity_id)
+        result = self.db_access_obj.fetch_data(query,
+                                               blueprint_type_id,
+                                               activity_id)
 
         if result is not None:
             data = []
@@ -387,9 +383,9 @@ class EveDB(object):
                     WHERE i.typeID = ?
                     and i.activityId = ?
                 """
-        result = self.db_access_obj.fetchData(query,
-                                              blueprint_type_id,
-                                              activity_id)
+        result = self.db_access_obj.fetch_data(query,
+                                               blueprint_type_id,
+                                               activity_id)
 
         if result is not None:
             data = result[0][0]
@@ -412,7 +408,7 @@ class EveDB(object):
                     FROM ramActivities AS r
                     WHERE r.published = '1'
                 """
-        result = self.db_access_obj.fetchData(query)
+        result = self.db_access_obj.fetch_data(query)
 
         if result is not None:
             data = []
@@ -424,10 +420,10 @@ class EveDB(object):
 
         return data
 
-    def get_list_ramAssemblyLineTypes(self,
-                                        activity_id=EVE_ACTIVITY_MANUFACTURING,
-                                        group_id=None,
-                                        filter_outposts=False):
+    def get_lst_ram_asmb_line_types(self,
+                                    activity_id=EVE_ACTIVITY_MANUFACTURING,
+                                    group_id=None,
+                                    filter_outposts=False):
         '''
         Get list of ramassemblylinetypes
         '''
@@ -452,16 +448,16 @@ class EveDB(object):
                     ramAssemblyLineTypes as rlt
                     WHERE rlt.activityID = ?
             """
-            result = self.db_access_obj.fetchData(query, activity_id)
+            result = self.db_access_obj.fetch_data(query, activity_id)
         else:
             query += """
                     ramAssemblyLineTypeDetailPerGroup as rg, ramAssemblyLineTypes as rlt
                     WHERE
                     rlt.assemblyLineTypeID = rg.assemblyLineTypeID
-                    AND 
+                    AND
                     rlt.activityID = ? and rg.groupID = ?
             """
-            result = self.db_access_obj.fetchData(query, activity_id, group_id)
+            result = self.db_access_obj.fetch_data(query, activity_id, group_id)
 
         if result is not None:
             data = []
@@ -479,10 +475,10 @@ class EveDB(object):
 
         return data
 
-    def get_detail_ramAssemblyLineTypes(self,
-                               assembly_line_type_id=None,
-                               assembly_line_type_name=None,
-                               activity_id=EVE_ACTIVITY_MANUFACTURING):
+    def get_dtl_ram_asmb_line_types(self,
+                                    assembly_line_type_id=None,
+                                    assembly_line_type_name=None,
+                                    activity_id=EVE_ACTIVITY_MANUFACTURING):
         '''
         Get bonus multiplier for specified activity and assembly line type
         '''
@@ -505,29 +501,29 @@ class EveDB(object):
             query += """
                             AND r.assemblyLineTypeId = ?
                     """
-            result = self.db_access_obj.fetchData(query,
-                                                  activity_id,
-                                                  assembly_line_type_id)
+            result = self.db_access_obj.fetch_data(query,
+                                                   activity_id,
+                                                   assembly_line_type_id)
         else:
             if assembly_line_type_name is not None:
                 query += """
                             AND r.assemblyLineTypeName = ?
                         """
-                result = self.db_access_obj.fetchData(query,
-                                                      activity_id,
-                                                      assembly_line_type_name)
+                result = self.db_access_obj.fetch_data(query,
+                                                       activity_id,
+                                                       assembly_line_type_name)
 
         if (result is not None) and (len(result) != 0):
             row = result[0]
             data = {'assembly_line_type_id': row[0],
-                     'assembly_line_type_name': row[1],
-                     'description': row[2],
-                     'base_time_multiplier': row[3],
-                     'base_material_multiplier': row[4],
-                     'base_cost_multiplier': row[5],
-                     'volume': row[6],
-                     'activity_id': row[7],
-                     'min_cost_per_hour': row[8]}
+                    'assembly_line_type_name': row[1],
+                    'description': row[2],
+                    'base_time_multiplier': row[3],
+                    'base_material_multiplier': row[4],
+                    'base_cost_multiplier': row[5],
+                    'volume': row[6],
+                    'activity_id': row[7],
+                    'min_cost_per_hour': row[8]}
         else:
             data = None
 
