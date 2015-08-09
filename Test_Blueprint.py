@@ -4,16 +4,14 @@ Created on 17.6.2014
 @author: Pavol Antalik
 '''
 
-#import math
 import re
 
-from DBAccessSQLite import DBAccessSQLite
+from DataAccess.DBAccessSQLite import DBAccessSQLite
+from DataAccess.EveDB import EveDB
+# from EveOnline.EveMathConstants import EVE_ACTIVITY_MANUFACTURING
+from EveOnline.EveItemManufacturing import EveItemManufacturing
 
-from EveOnline.EveMathConstants import EVE_ACTIVITY_MANUFACTURING
-
-from EveOnline.EveManufacturedItem import EveItemManufacturing
-
-DB = 'data/eve.db'
+DATA_FILE = 'data/eve.db'
 
 BUILD_PRODUCT_NAME = 'Ark'
 BUILD_PRODUCT_RUNS = 1
@@ -103,14 +101,14 @@ Sylramic Fibers\t18,126\tComposite\t\t\t906.30 m3
 Sylramic Fibers\t1,119,257\tComposite\t\t\t55,962.85 m3
 '''
 
-#ASSETS_LIST = '''Zydrine\t51732\tMineral\t
-#Providence\t1\tShip\t
-#'''
+# ASSETS_LIST = '''Zydrine\t51732\tMineral\t
+# Providence\t1\tShip\t
+# '''
 
-#ASSETS_LIST = '''Capital Jump Drive\t29\tCapital Construction Components\t
-#'''
+# ASSETS_LIST = '''Capital Jump Drive\t29\tCapital Construction Components\t
+# '''
 
-#ASSETS_LIST = ''
+ASSETS_LIST = ''
 
 
 def create_asset_list(line_list):
@@ -118,8 +116,6 @@ def create_asset_list(line_list):
     Generate asset list from text lines
     '''
     asset_dict = {}
-
-    e_asset = EveItemManufacturing(db_access_object)
 
     for line in line_list.splitlines():
         match = re.match(r"^(\D+)\t([\d\,]*)\t(\D+)\t.*", line)
@@ -130,9 +126,9 @@ def create_asset_list(line_list):
                 quantity = 0
             else:
                 quantity = int(quantity_string)
-            group_name = match.group(3).strip()
+            # group_name = match.group(3).strip()
 
-            item = e_asset.get_inv_item(type_name=type_name)
+            item = data_access_object.get_inv_item(type_name=type_name)
             if item is not None:
                 type_id = item["type_id"]
                 if type_id in asset_dict.iterkeys():
@@ -146,11 +142,14 @@ def create_asset_list(line_list):
 def write_material_list(material_list,
                         asset_list,
                         format_string):
+    '''
+    Outputs a formated material list
+    '''
 
     for material_type_id, material_quantity in material_list.iteritems():
-        material_item = EveItemManufacturing(db_access_object,
-                                 type_id=material_type_id)
-        material_name = material_item.get_inv_item(type_id=material_type_id)
+        material_item = EveItemManufacturing(data_access_object,
+                                             type_id=material_type_id)
+        material_name = material_item.data_access.get_inv_item(type_id=material_type_id)
         if material_name is not None:
             if material_type_id in asset_list.iterkeys():
                 asset_quantity = asset_list[material_type_id]
@@ -165,22 +164,22 @@ def main():
     Main function for testing the classes
     '''
 
-    e_built_item = EveItemManufacturing(db_access_object,
-                                   type_name=BUILD_PRODUCT_NAME)
+    e_built_item = EveItemManufacturing(data_access_object,
+                                        type_name=BUILD_PRODUCT_NAME)
 
     e_built_item.manufacturing_quantity = BUILD_PRODUCT_RUNS
     e_built_item.blueprint_me_level = BUILD_PRODUCT_ME
-    e_built_item.assembly_line_type_id = e_built_item.get_assembly_line_type(assembly_line_type_name="Advanced Large Ship Assembly Array")['assemblyLineTypeID']
+    e_built_item.assembly_line_type_id = e_built_item.data_access.get_dtl_ram_asmb_line_types(assembly_line_type_name="Advanced Large Ship Assembly Array")['assembly_line_type_id']
 
-    #generate manufacturing job tree
+    # generate manufacturing job tree
     e_built_item.manufacturing_data_calculate()
 
-    #set facility for all jobs
+    # set facility for all jobs
     manufacturing_job_list = e_built_item.get_manufacturing_job_list()
 
     for job in manufacturing_job_list:
         if job.type_name[0:7] == 'Capital':
-            job.assembly_line_type_id = job.get_assembly_line_type(assembly_line_type_name="Thukker Component Assembly Array")['assemblyLineTypeID']
+            job.assembly_line_type_id = job.data_access.get_dtl_ram_asmb_line_types(assembly_line_type_name="Thukker Component Assembly Array")['assembly_line_type_id']
 
     # Recalculate after setting facility
     asset_dict = create_asset_list(ASSETS_LIST)
@@ -191,23 +190,24 @@ def main():
 
     for job in manufacturing_job_list:
         print "%s (id %s): runs %d (ME: %d, level %d)" % (job.type_name,
-                                                  job.type_id,
-                                                  job.manufacturing_quantity,
-                                                  job.blueprint_me_level,
-                                                  job.build_queue_level)
+                                                          job.type_id,
+                                                          job.manufacturing_quantity,
+                                                          job.blueprint_me_level,
+                                                          job.build_queue_level)
 
     print
 
     for mat_id, quant in e_built_item.get_manufacturing_material_list().iteritems():
-        e_material_item = EveItemManufacturing(db_access_object,
-                                          type_id=mat_id)
+        e_material_item = EveItemManufacturing(data_access_object,
+                                               type_id=mat_id)
 
         print "%s\t%d" % (e_material_item.type_name, quant)
 
 
 if __name__ == '__main__':
-    db_access_object = DBAccessSQLite(DB)
+    DB_ACCESS_OBJECT = DBAccessSQLite(DATA_FILE)
+    data_access_object = EveDB(DB_ACCESS_OBJECT)
 
     main()
 
-    db_access_object.close()
+    DB_ACCESS_OBJECT.close()
