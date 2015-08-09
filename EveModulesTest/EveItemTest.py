@@ -14,7 +14,7 @@ class TestEveItem(unittest.TestCase):
     Unit test for class EveItem
     '''
 
-    datafile = '../data/eve.db'
+    DATA_FILE = '../data/eve.db'
 
     maxDiff = None
 
@@ -22,9 +22,9 @@ class TestEveItem(unittest.TestCase):
         '''
         Set-up of the testing environment
         '''
-        self.db_access_object = DBAccessSQLite(self.datafile)
+        self.db_access_object = DBAccessSQLite(self.DATA_FILE)
         self.data_access_object = EveDB(self.db_access_object)
-        self.eve_item = EveItem(self.data_access_object)
+        self.eve_item_manufacturing = EveItem(self.data_access_object)
 
     def tearDown(self):
         '''
@@ -36,17 +36,17 @@ class TestEveItem(unittest.TestCase):
         '''
         Test for loading data to object attributes
         '''
-        self.eve_item.get_item(type_name="Charon")
+        self.eve_item_manufacturing.get_item(type_name="Charon")
         self.failUnlessEqual("Charon",
-                             self.eve_item.type_name)
+                             self.eve_item_manufacturing.type_name)
 
     def test_get_item_ark(self):
         '''
         Test for loading data to object attributes - Ark
         '''
-        self.eve_item.get_item(type_id=28850)
+        self.eve_item_manufacturing.get_item(type_id=28850)
         self.failUnlessEqual("Ark",
-                             self.eve_item.type_name)
+                             self.eve_item_manufacturing.type_name)
 
 
 if __name__ == "__main__":

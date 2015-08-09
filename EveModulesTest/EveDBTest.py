@@ -14,7 +14,7 @@ class TestEveDB(unittest.TestCase):
     Unit test for class EveDB
     '''
 
-    datafile = '../data/eve.db'
+    DATA_FILE = '../data/eve.db'
 
     maxDiff = None
 
@@ -22,7 +22,7 @@ class TestEveDB(unittest.TestCase):
         '''
         Set-up of the testing environment
         '''
-        self.db_access_object = DBAccessSQLite(self.datafile)
+        self.db_access_object = DBAccessSQLite(self.DATA_FILE)
         self.data_access_object = EveDB(self.db_access_object)
 
     def tearDown(self):
@@ -102,11 +102,11 @@ class TestEveDB(unittest.TestCase):
         materials = [{'material_type_id': 34, 'quantity': 82}, {'material_type_id': 35, 'quantity': 163}, {'material_type_id': 36, 'quantity': 82}]
         self.failUnlessEqual(materials,
                              self.data_access_object.get_lst_mat_for_rfn_adj(type_id=18,
-                                                                 fclt_base_yield=0.54,
-                                                                 rprcs_skill_lvl=5,
-                                                                 rprcs_eff_skill_lvl=5,
-                                                                 mtrl_spcfc_prcs_skill_lvl=5,
-                                                                 implant_bonus=1.02))
+                                                                             fclt_base_yield=0.54,
+                                                                             rprcs_skill_lvl=5,
+                                                                             rprcs_eff_skill_lvl=5,
+                                                                             mtrl_spcfc_prcs_skill_lvl=5,
+                                                                             implant_bonus=1.02))
 
     def test_get_mat_for_bp(self):
         '''
