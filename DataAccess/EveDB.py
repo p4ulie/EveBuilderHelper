@@ -5,6 +5,7 @@ Created on 18.6.2014
 '''
 
 import math
+import re
 from EveOnline.EveMathConstants import EVE_ACTIVITY_MANUFACTURING
 
 
@@ -32,7 +33,6 @@ class EveDB(object):
         query = """
                     SELECT c.categoryID,
                             c.categoryName,
-                            c.description,
                             c.iconID
                     FROM invCategories AS c
                     WHERE c.published = 1
@@ -44,33 +44,42 @@ class EveDB(object):
             for row in result:
                 data.append({'category_id': row[0],
                              'category_name': row[1],
-                             'description': row[2],
-                             'icon_id': row[3]})
+                             'icon_id': row[2]})
 
         return data
 
-    def get_list_of_inv_groups(self, category_id=None):
+    def get_list_of_inv_groups(self, category_id=None, category_name=None):
         '''
         Get list of groups
         '''
-        data = None
+        data = []
 
         query = """
                     SELECT g.groupID,
                             g.categoryID,
                             g.groupName,
-                            g.description,
-                            g.iconID
+                            g.iconID,
+                            g.anchored,
+                            g.anchorable,
+                            g.fittableNonSingleton,
+                            g.useBasePrice
                     FROM invGroups AS g
-                    WHERE g.published = '1'
                 """
 
         if category_id is not None:
             query += """
-                        AND g.categoryID = ?
+                        WHERE g.categoryID = ?
+                        and g.published=1
                     """
             result = self.db_access_obj.fetch_data(query, category_id)
         else:
+            if category_name is not None:
+                query += """
+                            WHERE g.categoryName = ?
+                            and g.published=1
+                        """
+                result = self.db_access_obj.fetch_data(query, category_name)
+
             result = self.db_access_obj.fetch_data(query)
 
         if result is not None:
@@ -79,80 +88,97 @@ class EveDB(object):
                 data.append({'group_id': row[0],
                              'category_id': row[1],
                              'group_name': row[2],
-                             'description': row[3],
-                             'icon_id': row[4]})
+                             'icon_id': row[3],
+                             'anchored': row[4],
+                             'anchorable': row[5],
+                             'fittable_non_singleton': row[6],
+                             'use_base_price': row[7]})
 
         return data
 
-    def get_inv_category(self, category_id=None):
+    def get_inv_category(self, category_id=None, category_name=None):
         '''
         Get category data
         '''
-        data = None
+        data = []
+
+        query = """
+                    SELECT c.categoryID,
+                           c.categoryName,
+                           c.iconID
+                    FROM invCategories AS c
+                """
 
         if category_id is not None:
-            query = """
-                        SELECT c.categoryID,
-                               c.categoryName,
-                               c.description,
-                               c.iconID
-                        FROM invCategories AS c
-                        WHERE c.published = '1'
-                        AND c.categoryID = ?
-                    """
+            query += """
+                        WHERE c.categoryID = ?
+                        AND c.published = 1
+                     """
             result = self.db_access_obj.fetch_data(query, category_id)
+        else:
+            if category_name is not None:
+                query += """
+                            WHERE c.categoryName = ?
+                            AND c.published = 1
+                         """
+                result = self.db_access_obj.fetch_data(query, category_name)
 
         if (result is not None) and (len(result) > 0):
-            data = []
-            for row in result:
-                data.append({'`category_id': row[0],
-                             'category_name': row[1],
-                             'description': row[2],
-                             'icon_id': row[3]})
+            row = result[0]
+            data = {'category_id': row[0],
+                    'category_name': row[1],
+                    'icon_id': row[2]}
 
-        return data
+            return data
 
-    def get_inv_group(self, group_id=None):
+        return None
+
+    def get_inv_group(self, group_id=None, group_name=None):
         '''
         Get group data
         '''
-        data = None
+        data = []
+        result = None
+        
+        query = """
+                    SELECT g.groupID,
+                           g.categoryID,
+                           g.groupName,
+                           g.iconID,
+                           g.useBasePrice,
+                           g.anchored,
+                           g.anchorable,
+                           g.fittableNonSingleton
+                    FROM invGroups AS g
+                """
 
         if group_id is not None:
-            query = """
-                        SELECT g.groupID,
-                               g.categoryID,
-                               g.groupName,
-                               g.description,
-                               g.iconID,
-                               g.useBasePrice,
-                               g.allowManufacture,
-                               g.allowRecycler,
-                               g.anchored,
-                               g.anchorable,
-                               g.fittableNonSingleton
-                        FROM invGroups AS g
-                        WHERE g.published = '1'
-                        AND g.groupID = ?
+            query += """
+                        WHERE g.groupID = ?
+                        AND g.published=1
                     """
             result = self.db_access_obj.fetch_data(query, group_id)
-
+        else:
+            query += """
+                        WHERE g.groupName = ?
+                        AND g.published=1
+                    """
+            result = self.db_access_obj.fetch_data(query, group_name)
+                        
         if (result is not None) and (len(result) > 0):
-            data = []
-            for row in result:
-                data.append({'group_id': row[0],
-                             'category_id': row[1],
-                             'group_name': row[2],
-                             'description': row[3],
-                             'icon_id': row[4],
-                             'use_base_price': row[5],
-                             'allow_manufacture': row[6],
-                             'allow_recycler': row[7],
-                             'anchored': row[8],
-                             'anchorable': row[9],
-                             'fittable_non_singleton': row[10]})
+            row = result[0]
+            data = {'group_id': row[0],
+                    'category_id': row[1],
+                    'group_name': row[2],
+                    'icon_id': row[3],
+                    'use_base_price': row[4],
+                    'anchored': row[5],
+                    'anchorable': row[6],
+                    'fittable_non_singleton': row[7]}
 
-        return data
+            return data
+
+        return None
 
     def get_list_of_inv_items(self, type_name=None, group_id=None):
         '''
@@ -173,18 +199,19 @@ class EveDB(object):
                             t.basePrice,
                             t.marketGroupID
                     FROM invtypes AS t
-                    WHERE t.published = '1'
                 """
 
         if type_name is not None:
             query += """
-                        AND t.typeName like '%?%'
+                        WHERE t.typeName like '%?%'
+                        AND t.published = 1
                     """
             result = self.db_access_obj.fetch_data(query, type_name)
         else:
             if group_id is not None:
                 query += """
-                            AND t.groupID = ?
+                            WHERE t.groupID = ?
+                            AND t.published = 1
                         """
                 result = self.db_access_obj.fetch_data(query, group_id)
 
@@ -201,7 +228,7 @@ class EveDB(object):
                              'portion_size': row[7],
                              'race_id': row[8],
                              'base_price': row[9],
-                             'market_group_id': row[0]})
+                             'market_group_id': row[10]})
         else:
             data = None
 
@@ -226,18 +253,19 @@ class EveDB(object):
                             t.basePrice,
                             t.marketGroupID
                     FROM invtypes AS t
-                    WHERE t.published = '1'
                 """
 
         if type_id is not None:
             query += """
-                        AND t.typeID = ?
+                        WHERE t.typeID = ?
+                        AND t.published = 1
                     """
             result = self.db_access_obj.fetch_data(query, type_id)
         else:
             if type_name is not None:
                 query += """
-                            AND t.typeName = ?
+                            WHERE t.typeName = ?
+                            AND t.published = 1
                         """
                 result = self.db_access_obj.fetch_data(query, type_name)
 
@@ -254,7 +282,7 @@ class EveDB(object):
                     'portion_size': row[7],
                     'race_id': row[8],
                     'base_price': row[9],
-                    'market_group_id': row[0]}
+                    'market_group_id': row[10]}
         else:
             data = None
 
@@ -274,7 +302,7 @@ class EveDB(object):
                         SELECT typeID
                         FROM industryactivityproducts AS i
                         WHERE i.productTypeID = ?
-                        and i.activityId = ?
+                        AND i.activityId = ?
                     """
             result = self.db_access_obj.fetch_data(query,
                                                    type_id,
@@ -333,7 +361,7 @@ class EveDB(object):
                                          (1 + mtrl_spcfc_prcs_skill_lvl * 0.02) *
                                          (1 + rprcs_skill_lvl * 0.03) *
                                          (1 + rprcs_eff_skill_lvl * 0.02) *
-                                         implant_bonus)
+                                         (1 + implant_bonus))
 
             for material in refining_list:
                 material['quantity'] = int(math.floor((material['quantity'] * refining_yield_coeficienf)))
@@ -351,11 +379,10 @@ class EveDB(object):
 
         query = """
                     SELECT i.materialTypeID,
-                            i.quantity,
-                            i.consume
+                            i.quantity
                     FROM industryactivitymaterials AS i
                     WHERE i.typeID = ?
-                    and i.activityId = ?
+                    AND i.activityId = ?
                 """
         result = self.db_access_obj.fetch_data(query,
                                                blueprint_type_id,
@@ -365,8 +392,7 @@ class EveDB(object):
             data = []
             for row in result:
                 data.append({'material_type_id': row[0],
-                             'quantity': row[1],
-                             'consume': row[2]})
+                             'quantity': row[1]})
 
         return data
 
@@ -381,7 +407,7 @@ class EveDB(object):
                     SELECT time
                     FROM industryactivity AS i
                     WHERE i.typeID = ?
-                    and i.activityId = ?
+                    AND i.activityId = ?
                 """
         result = self.db_access_obj.fetch_data(query,
                                                blueprint_type_id,
@@ -406,7 +432,7 @@ class EveDB(object):
                             r.iconNo,
                             r.description
                     FROM ramActivities AS r
-                    WHERE r.published = '1'
+                    WHERE r.published = 1
                 """
         result = self.db_access_obj.fetch_data(query)
 
@@ -528,3 +554,29 @@ class EveDB(object):
             data = None
 
         return data
+
+    def get_list_ores_for_sec_status(self,
+                                     sec_status_low_limit=1.0):
+        '''
+        Get list of ores available in system specified by security status
+        '''
+        
+        category_asteroid = self.get_inv_category(category_name='Asteroid')
+        groups_asteroid = self.get_list_of_inv_groups(category_id=category_asteroid['category_id'])
+    
+        ore_list = []
+    
+        sec_status_low_limit = float(sec_status_low_limit)
+        ore_sec_status_re = re.compile(".*Available in \<color\=\'0x[0-9|A-F]{8}\'\>(\d+\.\d+)\<\/color\> security status solar systems or lower.*")
+        
+        for ore_group in groups_asteroid:
+                ores = self.get_list_of_inv_items(group_id=ore_group['group_id'])
+                for ore in ores:
+                    ore_sec_status_result = ore_sec_status_re.search(ore['description'])
+                    if ore_sec_status_result is not None:
+                        ore_sec_status = float(ore_sec_status_result.group(1))
+                        # 
+                        if ore_sec_status >= sec_status_low_limit:
+                            ore_list.append(ore)
+
+        return ore_list
