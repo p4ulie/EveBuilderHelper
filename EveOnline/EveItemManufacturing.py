@@ -200,3 +200,84 @@ class EveItemManufacturing(EveItem):
                         material_list[mat_id] = quant
 
         return material_list
+
+    def get_reprocessing_material_list(self):
+        '''
+        Get base amounts of objects obtained by reprocessing
+        '''
+        materials = []
+        
+        if self.type_id is not None:
+            materials = self.data_access.get_lst_mat_for_rfn(type_id=self.type_id)
+
+        return materials
+        
+    def get_reprocessing_material_list_adjusted(self,
+                                                fclt_base_yield=0.54,
+                                                rprcs_skill_lvl=0,
+                                                rprcs_eff_skill_lvl=0,
+                                                mtrl_spcfc_prcs_skill_lvl=0,
+                                                implant_bonus=1):
+        '''
+        Get list of objects obtained by reprocessing, adjusted by facily bonuses and skills
+        '''
+
+        materials = []
+        
+        if self.type_id is not None:
+            materials = self.data_access.get_lst_mat_for_rfn_adj(type_id=self.type_id,
+                                                                 fclt_base_yield=fclt_base_yield,
+                                                                 rprcs_skill_lvl=rprcs_skill_lvl,
+                                                                 rprcs_eff_skill_lvl=rprcs_eff_skill_lvl,
+                                                                 mtrl_spcfc_prcs_skill_lvl=mtrl_spcfc_prcs_skill_lvl,
+                                                                 implant_bonus=implant_bonus)
+
+        return materials
+
+    def get_mineral_matrix_adjusted(self,
+                                    sec_status_low_limit=0.0,
+                                    fclt_base_yield=0.54,
+                                    rprcs_skill_lvl=0,
+                                    rprcs_eff_skill_lvl=0,
+                                    mtrl_spcfc_prcs_skill_lvl=0,
+                                    implant_bonus=1):
+        '''
+        Get matrix of mineral amounts obtained by reprocessing a ore
+        '''
+        
+        refined_amounts_row_template = {}
+    
+        # add minerals to matrix row template
+        group_id_mineral = self.data_access.get_inv_group(group_name='Mineral')['group_id']
+        mineral_list = self.data_access.get_list_of_inv_items(group_id=group_id_mineral)
+        for mineral in mineral_list:
+            refined_amounts_row_template[mineral['type_id']] = 0
+    
+        # add ice products to matrix row template
+        group_id_ice_product = self.data_access.get_inv_group(group_name='Ice Product')['group_id']
+        ice_product_list = self.data_access.get_list_of_inv_items(group_id=group_id_ice_product)
+        for ice_product in ice_product_list:
+            refined_amounts_row_template[ice_product['type_id']] = 0
+    
+    
+        # build the matrix
+        refining_matrix = {}
+                    
+        ore_list = self.data_access.get_list_ores_for_sec_status(sec_status_low_limit)
+        
+        for ore in ore_list:
+            reproc_mat_list = self.data_access.get_lst_mat_for_rfn_adj(type_id=ore['type_id'],
+                                                                       fclt_base_yield=fclt_base_yield,
+                                                                       rprcs_skill_lvl=rprcs_skill_lvl,
+                                                                       rprcs_eff_skill_lvl=rprcs_eff_skill_lvl,
+                                                                       mtrl_spcfc_prcs_skill_lvl=mtrl_spcfc_prcs_skill_lvl,
+                                                                       implant_bonus=implant_bonus)
+                                                                               
+            refined_amounts = refined_amounts_row_template.copy()
+
+            for reproc_mat in reproc_mat_list:
+                refined_amounts[reproc_mat['material_type_id']] = reproc_mat['quantity']
+                
+            refining_matrix[ore['type_id']] = refined_amounts
+
+        return refining_matrix

@@ -556,7 +556,7 @@ class EveDB(object):
         return data
 
     def get_list_ores_for_sec_status(self,
-                                     sec_status_low_limit=1.0):
+                                     sec_status_low_limit=0.0):
         '''
         Get list of ores available in system specified by security status
         '''
@@ -567,16 +567,16 @@ class EveDB(object):
         ore_list = []
     
         sec_status_low_limit = float(sec_status_low_limit)
-        ore_sec_status_re = re.compile(".*Available in \<color\=\'0x[0-9|A-F]{8}\'\>(\d+\.\d+)\<\/color\> security status solar systems or lower.*")
+        ore_sec_status_re = re.compile(r".*Available in \<color\=\'0x[0-9|A-F]{8}\'\>(\d+\.\d+)\<\/color\> security status solar systems or lower.*")
         
         for ore_group in groups_asteroid:
-                ores = self.get_list_of_inv_items(group_id=ore_group['group_id'])
-                for ore in ores:
-                    ore_sec_status_result = ore_sec_status_re.search(ore['description'])
-                    if ore_sec_status_result is not None:
-                        ore_sec_status = float(ore_sec_status_result.group(1))
-                        # 
-                        if ore_sec_status >= sec_status_low_limit:
-                            ore_list.append(ore)
+            ores = self.get_list_of_inv_items(group_id=ore_group['group_id'])
+            for ore in ores:
+                ore_sec_status_result = ore_sec_status_re.search(ore['description'])
+                if ore_sec_status_result is not None:
+                    ore_sec_status = float(ore_sec_status_result.group(1))
+                    # 
+                    if ore_sec_status >= sec_status_low_limit:
+                        ore_list.append(ore)
 
         return ore_list
