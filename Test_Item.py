@@ -17,9 +17,9 @@ def main():
     '''
 
     db_access_object = DBAccessSQLite(DATA_FILE)
-    data_access_object = EveDB(db_access_object)
+    DATA_ACCESS_OBJECT = EveDB(db_access_object)
 
-    eve_item = EveItem(data_access_object,
+    eve_item = EveItem(DATA_ACCESS_OBJECT,
                        type_name="Providence")
 
     print eve_item.type_name
