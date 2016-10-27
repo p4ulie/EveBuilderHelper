@@ -7,7 +7,7 @@ Created on Dec 1, 2014
 from DataAccess.DBAccessSQLite import DBAccessSQLite
 from DataAccess.EveDB import EveDB
 from EveOnline.EveItemManufacturing import EveItemManufacturing
-from cvxopt import matrix, solvers
+from cvxopt import matrix, solvers, printing
 
 DATA_FILE = 'data/eve.db'
 
@@ -28,8 +28,8 @@ def main():
     # for simplyfication we filter ore list
     reproc_mat_list_filtered = {}
     reproc_mat_list_filtered[DATA_ACCESS_OBJECT.get_inv_item(type_name='Veldspar')['type_id']] = reproc_mat_list[DATA_ACCESS_OBJECT.get_inv_item(type_name='Veldspar')['type_id']]
-    reproc_mat_list_filtered[DATA_ACCESS_OBJECT.get_inv_item(type_name='Plagioclase')['type_id']] = reproc_mat_list[DATA_ACCESS_OBJECT.get_inv_item(type_name='Plagioclase')['type_id']]
-    reproc_mat_list_filtered[DATA_ACCESS_OBJECT.get_inv_item(type_name='Scordite')['type_id']] = reproc_mat_list[DATA_ACCESS_OBJECT.get_inv_item(type_name='Scordite')['type_id']]
+#    reproc_mat_list_filtered[DATA_ACCESS_OBJECT.get_inv_item(type_name='Plagioclase')['type_id']] = reproc_mat_list[DATA_ACCESS_OBJECT.get_inv_item(type_name='Plagioclase')['type_id']]
+#    reproc_mat_list_filtered[DATA_ACCESS_OBJECT.get_inv_item(type_name='Scordite')['type_id']] = reproc_mat_list[DATA_ACCESS_OBJECT.get_inv_item(type_name='Scordite')['type_id']]
     reproc_mat_list_filtered[DATA_ACCESS_OBJECT.get_inv_item(type_name='Pyroxeres')['type_id']] = reproc_mat_list[DATA_ACCESS_OBJECT.get_inv_item(type_name='Pyroxeres')['type_id']]
     reproc_mat_list = reproc_mat_list_filtered
 
@@ -62,9 +62,12 @@ def main():
     b = matrix(mineral_amounts_desired_matrix)
     c = matrix(ore_quantity_matrix)
 
-#    print A
-#    print b
-#    print c
+    printing.options['dformat'] = '%.1f'
+    printing.options['width'] = -1
+    
+    print A
+    print b
+    print c
 
     sol=solvers.lp(c,A,b)
     print(sol['x'])
