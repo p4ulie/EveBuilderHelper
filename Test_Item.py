@@ -20,7 +20,7 @@ def main():
     DATA_ACCESS_OBJECT = EveDB(db_access_object)
 
     eve_item = EveItem(DATA_ACCESS_OBJECT,
-                       type_name="Providence")
+                       type_name="Archon")
 
     print eve_item.type_name
 
