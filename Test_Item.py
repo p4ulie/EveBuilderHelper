@@ -9,6 +9,7 @@ from DataAccess.EveDB import EveDB
 from EveOnline.EveOnlineInvType import EveOnlineInvType
 from EveOnline.EveOnlineInvGroup import EveOnlineInvGroup
 from EveOnline.EveOnlineInvCategory import EveOnlineInvCategory
+from EveOnline.EveOnlineRamAssemblyLineTypes import EveOnlineRamAssemblyLineTypes
 
 DATA_FILE = 'data/eve.db'
 
@@ -29,9 +30,14 @@ def main():
     eve_inv_type = EveOnlineInvType(DATA_ACCESS_OBJECT,
                                     type_name="Veldspar")
 
+    eve_assembly_line_type = EveOnlineRamAssemblyLineTypes(DATA_ACCESS_OBJECT,
+                                                           assembly_line_type_name="Thukker Component Assembly Array")
+
+
     print eve_inv_category.category_name
     print eve_inv_group.group_name
     print eve_inv_type.type_name
+    print eve_assembly_line_type.base_material_multiplier
 
     DATA_ACCESS_OBJECT.db_access_obj.close()
 
