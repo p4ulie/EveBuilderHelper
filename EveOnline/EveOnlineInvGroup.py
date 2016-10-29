@@ -28,9 +28,9 @@ class EveOnlineInvGroup(object):
         self.anchorable = None
         self.fittable_non_singleton = None
 
-        self.get_group(group_id=group_id, group_name=group_name)
+        self.get_inv_group(group_id=group_id, group_name=group_name)
 
-    def get_group(self, group_id=None, group_name=None):
+    def get_inv_group(self, group_id=None, group_name=None):
         '''
         Get item by ID
         '''

@@ -34,9 +34,9 @@ class EveOnlineInvType(object):
         self.sound_id = None
         self.graphic_id = None
 
-        self.get_item(type_id=type_id, type_name=type_name)
+        self.get_inv_type(type_id=type_id, type_name=type_name)
 
-    def get_item(self, type_id=None, type_name=None):
+    def get_inv_type(self, type_id=None, type_name=None):
         '''
         Get item by ID
         '''

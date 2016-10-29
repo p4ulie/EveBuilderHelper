@@ -23,9 +23,9 @@ class EveOnlineInvCategory(object):
         self.category_name = ''
         self.icon_id = None
 
-        self.get_category(category_id=category_id, category_name=category_name)
+        self.get_inv_category(category_id=category_id, category_name=category_name)
 
-    def get_category(self, category_id=None, category_name=None):
+    def get_inv_category(self, category_id=None, category_name=None):
         '''
         Get item by ID
         '''
