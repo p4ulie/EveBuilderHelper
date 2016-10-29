@@ -5,7 +5,7 @@ Created on Sep 15, 2014
 '''
 
 
-class EveItem(object):
+class EveOnlineInvType(object):
     '''
     Class for data and methods for Items in Eve Online
     '''
@@ -18,10 +18,9 @@ class EveItem(object):
         # set data access object reference (to load data from DB, files, ...)
         self.data_access = data_access
 
-        # basic item attributes
+        # basic invType attributes
         self.type_id = None
         self.group_id = None
-        self.category_id = None
         self.type_name = ''
         self.description = ''
         self.mass = None
@@ -31,26 +30,21 @@ class EveItem(object):
         self.race_id = None
         self.base_price = None
         self.market_group_id = None
-
+        self.icon_id = None
+        self.sound_id = None
         self.graphic_id = None
-        self.radius = None
-        self.published = None
-        self.chance_of_duplicating = None
 
-        self.meta_group = None
-
-        if type_id is not None:
-            self.get_item(type_id=type_id)
-        else:
-            if type_name is not None:
-                self.get_item(type_name=type_name)
+        self.get_item(type_id=type_id, type_name=type_name)
 
     def get_item(self, type_id=None, type_name=None):
         '''
-        Get item by ID or name
+        Get item by ID
         '''
 
-        data = self.data_access.get_inv_item(type_id=type_id, type_name=type_name)
+        if type_name is not None:
+            data = self.data_access.get_inv_type(type_name=type_name)
+        else:
+            data = self.data_access.get_inv_type(type_id=type_id)
 
         if data is not None:
             for key, value in data.iteritems():
