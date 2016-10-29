@@ -6,7 +6,7 @@ Created on Nov 25, 2014
 import unittest
 from DataAccess.DBAccessSQLite import DBAccessSQLite
 from DataAccess.EveDB import EveDB
-from EveOnline.EveItemManufacturing import EveItemManufacturing
+from EveOnline.EveItemManufacturing import eveOnlineInvTypeManufacturing
 
 
 class Test(unittest.TestCase):
@@ -31,8 +31,8 @@ class Test(unittest.TestCase):
         self.db_access_obj = DBAccessSQLite(self.DATA_FILE)
         self.data_access = EveDB(self.db_access_obj)
 
-        self.eve_item_manufacturing = EveItemManufacturing(self.data_access,
-                                                           type_name=self.BUILD_PRODUCT_NAME)
+        self.eve_item_manufacturing = eveOnlineInvTypeManufacturing(self.data_access,
+                                                                    type_name=self.BUILD_PRODUCT_NAME)
 
     def tearDown(self):
         '''

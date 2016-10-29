@@ -234,7 +234,7 @@ class EveDB(object):
 
         return data
 
-    def get_inv_item(self, type_id=None, type_name=None):
+    def get_inv_type(self, type_id=None, type_name=None):
         '''
         Get item by ID or name
         '''

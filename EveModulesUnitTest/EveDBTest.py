@@ -107,7 +107,7 @@ class TestEveDB(unittest.TestCase):
         '''
         item = {'market_group_id': 1657, 'description': 'A standard cargo container, used for common freight.', 'type_id': 3293, 'volume': 325.0, 'portion_size': 1, 'capacity': 390.0, 'type_name': 'Medium Standard Container', 'mass': 100000.0, 'race_id': None, 'group_id': 12, 'base_price': 12000}
         self.failUnlessEqual(item,
-                             self.data_access_object.get_inv_item(type_id=3293))
+                             self.data_access_object.get_inv_type(type_id=3293))
 
     def test_get_bp_id_for_item(self):
         '''
