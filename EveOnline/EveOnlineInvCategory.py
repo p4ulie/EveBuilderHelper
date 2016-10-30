@@ -27,7 +27,7 @@ class EveOnlineInvCategory(object):
 
     def get_inv_category(self, category_id=None, category_name=None):
         '''
-        Get item by ID
+        Get category by ID
         '''
 
         if category_name is not None:

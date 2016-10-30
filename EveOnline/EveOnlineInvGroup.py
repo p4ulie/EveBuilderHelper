@@ -32,7 +32,7 @@ class EveOnlineInvGroup(object):
 
     def get_inv_group(self, group_id=None, group_name=None):
         '''
-        Get item by ID
+        Get group by ID
         '''
 
         if group_name is not None:

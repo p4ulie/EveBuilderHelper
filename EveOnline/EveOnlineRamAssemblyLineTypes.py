@@ -38,7 +38,7 @@ class EveOnlineRamAssemblyLineTypes(object):
                                    assembly_line_type_id=None,
                                    assembly_line_type_name=None):
         '''
-        Get item by ID
+        Get ram_asmb_line_type by ID
         '''
 
         if assembly_line_type_name is not None:
