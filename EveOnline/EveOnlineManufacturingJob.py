@@ -35,7 +35,7 @@ class EveOnlineManufacturingJob(EveOnlineBlueprint):
                  manufacturing_runs=1,
                  build_queue_level=0,
                  assembly_line_type_id=None,
-                 assembly_line_type_name=''):
+                 assembly_line_type_name='STATION manufacturing'):
         '''
         Constructor
         '''
