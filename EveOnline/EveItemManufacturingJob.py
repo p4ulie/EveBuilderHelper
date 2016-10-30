@@ -47,7 +47,6 @@ class EveOnlineInvTypeManufacturingJob(EveOnlineInvType):
                                   data_access,
                                   type_id=type_id)
 
-        self.get_item(type_id=type_id)
         self.blueprint_type_id = self.data_access.get_bp_id_for_item(self.type_id)
 
         self.blueprint_me_level = blueprint_me_level
@@ -80,7 +79,7 @@ class EveOnlineInvTypeManufacturingJob(EveOnlineInvType):
                     base_quantity = base_material["quantity"]
 
                     if self.assembly_line_type_id is not None:
-                        facility = self.data_access.get_dtl_ram_asmb_line_types(assembly_line_type_id=self.assembly_line_type_id)
+                        facility = self.data_access.get_ram_asmb_line_type(assembly_line_type_id=self.assembly_line_type_id)
                         facility_multiplier = facility['base_material_multiplier']
                         if facility_multiplier is None:
                             facility_multiplier = 1

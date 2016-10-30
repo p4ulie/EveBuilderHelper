@@ -26,7 +26,7 @@ class EveBlueprint(EveOnlineInvType):
                  blueprint_original=None,
                  blueprint_me_level=0,
                  blueprint_te_level=0,
-                 build_runs=0):
+                 blueprint_runs=0):
         '''
         Constructor
         '''
@@ -36,4 +36,7 @@ class EveBlueprint(EveOnlineInvType):
                                   data_access,
                                   type_id=type_id)
 
-        self.get_item(type_id=type_id)
+        self.blueprint_original = blueprint_original
+        self.blueprint_me_level = blueprint_me_level
+        self.blueprint_te_level = blueprint_te_level
+        self.blueprint_runs = blueprint_runs
