@@ -8,10 +8,10 @@ Created on Sep 15, 2014
 import math
 from EveOnline.EveMathConstants import EVE_ACTIVITY_MANUFACTURING
 from EveOnline import EveMathIndustry
-from EveOnline.EveItem import EveItem
+from EveOnline.EveOnlineInvType import EveOnlineInvType
 
 
-class EveItemManufacturing(EveItem):
+class EveOnlineInvTypeManufacturingJob(EveOnlineInvType):
     '''
     Class for data and methods for Items in Eve Online
     '''
@@ -34,7 +34,6 @@ class EveItemManufacturing(EveItem):
     def __init__(self,
                  data_access,
                  type_id=None,
-                 type_name=None,
                  blueprint_me_level=0,
                  blueprint_te_level=0,
                  manufacturing_quantity=1,
@@ -44,12 +43,11 @@ class EveItemManufacturing(EveItem):
         '''
 
         # initialize object and get basic data
-        EveItem.__init__(self,
-                         data_access,
-                         type_id=type_id,
-                         type_name=type_name)
+        EveOnlineInvType.__init__(self,
+                                  data_access,
+                                  type_id=type_id)
 
-        self.get_item(type_id=type_id, type_name=type_name)
+        self.get_item(type_id=type_id)
         self.blueprint_type_id = self.data_access.get_bp_id_for_item(self.type_id)
 
         self.blueprint_me_level = blueprint_me_level
@@ -78,7 +76,7 @@ class EveItemManufacturing(EveItem):
 
                 for base_material in base_material_list:
 
-                    material_id = self.data_access.get_inv_item(type_id=base_material["material_type_id"])["type_id"]
+                    material_id = self.data_access.get_inv_type(type_id=base_material["material_type_id"])["type_id"]
                     base_quantity = base_material["quantity"]
 
                     if self.assembly_line_type_id is not None:
@@ -89,9 +87,10 @@ class EveItemManufacturing(EveItem):
                     else:
                         facility_multiplier = 1
 
-                    bonused_quantity = (math.ceil(base_quantity *
-                                                  EveMathIndustry.calculate_me_multiplier(self.blueprint_me_level, facility_multiplier)) *
-                                        self.manufacturing_quantity)
+                    bonused_quantity = (base_quantity *
+                                                 EveMathIndustry.calculate_me_multiplier(self.blueprint_me_level, facility_multiplier) *
+                                                 self.manufacturing_quantity
+                                                 )
 
                     manufacturing_quantity = bonused_quantity
 
@@ -110,9 +109,9 @@ class EveItemManufacturing(EveItem):
                     if manufacturing_quantity > 0:
                         if material is None:
                             # add material to list
-                            material = EveItemManufacturing(self.data_access,
-                                                            type_id=material_id,
-                                                            build_queue_level=(self.build_queue_level + 1))
+                            material = EveOnlineInvTypeManufacturingJob(self.data_access,
+                                                                        type_id=material_id,
+                                                                        build_queue_level=(self.build_queue_level + 1))
                             material.parent = self
                             self.material_list.append(material)
 
