@@ -16,7 +16,8 @@ from EveOnline.EveOnlineRamAssemblyLineTypes import EveOnlineRamAssemblyLineType
 
 DATA_FILE = 'data/eve.db'
 
-BUILD_PRODUCT_NAME = 'Vexor'
+BUILD_PRODUCT_NAME = 'Rorqual'
+BUILD_FACILITY = 'Station'
 BUILD_PRODUCT_RUNS = 1
 BUILD_PRODUCT_ME = 10
 BUILD_PRODUCT_TE = 20
@@ -93,7 +94,7 @@ def main():
                                                    type_name=BUILD_PRODUCT_NAME,
                                                    blueprint_me_level=BUILD_PRODUCT_ME,
                                                    manufacturing_runs=BUILD_PRODUCT_RUNS,
-                                                   assembly_line_type_name="Station")
+                                                   assembly_line_type_name=BUILD_FACILITY)
 
     if building_job_chain.is_buildable() == False:
         print ("Can not build this item.")
