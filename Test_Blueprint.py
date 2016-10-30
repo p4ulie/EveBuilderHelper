@@ -92,8 +92,8 @@ def main():
     building_job_chain = EveOnlineManufacturingJob(DATA_ACCESS_OBJECT,
                                                    type_name=BUILD_PRODUCT_NAME,
                                                    blueprint_me_level=BUILD_PRODUCT_ME,
-                                                   build_quantity=BUILD_PRODUCT_RUNS,
-                                                   assembly_line_type_name="Medium Ship Assembly Array")
+                                                   manufacturing_runs=BUILD_PRODUCT_RUNS,
+                                                   assembly_line_type_name="Station")
 
     if building_job_chain.is_buildable() == False:
         print ("Can not build this item.")
@@ -119,7 +119,7 @@ def main():
     for job in manufacturing_job_list:
         print "%s (id %s): runs %d (ME: %d, level %d)" % (job.type_name,
                                                           job.type_id,
-                                                          job.build_quantity,
+                                                          job.manufacturing_runs,
                                                           job.blueprint_me_level,
                                                           job.build_queue_level)
 
