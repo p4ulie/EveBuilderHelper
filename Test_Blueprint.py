@@ -16,10 +16,12 @@ from EveOnline.EveOnlineRamAssemblyLineTypes import EveOnlineRamAssemblyLineType
 
 DATA_FILE = 'data/eve.db'
 
-BUILD_PRODUCT_NAME = 'Rorqual'
+BUILD_PRODUCT_NAME = 'Ark'
+#BUILD_FACILITY = 'Large Ship Assembly Array'
+#BUILD_PRODUCT_NAME = 'Capital Cargo Bay'
 BUILD_FACILITY = 'STATION manufacturing'
 BUILD_PRODUCT_RUNS = 1
-BUILD_PRODUCT_ME = 10
+BUILD_PRODUCT_ME = 9
 BUILD_PRODUCT_TE = 20
 
 # ASSETS_LIST = '''Capital Jump Drive\t29\tCapital Construction Components\t
@@ -120,9 +122,9 @@ def main():
     manufacturing_job_list = building_job_chain.get_manufacturing_job_list()
 
     for job in manufacturing_job_list:
-        print ("level: %d - %s: runs %d (ME: %d, Facility: %s)" % (job.build_queue_level,
-                                                     job.type_name,
+        print ("level: %d runs %d, %s (ME: %d, Facility: %s)" % (job.build_queue_level,
                                                      job.manufacturing_runs,
+                                                     job.type_name,
                                                      job.blueprint_me_level,
                                                      job.assembly_line.assembly_line_type_name
                                                      ))
