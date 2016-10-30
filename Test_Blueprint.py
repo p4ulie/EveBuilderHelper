@@ -17,7 +17,7 @@ from EveOnline.EveOnlineRamAssemblyLineTypes import EveOnlineRamAssemblyLineType
 DATA_FILE = 'data/eve.db'
 
 BUILD_PRODUCT_NAME = 'Rorqual'
-BUILD_FACILITY = 'Station'
+BUILD_FACILITY = 'STATION manufacturing'
 BUILD_PRODUCT_RUNS = 1
 BUILD_PRODUCT_ME = 10
 BUILD_PRODUCT_TE = 20
@@ -104,11 +104,13 @@ def main():
     building_job_chain.manufacturing_data_calculate()
 
     # set facility for all jobs
-#    manufacturing_job_list = building_job_chain.get_manufacturing_job_list()
+    manufacturing_job_list = building_job_chain.get_manufacturing_job_list()
 
- #   for job in manufacturing_job_list:
- #       if job.type_name[0:7] == 'Capital':
- #           job.assembly_line_type_id = job.data_access.get_ram_asmb_line_type(assembly_line_type_name="Thukker Component Assembly Array")['assembly_line_type_id']
+    for job in manufacturing_job_list:
+        if job.type_name[0:7] == 'Capital':
+            job.blueprint_me_level = 10
+            job.assembly_line = EveOnlineRamAssemblyLineTypes(DATA_ACCESS_OBJECT,
+                                                              assembly_line_type_name='Thukker Component Assembly Array')
 
     # Recalculate after setting facility
     asset_dict = create_asset_list(ASSETS_LIST)
@@ -118,11 +120,12 @@ def main():
     manufacturing_job_list = building_job_chain.get_manufacturing_job_list()
 
     for job in manufacturing_job_list:
-        print "%s (id %s): runs %d (ME: %d, level %d)" % (job.type_name,
-                                                          job.type_id,
-                                                          job.manufacturing_runs,
-                                                          job.blueprint_me_level,
-                                                          job.build_queue_level)
+        print ("level: %d - %s: runs %d (ME: %d, Facility: %s)" % (job.build_queue_level,
+                                                     job.type_name,
+                                                     job.manufacturing_runs,
+                                                     job.blueprint_me_level,
+                                                     job.assembly_line.assembly_line_type_name
+                                                     ))
 
     print
 
