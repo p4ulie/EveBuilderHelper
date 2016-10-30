@@ -9,7 +9,8 @@ import re
 from DataAccess.DBAccessSQLite import DBAccessSQLite
 from DataAccess.EveDB import EveDB
 # from EveOnline.EveMathConstants import EVE_ACTIVITY_MANUFACTURING
-from EveOnline.EveItemManufacturingJob import EveOnlineInvTypeManufacturingJob
+from EveOnline.EveOnlineManufacturingJob import EveOnlineManufacturingJob, EveOnlineInvType
+from EveOnline.EveOnlineRamAssemblyLineTypes import EveOnlineRamAssemblyLineTypes
 
 DATA_FILE = 'data/eve.db'
 
@@ -69,8 +70,8 @@ def write_material_list(material_list,
     '''
 
     for material_type_id, material_quantity in material_list.iteritems():
-        material_item = EveOnlineInvTypeManufacturingJob(DATA_ACCESS_OBJECT,
-                                                         type_id=material_type_id)
+        material_item = EveOnlineManufacturingJob(DATA_ACCESS_OBJECT,
+                                                  type_id=material_type_id)
         material_name = material_item.data_access.get_inv_type(type_id=material_type_id)
         if material_name is not None:
             if material_type_id in asset_list.iterkeys():
@@ -86,10 +87,11 @@ def main():
     Main function for testing the classes
     '''
 
+    building_product = EveOnlineInvType
     product_type_id = DATA_ACCESS_OBJECT.get_inv_type(type_name=BUILD_PRODUCT_NAME)["type_id"]
 
-    e_built_item = EveOnlineInvTypeManufacturingJob(DATA_ACCESS_OBJECT,
-                                                    type_id=product_type_id)
+    e_built_item = EveOnlineManufacturingJob(DATA_ACCESS_OBJECT,
+                                             type_id=product_type_id)
 
 
     e_built_item.manufacturing_quantity = BUILD_PRODUCT_RUNS
@@ -123,8 +125,8 @@ def main():
     print
 
     for mat_id, quant in e_built_item.get_manufacturing_material_list().iteritems():
-        e_material_item = EveOnlineInvTypeManufacturingJob(DATA_ACCESS_OBJECT,
-                                                           type_id=mat_id)
+        e_material_item = EveOnlineManufacturingJob(DATA_ACCESS_OBJECT,
+                                                    type_id=mat_id)
 
         print "%s\t%d" % (e_material_item.type_name, quant)
 

@@ -6,7 +6,7 @@ Created on Dec 1, 2014
 
 from DataAccess.DBAccessSQLite import DBAccessSQLite
 from DataAccess.EveDB import EveDB
-from EveOnline.EveItemManufacturingJob import EveOnlineInvTypeManufacturingJob
+from EveOnline.EveOnlineManufacturingJob import EveOnlineManufacturingJob
 from cvxopt import matrix, solvers, printing
 
 DATA_FILE = 'data/eve.db'
@@ -17,7 +17,7 @@ def main():
     Main function
     '''
 
-    ore = EveOnlineInvTypeManufacturingJob(DATA_ACCESS_OBJECT)
+    ore = EveOnlineManufacturingJob(DATA_ACCESS_OBJECT)
     reproc_mat_list = ore.get_mineral_matrix_adjusted(sec_status_low_limit=0.9,
                                                       fclt_base_yield=0.54,
                                                       rprcs_skill_lvl=5,

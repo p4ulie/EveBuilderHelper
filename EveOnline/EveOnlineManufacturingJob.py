@@ -11,7 +11,7 @@ from EveOnline import EveMathIndustry
 from EveOnline.EveOnlineInvType import EveOnlineInvType
 
 
-class EveOnlineInvTypeManufacturingJob(EveOnlineInvType):
+class EveOnlineManufacturingJob(EveOnlineInvType):
     '''
     Class for data and methods for Items in Eve Online
     '''
@@ -24,12 +24,12 @@ class EveOnlineInvTypeManufacturingJob(EveOnlineInvType):
 
     manufacturing_quantity = 0
 
-    build_queue_level = 0  # order in which materials have to be build
+    build_queue_level = 0  # order in which products have to be build
 
     assembly_line_type_id = None   # assembly line used, for bonuses
 
     material_list = []
-    asset_list = {}  # asset list to calculate in (need to buy less)
+    asset_list = {}  # asset list to calculate in (need to buy/manufacture less)
 
     def __init__(self,
                  data_access,
@@ -37,7 +37,8 @@ class EveOnlineInvTypeManufacturingJob(EveOnlineInvType):
                  blueprint_me_level=0,
                  blueprint_te_level=0,
                  manufacturing_quantity=1,
-                 build_queue_level=0):
+                 build_queue_level=0,
+                 assembly_line_type_id=None):
         '''
         Constructor
         '''
@@ -53,6 +54,8 @@ class EveOnlineInvTypeManufacturingJob(EveOnlineInvType):
         self.blueprint_te_level = blueprint_te_level
         self.manufacturing_quantity = manufacturing_quantity
         self.build_queue_level = build_queue_level
+
+        self.assembly_line_type_id = assembly_line_type_id
 
         self.material_list = []
         self.asset_list = {}
@@ -108,9 +111,9 @@ class EveOnlineInvTypeManufacturingJob(EveOnlineInvType):
                     if manufacturing_quantity > 0:
                         if material is None:
                             # add material to list
-                            material = EveOnlineInvTypeManufacturingJob(self.data_access,
-                                                                        type_id=material_id,
-                                                                        build_queue_level=(self.build_queue_level + 1))
+                            material = EveOnlineManufacturingJob(self.data_access,
+                                                                 type_id=material_id,
+                                                                 build_queue_level=(self.build_queue_level + 1))
                             material.parent = self
                             self.material_list.append(material)
 
