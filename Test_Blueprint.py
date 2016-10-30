@@ -16,7 +16,7 @@ from EveOnline.EveOnlineRamAssemblyLineTypes import EveOnlineRamAssemblyLineType
 
 DATA_FILE = 'data/eve.db'
 
-BUILD_PRODUCT_NAME = 'Rorqual'
+BUILD_PRODUCT_NAME = 'Vexor'
 BUILD_PRODUCT_RUNS = 1
 BUILD_PRODUCT_ME = 10
 BUILD_PRODUCT_TE = 20
@@ -89,20 +89,19 @@ def main():
     Main function for testing the classes
     '''
 
-    building_product_blueprint = EveOnlineBlueprint(DATA_ACCESS_OBJECT,
-                                                    type_name=BUILD_PRODUCT_NAME,
-                                                    blueprint_me_level=BUILD_PRODUCT_ME)
 
-    if building_product_blueprint.is_buildable() == False:
-        print ("Can not build this item.")
-        exit()
-
-    building_facility =  EveOnlineRamAssemblyLineTypes(DATA_ACCESS_OBJECT, assembly_line_type_name="Medium Ship Assembly Array")
+    building_facility =  EveOnlineRamAssemblyLineTypes(DATA_ACCESS_OBJECT,
+                                                       assembly_line_type_name="Medium Ship Assembly Array")
 
     building_job_chain = EveOnlineManufacturingJob(DATA_ACCESS_OBJECT,
-                                                   type_id=building_product_blueprint.type_id,
+                                                   type_name=BUILD_PRODUCT_NAME,
+                                                   blueprint_me_level=BUILD_PRODUCT_ME,
                                                    build_quantity=BUILD_PRODUCT_RUNS,
                                                    assembly_line_type_id=building_facility.assembly_line_type_id,)
+
+    if building_job_chain.is_buildable() == False:
+        print ("Can not build this item.")
+        exit()
 
     # generate manufacturing job tree
     building_job_chain.manufacturing_data_calculate()

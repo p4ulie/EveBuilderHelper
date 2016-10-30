@@ -8,24 +8,19 @@ Created on Sep 15, 2014
 import math
 from EveOnline.EveMathConstants import EVE_ACTIVITY_MANUFACTURING
 from EveOnline import EveMathIndustry
-from EveOnline.EveOnlineInvType import EveOnlineInvType
+from EveOnline.EveOnlineBlueprint import EveOnlineBlueprint
 
 
-class EveOnlineManufacturingJob(EveOnlineInvType):
+class EveOnlineManufacturingJob(EveOnlineBlueprint):
     '''
     Class for data and methods for Items in Eve Online
     '''
 
     # manufacturing related attributes
     parent = None   # reference to parent object
-    blueprint_type_id = None   # determines whether item is buildable
-    blueprint_me_level = 0
-    blueprint_te_level = 0
 
     build_quantity = 0
-
     build_queue_level = 0  # order in which products have to be build
-
     assembly_line_type_id = None   # assembly line used, for bonuses
 
     material_list = []
@@ -34,6 +29,7 @@ class EveOnlineManufacturingJob(EveOnlineInvType):
     def __init__(self,
                  data_access,
                  type_id=None,
+                 type_name='',
                  blueprint_me_level=0,
                  blueprint_te_level=0,
                  build_quantity=1,
@@ -44,9 +40,10 @@ class EveOnlineManufacturingJob(EveOnlineInvType):
         '''
 
         # initialize object and get basic data
-        EveOnlineInvType.__init__(self,
-                                  data_access,
-                                  type_id=type_id)
+        EveOnlineBlueprint.__init__(self,
+                                    data_access,
+                                    type_id=type_id,
+                                    type_name=type_name)
 
         self.blueprint_type_id = self.data_access.get_bp_id_for_item(self.type_id)
 
