@@ -6,8 +6,8 @@ Created on Dec 1, 2014
 
 from DataAccess.DBAccessSQLite import DBAccessSQLite
 from DataAccess.EveDB import EveDB
-from EveOnline.EveItemManufacturing import EveItemManufacturing
-import cvxopt
+from EveOnline.EveOnlineManufacturingJob import EveOnlineManufacturingJob
+from cvxopt import matrix, solvers, printing
 
 DATA_FILE = 'data/eve.db'
 
@@ -17,38 +17,61 @@ def main():
     Main function
     '''
 
-    ore = EveItemManufacturing(DATA_ACCESS_OBJECT)
-    reproc_mat_list = ore.get_mineral_matrix_adjusted(sec_status_low_limit=0.0,
+    ore = EveOnlineManufacturingJob(DATA_ACCESS_OBJECT)
+    reproc_mat_list = ore.get_mineral_matrix_adjusted(sec_status_low_limit=0.9,
                                                       fclt_base_yield=0.54,
                                                       rprcs_skill_lvl=5,
                                                       rprcs_eff_skill_lvl=5,
                                                       mtrl_spcfc_prcs_skill_lvl=5,
                                                       implant_bonus=0)
 
-    veld_and_plag_matrix = {1230: reproc_mat_list[1230],
-                            18: reproc_mat_list[18],
-                            1224: reproc_mat_list[1224],
-                            1228: reproc_mat_list[1228]
-                            }
+    # for simplyfication we filter ore list
+    reproc_mat_list_filtered = {}
+    reproc_mat_list_filtered[DATA_ACCESS_OBJECT.get_inv_type(type_name='Veldspar')['type_id']] = reproc_mat_list[DATA_ACCESS_OBJECT.get_inv_type(type_name='Veldspar')['type_id']]
+#    reproc_mat_list_filtered[DATA_ACCESS_OBJECT.get_inv_item(type_name='Plagioclase')['type_id']] = reproc_mat_list[DATA_ACCESS_OBJECT.get_inv_item(type_name='Plagioclase')['type_id']]
+#    reproc_mat_list_filtered[DATA_ACCESS_OBJECT.get_inv_item(type_name='Scordite')['type_id']] = reproc_mat_list[DATA_ACCESS_OBJECT.get_inv_item(type_name='Scordite')['type_id']]
+    reproc_mat_list_filtered[DATA_ACCESS_OBJECT.get_inv_type(type_name='Pyroxeres')['type_id']] = reproc_mat_list[DATA_ACCESS_OBJECT.get_inv_type(type_name='Pyroxeres')['type_id']]
+    reproc_mat_list = reproc_mat_list_filtered
 
-    for k_ore,v_minerals in veld_and_plag_matrix.iteritems():
-        ore_name = DATA_ACCESS_OBJECT.get_inv_item(type_id=k_ore)['type_name']
+    # define mineral amounts we want to get refining the ores
+    mineral_amounts_desired={}
+    mineral_amounts_desired[DATA_ACCESS_OBJECT.get_inv_type(type_name='Tritanium')['type_id']] = 200
+    mineral_amounts_desired[DATA_ACCESS_OBJECT.get_inv_type(type_name='Nocxium')['type_id']] = 1
+#    mineral_amounts_desired[DATA_ACCESS_OBJECT.get_inv_item(type_name='Pyerite')['type_id']] = 160
+#    mineral_amounts_desired[DATA_ACCESS_OBJECT.get_inv_item(type_name='Mexallon')['type_id']] = 80
 
-        output = ""
-        names = ""
+    # define variables for building matrices
+    list_of_mineral_matrices = []
+    mineral_amounts_desired_matrix = []
+    ore_quantity_matrix = []
 
-        min_group = DATA_ACCESS_OBJECT.get_inv_group(group_name='Mineral')['group_id']
+    # build matrices for linear programming
+    for k_ore,v_minerals in reproc_mat_list.iteritems():
+        min_quantity_list = [-float(quant) for quant in v_minerals.values()]
+        list_of_mineral_matrices.append(min_quantity_list)
+        ore_quantity_matrix.append(float(1.0))
+        min_id_list = v_minerals.keys()
 
-        for mmm,quant in v_minerals.iteritems():
-            min_item = DATA_ACCESS_OBJECT.get_inv_item(type_id=mmm)
-            if min_item['group_id'] == min_group:
-                output += "%s\t" % (quant)
-                names += "%s\t" % (min_item['type_name'])
+    for min_id in min_id_list:
+        if (min_id not in mineral_amounts_desired.keys()):
+            mineral_amounts_desired_matrix.append(float(0.0))
+        else:
+            mineral_amounts_desired_matrix.append(-float(mineral_amounts_desired[min_id]))
+        
+    A = matrix(list_of_mineral_matrices)
+    b = matrix(mineral_amounts_desired_matrix)
+    c = matrix(ore_quantity_matrix)
 
-        print "Minerals:\t%s" % (names)
-        print "%s:\t%s" % (ore_name, output)
-
+    printing.options['dformat'] = '%.1f'
+    printing.options['width'] = -1
     
+    print A
+    print b
+    print c
+
+    sol=solvers.lp(c,A,b)
+    print(sol['x'])
+
 if __name__ == '__main__':
     DB_ACCESS_OBJECT = DBAccessSQLite(DATA_FILE)
     DATA_ACCESS_OBJECT = EveDB(DB_ACCESS_OBJECT)

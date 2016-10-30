@@ -1,5 +1,7 @@
+.gitignore
+.idea
 *.sqlite
-**.pyc
+*.pyc
 .project
 .pydevproject
 *.bak
@@ -8,6 +10,5 @@
 *.db
 *.exe
 .directory
-.gitignore
 data
 *.ods

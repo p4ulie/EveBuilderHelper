@@ -6,7 +6,7 @@ Created on Nov 25, 2014
 import unittest
 from DataAccess.DBAccessSQLite import DBAccessSQLite
 from DataAccess.EveDB import EveDB
-from EveOnline.EveItem import EveItem
+from EveOnline.EveOnlineInvType import EveOnlineInvType
 
 
 class TestEveItem(unittest.TestCase):
@@ -24,7 +24,7 @@ class TestEveItem(unittest.TestCase):
         '''
         self.db_access_object = DBAccessSQLite(self.DATA_FILE)
         self.data_access_object = EveDB(self.db_access_object)
-        self.eve_item_manufacturing = EveItem(self.data_access_object)
+        self.eve_item_manufacturing = EveOnlineInvType(self.data_access_object)
 
     def tearDown(self):
         '''
