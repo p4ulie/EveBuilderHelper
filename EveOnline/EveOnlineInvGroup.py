@@ -28,16 +28,19 @@ class EveOnlineInvGroup(object):
         self.anchorable = None
         self.fittable_non_singleton = None
 
-        self.get_inv_group(group_id=group_id, group_name=group_name)
+        if (group_id is not None) or (group_name is not None):
+            self.get_inv_group(group_id=group_id, group_name=group_name)
 
     def get_inv_group(self, group_id=None, group_name=None):
         '''
         Get group by ID
         '''
 
+        data = None
+
         if group_name is not None:
             data = self.data_access.get_inv_group(group_name=group_name)
-        else:
+        if group_id is not None:
             data = self.data_access.get_inv_group(group_id=group_id)
 
         if data is not None:
