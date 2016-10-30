@@ -6,7 +6,7 @@ Created on Dec 1, 2014
 
 from DataAccess.DBAccessSQLite import DBAccessSQLite
 from DataAccess.EveDB import EveDB
-from EveOnline.EveItemManufacturing import EveItemManufacturing
+from EveOnline.EveItemManufacturingJob import EveOnlineInvTypeManufacturingJob
 from cvxopt import matrix, solvers, printing
 
 DATA_FILE = 'data/eve.db'
@@ -17,7 +17,7 @@ def main():
     Main function
     '''
 
-    ore = EveItemManufacturing(DATA_ACCESS_OBJECT)
+    ore = EveOnlineInvTypeManufacturingJob(DATA_ACCESS_OBJECT)
     reproc_mat_list = ore.get_mineral_matrix_adjusted(sec_status_low_limit=0.9,
                                                       fclt_base_yield=0.54,
                                                       rprcs_skill_lvl=5,
@@ -27,16 +27,16 @@ def main():
 
     # for simplyfication we filter ore list
     reproc_mat_list_filtered = {}
-    reproc_mat_list_filtered[DATA_ACCESS_OBJECT.get_inv_item(type_name='Veldspar')['type_id']] = reproc_mat_list[DATA_ACCESS_OBJECT.get_inv_item(type_name='Veldspar')['type_id']]
+    reproc_mat_list_filtered[DATA_ACCESS_OBJECT.get_inv_type(type_name='Veldspar')['type_id']] = reproc_mat_list[DATA_ACCESS_OBJECT.get_inv_type(type_name='Veldspar')['type_id']]
 #    reproc_mat_list_filtered[DATA_ACCESS_OBJECT.get_inv_item(type_name='Plagioclase')['type_id']] = reproc_mat_list[DATA_ACCESS_OBJECT.get_inv_item(type_name='Plagioclase')['type_id']]
 #    reproc_mat_list_filtered[DATA_ACCESS_OBJECT.get_inv_item(type_name='Scordite')['type_id']] = reproc_mat_list[DATA_ACCESS_OBJECT.get_inv_item(type_name='Scordite')['type_id']]
-    reproc_mat_list_filtered[DATA_ACCESS_OBJECT.get_inv_item(type_name='Pyroxeres')['type_id']] = reproc_mat_list[DATA_ACCESS_OBJECT.get_inv_item(type_name='Pyroxeres')['type_id']]
+    reproc_mat_list_filtered[DATA_ACCESS_OBJECT.get_inv_type(type_name='Pyroxeres')['type_id']] = reproc_mat_list[DATA_ACCESS_OBJECT.get_inv_type(type_name='Pyroxeres')['type_id']]
     reproc_mat_list = reproc_mat_list_filtered
 
     # define mineral amounts we want to get refining the ores
     mineral_amounts_desired={}
-    mineral_amounts_desired[DATA_ACCESS_OBJECT.get_inv_item(type_name='Tritanium')['type_id']] = 200
-    mineral_amounts_desired[DATA_ACCESS_OBJECT.get_inv_item(type_name='Nocxium')['type_id']] = 1
+    mineral_amounts_desired[DATA_ACCESS_OBJECT.get_inv_type(type_name='Tritanium')['type_id']] = 200
+    mineral_amounts_desired[DATA_ACCESS_OBJECT.get_inv_type(type_name='Nocxium')['type_id']] = 1
 #    mineral_amounts_desired[DATA_ACCESS_OBJECT.get_inv_item(type_name='Pyerite')['type_id']] = 160
 #    mineral_amounts_desired[DATA_ACCESS_OBJECT.get_inv_item(type_name='Mexallon')['type_id']] = 80
 

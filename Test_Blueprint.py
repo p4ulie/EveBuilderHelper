@@ -9,7 +9,7 @@ import re
 from DataAccess.DBAccessSQLite import DBAccessSQLite
 from DataAccess.EveDB import EveDB
 # from EveOnline.EveMathConstants import EVE_ACTIVITY_MANUFACTURING
-from EveOnline.EveItemManufacturing import EveItemManufacturing
+from EveOnline.EveItemManufacturingJob import EveOnlineInvTypeManufacturingJob
 
 DATA_FILE = 'data/eve.db'
 
@@ -50,7 +50,7 @@ def create_asset_list(line_list):
                 quantity = int(quantity_string)
             # group_name = match.group(3).strip()
 
-            item = DATA_ACCESS_OBJECT.get_inv_item(type_name=type_name)
+            item = DATA_ACCESS_OBJECT.get_inv_type(type_name=type_name)
             if item is not None:
                 type_id = item["type_id"]
                 if type_id in asset_dict.iterkeys():
@@ -69,9 +69,9 @@ def write_material_list(material_list,
     '''
 
     for material_type_id, material_quantity in material_list.iteritems():
-        material_item = EveItemManufacturing(DATA_ACCESS_OBJECT,
-                                             type_id=material_type_id)
-        material_name = material_item.data_access.get_inv_item(type_id=material_type_id)
+        material_item = EveOnlineInvTypeManufacturingJob(DATA_ACCESS_OBJECT,
+                                                         type_id=material_type_id)
+        material_name = material_item.data_access.get_inv_type(type_id=material_type_id)
         if material_name is not None:
             if material_type_id in asset_list.iterkeys():
                 asset_quantity = asset_list[material_type_id]
@@ -86,12 +86,15 @@ def main():
     Main function for testing the classes
     '''
 
-    e_built_item = EveItemManufacturing(DATA_ACCESS_OBJECT,
-                                        type_name=BUILD_PRODUCT_NAME)
+    product_type_id = DATA_ACCESS_OBJECT.get_inv_type(type_name=BUILD_PRODUCT_NAME)["type_id"]
+
+    e_built_item = EveOnlineInvTypeManufacturingJob(DATA_ACCESS_OBJECT,
+                                                    type_id=product_type_id)
+
 
     e_built_item.manufacturing_quantity = BUILD_PRODUCT_RUNS
     e_built_item.blueprint_me_level = BUILD_PRODUCT_ME
-    e_built_item.assembly_line_type_id = e_built_item.data_access.get_dtl_ram_asmb_line_types(assembly_line_type_name="Medium Ship Assembly Array")['assembly_line_type_id']
+    e_built_item.assembly_line_type_id = e_built_item.data_access.get_ram_asmb_line_type(assembly_line_type_name="Medium Ship Assembly Array")['assembly_line_type_id']
 
     # generate manufacturing job tree
     e_built_item.manufacturing_data_calculate()
@@ -101,7 +104,7 @@ def main():
 
     for job in manufacturing_job_list:
         if job.type_name[0:7] == 'Capital':
-            job.assembly_line_type_id = job.data_access.get_dtl_ram_asmb_line_types(assembly_line_type_name="Thukker Component Assembly Array")['assembly_line_type_id']
+            job.assembly_line_type_id = job.data_access.get_ram_asmb_line_type(assembly_line_type_name="Thukker Component Assembly Array")['assembly_line_type_id']
 
     # Recalculate after setting facility
     asset_dict = create_asset_list(ASSETS_LIST)
@@ -120,8 +123,8 @@ def main():
     print
 
     for mat_id, quant in e_built_item.get_manufacturing_material_list().iteritems():
-        e_material_item = EveItemManufacturing(DATA_ACCESS_OBJECT,
-                                               type_id=mat_id)
+        e_material_item = EveOnlineInvTypeManufacturingJob(DATA_ACCESS_OBJECT,
+                                                           type_id=mat_id)
 
         print "%s\t%d" % (e_material_item.type_name, quant)
 
