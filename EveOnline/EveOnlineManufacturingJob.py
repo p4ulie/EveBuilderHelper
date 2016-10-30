@@ -22,7 +22,7 @@ class EveOnlineManufacturingJob(EveOnlineInvType):
     blueprint_me_level = 0
     blueprint_te_level = 0
 
-    manufacturing_quantity = 0
+    build_quantity = 0
 
     build_queue_level = 0  # order in which products have to be build
 
@@ -36,7 +36,7 @@ class EveOnlineManufacturingJob(EveOnlineInvType):
                  type_id=None,
                  blueprint_me_level=0,
                  blueprint_te_level=0,
-                 manufacturing_quantity=1,
+                 build_quantity=1,
                  build_queue_level=0,
                  assembly_line_type_id=None):
         '''
@@ -52,7 +52,7 @@ class EveOnlineManufacturingJob(EveOnlineInvType):
 
         self.blueprint_me_level = blueprint_me_level
         self.blueprint_te_level = blueprint_te_level
-        self.manufacturing_quantity = manufacturing_quantity
+        self.build_quantity = build_quantity
         self.build_queue_level = build_queue_level
 
         self.assembly_line_type_id = assembly_line_type_id
@@ -91,7 +91,7 @@ class EveOnlineManufacturingJob(EveOnlineInvType):
 
                     bonused_quantity = (base_quantity *
                                                  EveMathIndustry.calculate_me_multiplier(self.blueprint_me_level, facility_multiplier) *
-                                                 self.manufacturing_quantity
+                                                 self.build_quantity
                                                  )
 
                     manufacturing_quantity = bonused_quantity
@@ -117,7 +117,7 @@ class EveOnlineManufacturingJob(EveOnlineInvType):
                             material.parent = self
                             self.material_list.append(material)
 
-                        material.manufacturing_quantity = manufacturing_quantity
+                        material.build_quantity = manufacturing_quantity
                         material.asset_list = self.asset_list
                         material.manufacturing_data_calculate()
                     else:
@@ -190,7 +190,7 @@ class EveOnlineManufacturingJob(EveOnlineInvType):
 
         # is the item buildable ?
         if self.blueprint_type_id is None:
-            material_list[self.type_id] = self.manufacturing_quantity
+            material_list[self.type_id] = self.build_quantity
         else:
             for job in self.material_list:
                 mat_list = job.get_manufacturing_material_list()

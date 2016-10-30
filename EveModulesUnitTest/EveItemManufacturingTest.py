@@ -70,7 +70,7 @@ class Test(unittest.TestCase):
 
         self.eve_item_manufacturing.get_item(type_name="Ark")
         self.eve_item_manufacturing.blueprint_me_level = self.BUILD_PRODUCT_ME
-        self.eve_item_manufacturing.manufacturing_quantity = self.BUILD_PRODUCT_RUNS
+        self.eve_item_manufacturing.build_quantity = self.BUILD_PRODUCT_RUNS
         self.eve_item_manufacturing.manufacturing_data_calculate()
 
         self.failUnlessEqual(job_list,
@@ -99,7 +99,7 @@ class Test(unittest.TestCase):
 
         self.eve_item_manufacturing.get_item(type_name="Ark")
         self.eve_item_manufacturing.blueprint_me_level = self.BUILD_PRODUCT_ME
-        self.eve_item_manufacturing.manufacturing_quantity = self.BUILD_PRODUCT_RUNS
+        self.eve_item_manufacturing.build_quantity = self.BUILD_PRODUCT_RUNS
         self.eve_item_manufacturing.asset_list = assets
 
         self.eve_item_manufacturing.manufacturing_data_calculate()
@@ -117,7 +117,7 @@ class Test(unittest.TestCase):
 
         self.eve_item_manufacturing.get_item(type_name="Ark")
         self.eve_item_manufacturing.blueprint_me_level = self.BUILD_PRODUCT_ME
-        self.eve_item_manufacturing.manufacturing_quantity = self.BUILD_PRODUCT_RUNS
+        self.eve_item_manufacturing.build_quantity = self.BUILD_PRODUCT_RUNS
         self.eve_item_manufacturing.asset_list = assets
 
         self.eve_item_manufacturing.manufacturing_data_calculate()
@@ -133,7 +133,7 @@ class Test(unittest.TestCase):
 
         self.eve_item_manufacturing.get_item(type_name="Ark")
         self.eve_item_manufacturing.blueprint_me_level = self.BUILD_PRODUCT_ME
-        self.eve_item_manufacturing.manufacturing_quantity = self.BUILD_PRODUCT_RUNS
+        self.eve_item_manufacturing.build_quantity = self.BUILD_PRODUCT_RUNS
         self.eve_item_manufacturing.manufacturing_data_calculate()
 
         self.failUnlessEqual(material_list,
@@ -145,7 +145,7 @@ class Test(unittest.TestCase):
         '''
         self.eve_item_manufacturing.get_item(type_name="Ark")
         self.eve_item_manufacturing.blueprint_me_level = self.BUILD_PRODUCT_ME
-        self.eve_item_manufacturing.manufacturing_quantity = self.BUILD_PRODUCT_RUNS
+        self.eve_item_manufacturing.build_quantity = self.BUILD_PRODUCT_RUNS
         self.eve_item_manufacturing.manufacturing_data_calculate()
 
         job_name = "Capital Jump Drive"
@@ -159,7 +159,7 @@ class Test(unittest.TestCase):
         '''
         self.eve_item_manufacturing.get_item(type_name="Ark")
         self.eve_item_manufacturing.blueprint_me_level = self.BUILD_PRODUCT_ME
-        self.eve_item_manufacturing.manufacturing_quantity = self.BUILD_PRODUCT_RUNS
+        self.eve_item_manufacturing.build_quantity = self.BUILD_PRODUCT_RUNS
         self.eve_item_manufacturing.manufacturing_data_calculate()
 
         job_id = 21025

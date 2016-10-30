@@ -9,7 +9,9 @@ import re
 from DataAccess.DBAccessSQLite import DBAccessSQLite
 from DataAccess.EveDB import EveDB
 # from EveOnline.EveMathConstants import EVE_ACTIVITY_MANUFACTURING
-from EveOnline.EveOnlineManufacturingJob import EveOnlineManufacturingJob, EveOnlineInvType
+from EveOnline.EveOnlineInvType import EveOnlineInvType
+from EveOnline.EveOnlineBlueprint import EveOnlineBlueprint
+from EveOnline.EveOnlineManufacturingJob import EveOnlineManufacturingJob
 from EveOnline.EveOnlineRamAssemblyLineTypes import EveOnlineRamAssemblyLineTypes
 
 DATA_FILE = 'data/eve.db'
@@ -87,44 +89,48 @@ def main():
     Main function for testing the classes
     '''
 
-    building_product = EveOnlineInvType
-    product_type_id = DATA_ACCESS_OBJECT.get_inv_type(type_name=BUILD_PRODUCT_NAME)["type_id"]
+    building_product_blueprint = EveOnlineBlueprint(DATA_ACCESS_OBJECT,
+                                                    type_name=BUILD_PRODUCT_NAME,
+                                                    blueprint_me_level=BUILD_PRODUCT_ME)
 
-    e_built_item = EveOnlineManufacturingJob(DATA_ACCESS_OBJECT,
-                                             type_id=product_type_id)
+    if building_product_blueprint.is_buildable() == False:
+        print ("Can not build this item.")
+        exit()
 
+    building_facility =  EveOnlineRamAssemblyLineTypes(DATA_ACCESS_OBJECT, assembly_line_type_name="Medium Ship Assembly Array")
 
-    e_built_item.manufacturing_quantity = BUILD_PRODUCT_RUNS
-    e_built_item.blueprint_me_level = BUILD_PRODUCT_ME
-    e_built_item.assembly_line_type_id = e_built_item.data_access.get_ram_asmb_line_type(assembly_line_type_name="Medium Ship Assembly Array")['assembly_line_type_id']
+    building_job_chain = EveOnlineManufacturingJob(DATA_ACCESS_OBJECT,
+                                                   type_id=building_product_blueprint.type_id,
+                                                   build_quantity=BUILD_PRODUCT_RUNS,
+                                                   assembly_line_type_id=building_facility.assembly_line_type_id,)
 
     # generate manufacturing job tree
-    e_built_item.manufacturing_data_calculate()
+    building_job_chain.manufacturing_data_calculate()
 
     # set facility for all jobs
-    manufacturing_job_list = e_built_item.get_manufacturing_job_list()
+#    manufacturing_job_list = building_job_chain.get_manufacturing_job_list()
 
-    for job in manufacturing_job_list:
-        if job.type_name[0:7] == 'Capital':
-            job.assembly_line_type_id = job.data_access.get_ram_asmb_line_type(assembly_line_type_name="Thukker Component Assembly Array")['assembly_line_type_id']
+ #   for job in manufacturing_job_list:
+ #       if job.type_name[0:7] == 'Capital':
+ #           job.assembly_line_type_id = job.data_access.get_ram_asmb_line_type(assembly_line_type_name="Thukker Component Assembly Array")['assembly_line_type_id']
 
     # Recalculate after setting facility
     asset_dict = create_asset_list(ASSETS_LIST)
-    e_built_item.asset_list = asset_dict
-    e_built_item.manufacturing_data_calculate()
+    building_job_chain.asset_list = asset_dict
+    building_job_chain.manufacturing_data_calculate()
 
-    manufacturing_job_list = e_built_item.get_manufacturing_job_list()
+    manufacturing_job_list = building_job_chain.get_manufacturing_job_list()
 
     for job in manufacturing_job_list:
         print "%s (id %s): runs %d (ME: %d, level %d)" % (job.type_name,
                                                           job.type_id,
-                                                          job.manufacturing_quantity,
+                                                          job.build_quantity,
                                                           job.blueprint_me_level,
                                                           job.build_queue_level)
 
     print
 
-    for mat_id, quant in e_built_item.get_manufacturing_material_list().iteritems():
+    for mat_id, quant in building_job_chain.get_manufacturing_material_list().iteritems():
         e_material_item = EveOnlineManufacturingJob(DATA_ACCESS_OBJECT,
                                                     type_id=mat_id)
 
