@@ -23,7 +23,7 @@ class EveOnlineInvCategory(object):
         self.category_name = ''
         self.icon_id = None
 
-        if (category_id is not None) or (category_name is not None):
+        if (category_id is not None) or (category_name is not ''):
             self.get_inv_category(category_id=category_id, category_name=category_name)
 
     def get_inv_category(self, category_id=None, category_name=None):
@@ -33,10 +33,7 @@ class EveOnlineInvCategory(object):
 
         data = None
 
-        if category_name is not None:
-            data = self.data_access.get_inv_category(category_name=category_name)
-        if category_id is not None:
-            data = self.data_access.get_inv_category(category_id=category_id)
+        data = self.data_access.get_inv_category(category_id=category_id)
 
         if data is not None:
             for key, value in data.iteritems():

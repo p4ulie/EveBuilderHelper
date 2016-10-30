@@ -34,20 +34,21 @@ class EveOnlineInvType(object):
         self.sound_id = None
         self.graphic_id = None
 
-        if (type_id is not None) or (type_name is not None):
-            self.get_inv_type(type_id=type_id, type_name=type_name)
+        if (type_id is not None) or (type_name is not ''):
+            self.get_inv_type(type_id=type_id,
+                              type_name=type_name)
 
-    def get_inv_type(self, type_id=None, type_name=None):
+    def get_inv_type(self,
+                     type_id=None,
+                     type_name=None):
         '''
         Get item by ID
         '''
 
         data = None
 
-        if type_name is not None:
-            data = self.data_access.get_inv_type(type_name=type_name)
-        if type_id is not None:
-            data = self.data_access.get_inv_type(type_id=type_id)
+        data = self.data_access.get_inv_type(type_id=type_id,
+                                             type_name=type_name)
 
         if data is not None:
             for key, value in data.iteritems():

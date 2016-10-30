@@ -89,15 +89,11 @@ def main():
     Main function for testing the classes
     '''
 
-
-    building_facility =  EveOnlineRamAssemblyLineTypes(DATA_ACCESS_OBJECT,
-                                                       assembly_line_type_name="Medium Ship Assembly Array")
-
     building_job_chain = EveOnlineManufacturingJob(DATA_ACCESS_OBJECT,
                                                    type_name=BUILD_PRODUCT_NAME,
                                                    blueprint_me_level=BUILD_PRODUCT_ME,
                                                    build_quantity=BUILD_PRODUCT_RUNS,
-                                                   assembly_line_type_id=building_facility.assembly_line_type_id,)
+                                                   assembly_line_type_name="Medium Ship Assembly Array")
 
     if building_job_chain.is_buildable() == False:
         print ("Can not build this item.")

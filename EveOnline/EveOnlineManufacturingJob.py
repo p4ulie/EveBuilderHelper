@@ -9,7 +9,7 @@ import math
 from EveOnline.EveMathConstants import EVE_ACTIVITY_MANUFACTURING
 from EveOnline import EveMathIndustry
 from EveOnline.EveOnlineBlueprint import EveOnlineBlueprint
-
+from EveOnline.EveOnlineRamAssemblyLineTypes import EveOnlineRamAssemblyLineTypes
 
 class EveOnlineManufacturingJob(EveOnlineBlueprint):
     '''
@@ -21,7 +21,7 @@ class EveOnlineManufacturingJob(EveOnlineBlueprint):
 
     build_quantity = 0
     build_queue_level = 0  # order in which products have to be build
-    assembly_line_type_id = None   # assembly line used, for bonuses
+    assembly_line = None   # assembly line used, for bonuses
 
     material_list = []
     asset_list = {}  # asset list to calculate in (need to buy/manufacture less)
@@ -34,7 +34,8 @@ class EveOnlineManufacturingJob(EveOnlineBlueprint):
                  blueprint_te_level=0,
                  build_quantity=1,
                  build_queue_level=0,
-                 assembly_line_type_id=None):
+                 assembly_line_type_id=None,
+                 assembly_line_type_name=''):
         '''
         Constructor
         '''
@@ -52,7 +53,9 @@ class EveOnlineManufacturingJob(EveOnlineBlueprint):
         self.build_quantity = build_quantity
         self.build_queue_level = build_queue_level
 
-        self.assembly_line_type_id = assembly_line_type_id
+        self.assembly_line = EveOnlineRamAssemblyLineTypes(self.data_access,
+                                                           assembly_line_type_id=assembly_line_type_id,
+                                                           assembly_line_type_name=assembly_line_type_name)
 
         self.material_list = []
         self.asset_list = {}
@@ -78,18 +81,16 @@ class EveOnlineManufacturingJob(EveOnlineBlueprint):
                     material_id = self.data_access.get_inv_type(type_id=base_material["material_type_id"])["type_id"]
                     base_quantity = base_material["quantity"]
 
-                    if self.assembly_line_type_id is not None:
-                        facility = self.data_access.get_ram_asmb_line_type(assembly_line_type_id=self.assembly_line_type_id)
-                        facility_multiplier = facility['base_material_multiplier']
+                    if self.assembly_line.assembly_line_type_id is not None:
+                        facility_multiplier = self.assembly_line.base_material_multiplier
                         if facility_multiplier is None:
                             facility_multiplier = 1
                     else:
                         facility_multiplier = 1
 
                     bonused_quantity = (base_quantity *
-                                                 EveMathIndustry.calculate_me_multiplier(self.blueprint_me_level, facility_multiplier) *
-                                                 self.build_quantity
-                                                 )
+                                        EveMathIndustry.calculate_me_multiplier(self.blueprint_me_level, facility_multiplier) *
+                                        self.build_quantity)
 
                     manufacturing_quantity = bonused_quantity
 

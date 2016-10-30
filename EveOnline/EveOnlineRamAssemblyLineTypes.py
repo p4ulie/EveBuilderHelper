@@ -11,7 +11,8 @@ class EveOnlineRamAssemblyLineTypes(object):
     '''
 
     def __init__(self,
-                 data_access, assembly_line_type_id=None,
+                 data_access,
+                 assembly_line_type_id=None,
                  assembly_line_type_name=None):
         '''
         Constructor
@@ -31,8 +32,9 @@ class EveOnlineRamAssemblyLineTypes(object):
         self.activity_id = None
         self.min_cost_per_hour = None
 
-        self.get_ram_assembly_line_type(assembly_line_type_id=assembly_line_type_id,
-                                        assembly_line_type_name=assembly_line_type_name)
+        if (assembly_line_type_id is not None) or (assembly_line_type_name is not ''):
+            self.get_ram_assembly_line_type(assembly_line_type_id=assembly_line_type_id,
+                                            assembly_line_type_name=assembly_line_type_name)
 
     def get_ram_assembly_line_type(self,
                                    assembly_line_type_id=None,
@@ -41,10 +43,9 @@ class EveOnlineRamAssemblyLineTypes(object):
         Get ram_asmb_line_type by ID
         '''
 
-        if assembly_line_type_name is not None:
-            data = self.data_access.get_ram_asmb_line_type(assembly_line_type_name=assembly_line_type_name)
-        else:
-            data = self.data_access.get_ram_asmb_line_type(assembly_line_type_id=assembly_line_type_id)
+        data = None
+
+        data = self.data_access.get_ram_asmb_line_type(assembly_line_type_name=assembly_line_type_name)
 
         if data is not None:
             for key, value in data.iteritems():
