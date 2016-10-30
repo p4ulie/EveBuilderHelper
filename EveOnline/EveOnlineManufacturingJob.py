@@ -7,7 +7,7 @@ Created on Sep 15, 2014
 
 import math
 from EveOnline.EveMathConstants import EVE_ACTIVITY_MANUFACTURING
-from EveOnline import EveMathIndustry
+from EveOnline import EveOnlineIndustryFormulas
 from EveOnline.EveOnlineBlueprint import EveOnlineBlueprint
 from EveOnline.EveOnlineRamAssemblyLineTypes import EveOnlineRamAssemblyLineTypes
 
@@ -88,9 +88,10 @@ class EveOnlineManufacturingJob(EveOnlineBlueprint):
                     else:
                         facility_multiplier = 1
 
-                    bonused_quantity = (base_quantity *
-                                        EveMathIndustry.calculate_me_multiplier(self.blueprint_me_level, facility_multiplier) *
-                                        self.build_quantity)
+                    bonused_quantity = math.ceil(base_quantity *
+                                                 EveOnlineIndustryFormulas.calculate_me_multiplier(self.blueprint_me_level,
+                                                                                                   facility_multiplier) *
+                                                 self.build_quantity)
 
                     manufacturing_quantity = bonused_quantity
 
