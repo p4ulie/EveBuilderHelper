@@ -33,7 +33,8 @@ class EveOnlineInvCategory(object):
 
         data = None
 
-        data = self.data_access.get_inv_category(category_id=category_id)
+        data = self.data_access.get_inv_category(category_id=category_id,
+                                                 category_name=category_name)
 
         if data is not None:
             for key, value in data.iteritems():

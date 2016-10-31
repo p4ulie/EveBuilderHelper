@@ -101,6 +101,7 @@ class EveDB(object):
         Get category data
         '''
         data = []
+        result = None
 
         query = """
                     SELECT c.categoryID,
