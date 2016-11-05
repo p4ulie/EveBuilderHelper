@@ -46,8 +46,7 @@ class EveOnlineManufacturingJob(EveOnlineBlueprint):
                                     type_id=type_id,
                                     type_name=type_name)
 
-        self.blueprint_type_id = self.data_access.get_bp_id_for_item(self.type_id)
-
+        # self.blueprint_type_id = self.data_access.get_bp_id_for_type_id(self.type_id)
         self.blueprint_me_level = blueprint_me_level
         self.blueprint_te_level = blueprint_te_level
         self.manufacturing_runs = manufacturing_runs
@@ -116,7 +115,11 @@ class EveOnlineManufacturingJob(EveOnlineBlueprint):
                             material.parent = self
                             self.material_list.append(material)
 
-                        material.manufacturing_runs = manufacturing_quantity
+                        if material.is_buildable():
+                            print ("material.blueprint_produced_quantity: %d" % material.blueprint_produced_quantity)
+                            material.manufacturing_runs = manufacturing_quantity / material.blueprint_produced_quantity
+                        else:
+                            material.manufacturing_runs = manufacturing_quantity
                         material.asset_list = self.asset_list
                         material.manufacturing_data_calculate()
                     else:

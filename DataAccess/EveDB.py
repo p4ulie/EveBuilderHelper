@@ -289,9 +289,9 @@ class EveDB(object):
 
         return data
 
-    def get_bp_id_for_item(self,
-                           type_id=None,
-                           activity_id=EVE_ACTIVITY_MANUFACTURING):
+    def get_bp_id_for_type_id(self,
+                              type_id=None,
+                              activity_id=EVE_ACTIVITY_MANUFACTURING):
         '''
         Get Blueprint typeID from Item typeID
         '''
@@ -307,6 +307,56 @@ class EveDB(object):
                     """
             result = self.db_access_obj.fetch_data(query,
                                                    type_id,
+                                                   activity_id)
+
+            if (result is not None) and (len(result) > 0):
+                data = result[0][0]
+
+        return data
+
+    def get_type_id_for_bp_id(self,
+                             bp_type_id=None,
+                             activity_id=EVE_ACTIVITY_MANUFACTURING):
+        '''
+        Get Item typeID from Blueprint typeID
+        '''
+
+        data = None
+
+        if bp_type_id is not None:
+            query = """
+                        SELECT productTypeID
+                        FROM industryactivityproducts AS i
+                        WHERE i.typeID = ?
+                        AND i.activityId = ?
+                    """
+            result = self.db_access_obj.fetch_data(query,
+                                                   bp_type_id,
+                                                   activity_id)
+
+            if (result is not None) and (len(result) > 0):
+                data = result[0][0]
+
+        return data
+
+    def get_produced_quantity_per_run_for_bp_id(self,
+                                                bp_type_id=None,
+                                                activity_id=EVE_ACTIVITY_MANUFACTURING):
+        '''
+        Get produced quantity per run from Blueprint typeID
+        '''
+
+        data = None
+
+        if bp_type_id is not None:
+            query = """
+                        SELECT quantity
+                        FROM industryactivityproducts AS i
+                        WHERE i.typeID = ?
+                        AND i.activityId = ?
+                    """
+            result = self.db_access_obj.fetch_data(query,
+                                                   bp_type_id,
                                                    activity_id)
 
             if (result is not None) and (len(result) > 0):
