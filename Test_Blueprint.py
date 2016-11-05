@@ -16,11 +16,11 @@ from EveOnline.EveOnlineRamAssemblyLineTypes import EveOnlineRamAssemblyLineType
 
 DATA_FILE = 'data/eve.db'
 
-BUILD_PRODUCT_NAME = 'Hydrogen Fuel Block'
+BUILD_PRODUCT_NAME = 'Nitrogen Fuel Block'
 #BUILD_FACILITY = 'Large Ship Assembly Array'
 #BUILD_PRODUCT_NAME = 'Capital Cargo Bay'
 BUILD_FACILITY = 'STATION manufacturing'
-BUILD_PRODUCT_RUNS = 1
+BUILD_PRODUCT_RUNS = 650
 BUILD_PRODUCT_ME = 10
 BUILD_PRODUCT_TE = 20
 
@@ -138,6 +138,18 @@ def main():
 
         print "%s\t%d" % (e_material_item.type_name, quant)
 
+
+    print
+
+    refining_type = EveOnlineInvType(DATA_ACCESS_OBJECT,
+                                     type_name="White Glaze")
+
+    refining_list = DATA_ACCESS_OBJECT.get_lst_mat_for_rfn(type_id=refining_type.type_id)
+    print ("Refining list for %s:" % (refining_type.type_name))
+
+    for mat in refining_list:
+        print ("material: %s, quantity: %d" % (DATA_ACCESS_OBJECT.get_inv_type(mat['material_type_id'])['type_name'],
+                                               mat['quantity']))
 
 if __name__ == '__main__':
     DB_ACCESS_OBJECT = DBAccessSQLite(DATA_FILE)
