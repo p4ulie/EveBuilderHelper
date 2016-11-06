@@ -15,7 +15,7 @@ class MarketAccessEveCentral(object):
     '''
 
     BASE_URL = 'https://api.eve-central.com/api'
-    CACHE_EXPIRE_AFTER = 1 # expire after specified number of hours
+    CACHE_EXPIRE_AFTER = 3600 # expire after specified number of seconds
 
     def __init__(self,
                  base_url=None,
@@ -28,7 +28,7 @@ class MarketAccessEveCentral(object):
             self.BASE_URL = base_url
 
         if use_cache:
-            expire_after = datetime.timedelta(hours=1)
+            expire_after = datetime.timedelta(seconds=self.CACHE_EXPIRE_AFTER)
             requests_cache.install_cache(expire_after=expire_after)
             requests_cache.core.remove_expired_responses()
 
