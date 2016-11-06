@@ -46,8 +46,7 @@ class EveOnlineManufacturingJob(EveOnlineBlueprint):
                                     type_id=type_id,
                                     type_name=type_name)
 
-        self.blueprint_type_id = self.data_access.get_bp_id_for_item(self.type_id)
-
+        # self.blueprint_type_id = self.data_access.get_bp_id_for_type_id(self.type_id)
         self.blueprint_me_level = blueprint_me_level
         self.blueprint_te_level = blueprint_te_level
         self.manufacturing_runs = manufacturing_runs
@@ -88,10 +87,10 @@ class EveOnlineManufacturingJob(EveOnlineBlueprint):
                     else:
                         facility_multiplier = 1
 
-                    bonused_quantity = math.ceil(base_quantity *
-                                                 EveOnlineIndustryFormulas.calculate_me_multiplier(self.blueprint_me_level,
+                    bonused_quantity = int(math.ceil(base_quantity *
+                                                     EveOnlineIndustryFormulas.calculate_me_multiplier(self.blueprint_me_level,
                                                                                                    facility_multiplier) *
-                                                 self.manufacturing_runs)
+                                                     self.manufacturing_runs))
 
                     manufacturing_quantity = bonused_quantity
 
@@ -116,7 +115,12 @@ class EveOnlineManufacturingJob(EveOnlineBlueprint):
                             material.parent = self
                             self.material_list.append(material)
 
-                        material.manufacturing_runs = manufacturing_quantity
+                        if material.is_buildable():
+                            # print ("material.blueprint_produced_quantity: %d" % material.blueprint_produced_quantity)
+                            material.manufacturing_runs = int(math.ceil(manufacturing_quantity / \
+                                                                        material.blueprint_produced_quantity))
+                        else:
+                            material.manufacturing_runs = manufacturing_quantity
                         material.asset_list = self.asset_list
                         material.manufacturing_data_calculate()
                     else:
@@ -179,6 +183,37 @@ class EveOnlineManufacturingJob(EveOnlineBlueprint):
                 manufacturing_job_list.extend(job.get_manufacturing_job_list())
 
         return manufacturing_job_list
+
+    def get_manufacturing_job_parameter_list(self):
+        '''
+        Get list (dict) of parameters representing building jobs
+        '''
+
+        manufacturing_job_param_list = {}
+
+        # is the item buildable ?
+        if self.blueprint_type_id is not None:
+            manufacturing_job_param_list = { 'type_id': self.type_id,
+                                             'type_name': self.type_name,
+                                             'runs': self.manufacturing_runs,
+                                             'blueprint_me_level': self.blueprint_me_level,
+                                             'blueprint_te_level': self.blueprint_te_level,
+                                             'assembly_line_type_id': self.assembly_line.assembly_line_type_id}
+
+            manufacturing_job_param_list_materials = []
+
+            for job in self.material_list:
+                if job.is_buildable():
+                    manufacturing_job_param_list_materials.append(job.get_manufacturing_job_parameter_list())
+                else:
+                    manufacturing_job_param_list_materials.append({ 'type_id': job.type_id,
+                                                                    'type_name': job.type_name,
+                                                                    'quantity': job.manufacturing_runs})
+
+            manufacturing_job_param_list['material_list'] = manufacturing_job_param_list_materials
+
+        return manufacturing_job_param_list
+
 
     def get_manufacturing_material_list(self):
         '''

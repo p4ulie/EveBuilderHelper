@@ -38,7 +38,8 @@ class EveOnlineInvGroup(object):
 
         data = None
 
-        data = self.data_access.get_inv_group(group_id=group_id)
+        data = self.data_access.get_inv_group(group_id=group_id,
+                                              group_name=group_name)
 
         if data is not None:
             for key, value in data.iteritems():

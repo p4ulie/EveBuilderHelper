@@ -38,7 +38,8 @@ class EveOnlineBlueprint(EveOnlineInvType):
                                   type_id=type_id,
                                   type_name=type_name)
 
-        self.blueprint_type_id = self.data_access.get_bp_id_for_item(self.type_id)
+        self.blueprint_type_id = self.data_access.get_bp_id_for_type_id(self.type_id)
+        self.blueprint_produced_quantity = self.data_access.get_produced_quantity_per_run_for_bp_id(self.blueprint_type_id)
 
         self.blueprint_original = blueprint_original
         self.blueprint_me_level = blueprint_me_level

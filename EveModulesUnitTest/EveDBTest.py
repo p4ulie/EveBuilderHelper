@@ -115,7 +115,7 @@ class TestEveDB(unittest.TestCase):
         '''
         blueprint = 32860
         self.failUnlessEqual(blueprint,
-                             self.data_access_object.get_bp_id_for_item(type_id=3293))
+                             self.data_access_object.get_bp_id_for_type_id(type_id=3293))
 
     def test_get_lst_mat_for_rfn(self):
         '''
