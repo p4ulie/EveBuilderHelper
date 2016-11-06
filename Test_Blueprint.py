@@ -14,6 +14,9 @@ from EveOnline.EveOnlineBlueprint import EveOnlineBlueprint
 from EveOnline.EveOnlineManufacturingJob import EveOnlineManufacturingJob
 from EveOnline.EveOnlineRamAssemblyLineTypes import EveOnlineRamAssemblyLineTypes
 
+from DataAccess.MarketAccessEveCentral import MarketAccessEveCentral
+from DataAccess.EveMarket import EveMarket
+
 DATA_FILE = 'data/eve.db'
 
 BUILD_PRODUCT_NAME = 'Nitrogen Fuel Block'
@@ -150,6 +153,14 @@ def main():
     for mat in refining_list:
         print ("material: %s, quantity: %d" % (DATA_ACCESS_OBJECT.get_inv_type(mat['material_type_id'])['type_name'],
                                                mat['quantity']))
+
+    market = EveMarket(MarketAccessEveCentral())
+
+    print market.market_access_obj.get_marketstats(type_id=34,use_system=30000142)[0]['buy']['max']
+    print market.get_price(type_id=34,
+                           solar_system_id=30000142,
+                           price_type='buy',
+                           price_param='max')
 
 if __name__ == '__main__':
     DB_ACCESS_OBJECT = DBAccessSQLite(DATA_FILE)
