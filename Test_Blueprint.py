@@ -5,6 +5,7 @@ Created on 17.6.2014
 '''
 
 import re
+import json
 
 from DataAccess.DBAccessSQLite import DBAccessSQLite
 from DataAccess.EveDB import EveDB
@@ -23,7 +24,7 @@ locale.setlocale(locale.LC_ALL, 'en_US.utf8')
 
 DATA_FILE = 'data/eve.db'
 
-BUILD_PRODUCT_NAME = 'Vexor'
+BUILD_PRODUCT_NAME = 'Providence'
 #BUILD_FACILITY = 'Large Ship Assembly Array'
 #BUILD_PRODUCT_NAME = 'Capital Cargo Bay'
 BUILD_FACILITY = 'STATION manufacturing'
@@ -171,7 +172,8 @@ def main():
     #     print ("material: %s, quantity: %d" % (DATA_ACCESS_OBJECT.get_inv_type(mat['material_type_id'])['type_name'],
     #                                            mat['quantity']))
 
-
+    print json.dumps(building_job_chain.get_manufacturing_job_parameter_list(),
+                     indent=2)
 
 if __name__ == '__main__':
     DB_ACCESS_OBJECT = DBAccessSQLite(DATA_FILE)
