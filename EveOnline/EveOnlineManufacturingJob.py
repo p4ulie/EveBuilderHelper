@@ -116,7 +116,7 @@ class EveOnlineManufacturingJob(EveOnlineBlueprint):
                             self.material_list.append(material)
 
                         if material.is_buildable():
-                            print ("material.blueprint_produced_quantity: %d" % material.blueprint_produced_quantity)
+                            # print ("material.blueprint_produced_quantity: %d" % material.blueprint_produced_quantity)
                             material.manufacturing_runs = manufacturing_quantity / material.blueprint_produced_quantity
                         else:
                             material.manufacturing_runs = manufacturing_quantity
